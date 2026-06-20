@@ -1,0 +1,46 @@
+{
+  "name": "ultra-extra-more-genius-thinking",
+  "version": "1.6.0",
+  "description": "MCP server: iteratif ultra-deep thinking — dadik modelleri bile çok tur düşündürerek kaliteyi artırır.",
+  "type": "module",
+  "main": "./dist/server.js",
+  "bin": {
+    "ultra-thinking": "./dist/cli/index.js",
+    "ultra-thinking-mcp": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "test": "npm run build && node --test test/*.mjs",
+    "mcp-config": "node dist/cli/index.js mcp-config"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "cursor-mcp.example.json",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "cursor",
+    "vscode",
+    "antigravity",
+    "thinking",
+    "reasoning",
+    "deep-thinking"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

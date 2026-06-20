@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tavus Kuşu — Pavo cristatus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0f0c;
+      font-family: "Georgia", "Times New Roman", serif;
+    }
+    .stage {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(20, 60, 40, 0.6) 0%, transparent 70%),
+        radial-gradient(ellipse 120% 80% at 50% 0%, #1a2830 0%, #0d1210 45%, #060908 100%);
+    }
+    svg {
+      width: min(96vw, 1400px);
+      height: min(96vh, 900px);
+      filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.55));
+    }
+    .caption {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(200, 220, 210, 0.55);
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg" aria-label="Gerçekçi tavus kuşu illüstrasyonu">
+      <defs>
+        <!-- Arka plan -->
+        <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#2a3d4a"/>
+          <stop offset="35%" stop-color="#1e2e28"/>
+          <stop offset="100%" stop-color="#0f1812"/>
+        </linearGradient>
+        <radialGradient id="sunGlow" cx="78%" cy="18%" r="35%">
+          <stop offset="0%" stop-color="#fff8e8" stop-opacity="0.35"/>
+          <stop offset="40%" stop-color="#ffd98a" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#ffd98a" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1a3020" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#0a140c"/>
+        </linearGradient>
+
+        <!-- Gövde — iriyez yeşil-mavi -->
+        <linearGradient id="bodySheen" x1="20%" y1="10%" x2="80%" y2="90%">
+          <stop offset="0%" stop-color="#1a5a72"/>
+          <stop offset="25%" stop-color="#0e3d52"/>
+          <stop offset="50%" stop-color="#1a7088"/>
+          <stop offset="75%" stop-color="#0a3040"/>
+          <stop offset="100%" stop-color="#062028"/>
+        </linearGradient>
+        <linearGradient id="neckSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2a8a9a"/>
+          <stop offset="40%" stop-color="#1a6070"/>
+          <stop offset="100%" stop-color="#0c3848"/>
+        </linearGradient>
+        <radialGradient id="breastGlow" cx="40%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="#3aaabb" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#0e4858" stop-opacity="1"/>
+        </radialGradient>
+
+        <!-- Taç tüyleri -->
+        <linearGradient id="crestGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#1a5060"/>
+          <stop offset="100%" stop-color="#60c8d8"/>
+        </linearGradient>
+
+        <!-- Kuyruk tüyü — ocellus (göz lekesi) -->
+        <radialGradient id="ocellusOuter" cx="50%" cy="45%" r="50%">
+          <stop offset="0%" stop-color="#c8a030"/>
+          <stop offset="35%" stop-color="#8a6018"/>
+          <stop offset="55%" stop-color="#1a5080"/>
+          <stop offset="72%" stop-color="#0a2848"/>
+          <stop offset="88%" stop-color="#206888"/>
+          <stop offset="100%" stop-color="#0a2030"/>
+        </radialGradient>
+        <radialGradient id="ocellusInner" cx="48%" cy="42%" r="28%">
+          <stop offset="0%" stop-color="#102030"/>
+          <stop offset="55%" stop-color="#081018"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+        <radialGradient id="ocellusHighlight" cx="35%" cy="30%" r="20%">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="featherBarb" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1a6888"/>
+          <stop offset="30%" stop-color="#0a3858"/>
+          <stop offset="70%" stop-color="#206878"/>
+          <stop offset="100%" stop-color="#082838"/>
+        </linearGradient>
+        <linearGradient id="featherGold" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#d4a830"/>
+          <stop offset="50%" stop-color="#a07820"/>
+          <stop offset="100%" stop-color="#604810"/>
+        </linearGradient>
+        <linearGradient id="trainFeather" x1="50%" y1="0%" x2="50%" y2="100%">
+          <stop offset="0%" stop-color="#287898"/>
+          <stop offset="40%" stop-color="#1a5870"/>
+          <stop offset="100%" stop-color="#0a2838"/>
+        </linearGradient>
+
+        <!-- Bacak -->
+        <linearGradient id="legGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#6a5040"/>
+          <stop offset="50%" stop-color="#9a7860"/>
+          <stop offset="100%" stop-color="#5a4030"/>
+        </linearGradient>
+
+        <!-- Filtreler -->
+        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.35"/>
+        </filter>
+        <filter id="featherTexture" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="12" result="noise"/>
+          <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+          <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="textured"/>
+          <feComponentTransfer in="textured">
+            <feFuncA type="linear" slope="0.08" intercept="0.92"/>
+          </feComponentTransfer>
+        </filter>
+        <filter id="iridescent" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" seed="5" result="turb"/>
+          <feDisplacementMap in="SourceGraphic" in2="turb" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Tüy deseni -->
+        <pattern id="barbPattern" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" stroke-opacity="0.04" stroke-width="0.5"/>
+        </pattern>
+
+        <!-- Tek ocellus sembolü -->
+        <symbol id="ocellus" viewBox="0 0 120 160">
+          <ellipse cx="60" cy="72" rx="52" ry="68" fill="url(#ocellusOuter)"/>
+          <ellipse cx="60" cy="72" rx="38" ry="50" fill="none" stroke="#c89828" stroke-width="2.5" opacity="0.85"/>
+          <ellipse cx="60" cy="72" rx="28" ry="36" fill="url(#ocellusInner)"/>
+          <ellipse cx="60" cy="72" rx="18" ry="22" fill="#040810"/>
+          <ellipse cx="48" cy="58" rx="8" ry="6" fill="url(#ocellusHighlight)"/>
+          <path d="M60 140 Q60 110 58 90" fill="none" stroke="#1a5068" stroke-width="3" stroke-linecap="round"/>
+          <path d="M52 95 Q48 75 50 55" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+          <path d="M68 95 Q72 75 70 55" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+        </symbol>
+
+        <!-- Uzun kuyruk tüyü -->
+        <symbol id="trainPlume" viewBox="0 0 40 200">
+          <path d="M20 200 C18 150 14 100 20 50 C22 30 18 10 20 0 C22 10 26 30 24 50 C30 100 22 150 20 200Z"
+                fill="url(#trainFeather)" stroke="#0a2030" stroke-width="0.5" stroke-opacity="0.4"/>
+          <path d="M20 200 C19 140 17 80 20 20" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="0.8"/>
+        </symbol>
+      </defs>
+
+      <!-- Arka plan manzara -->
+      <rect width="1400" height="900" fill="url(#skyGrad)"/>
+      <rect width="1400" height="900" fill="url(#sunGlow)"/>
+      <!-- Uzak tepeler -->
+      <path d="M0 620 Q200 520 400 580 T800 540 T1200 590 T1400 560 L1400 900 L0 900Z" fill="#152820" opacity="0.7"/>
+      <path d="M0 680 Q300 600 600 650 T1100 620 T1400 660 L1400 900 L0 900Z" fill="#0e1e14" opacity="0.85"/>
+      <!-- Çimen -->
+      <rect x="0" y="720" width="1400" height="180" fill="url(#groundGrad)"/>
+      <g opacity="0.35">
+        <ellipse cx="180" cy="780" rx="120" ry="18" fill="#1a4028"/>
+        <ellipse cx="520" cy="810" rx="90" ry="14" fill="#143820"/>
+        <ellipse cx="980" cy="795" rx="140" ry="16" fill="#1a3828"/>
+        <ellipse cx="1250" cy="820" rx="80" ry="12" fill="#122818"/>
+      </g>
+      <!-- Bulutlar -->
+      <g opacity="0.18" fill="#d8e8f0">
+        <ellipse cx="1050" cy="120" rx="90" ry="28"/>
+        <ellipse cx="1100" cy="115" rx="60" ry="22"/>
+        <ellipse cx="990" cy="118" rx="50" ry="20"/>
+        <ellipse cx="280" cy="90" rx="70" ry="20"/>
+        <ellipse cx="320" cy="85" rx="45" ry="16"/>
+      </g>
+
+      <!-- Gölge -->
+      <ellipse cx="620" cy="848" rx="280" ry="28" fill="#000" opacity="0.28"/>
+
+      <!-- KUYRUK TÜYLERİ (arkada) -->
+      <g id="tail-fan" filter="url(#softShadow)">
+        <!-- Alt katman — ince uzun tüyler -->
+        <g opacity="0.75">
+          <use href="#trainPlume" x="380" y="380" width="28" height="140" transform="rotate(-72 394 520)"/>
+          <use href="#trainPlume" x="420" y="360" width="30" height="150" transform="rotate(-58 435 510)"/>
+          <use href="#trainPlume" x="460" y="350" width="32" height="155" transform="rotate(-44 476 505)"/>
+          <use href="#trainPlume" x="500" y="340" width="34" height="160" transform="rotate(-30 517 500)"/>
+          <use href="#trainPlume" x="540" y="335" width="34" height="162" transform="rotate(-16 557 497)"/>
+          <use href="#trainPlume" x="580" y="332" width="34" height="165" transform="rotate(-2 597 497)"/>
+          <use href="#trainPlume" x="620" y="335" width="34" height="162" transform="rotate(12 637 497)"/>
+          <use href="#trainPlume" x="660" y="340" width="34" height="160" transform="rotate(26 677 500)"/>
+          <use href="#trainPlume" x="700" y="350" width="32" height="155" transform="rotate(40 716 505)"/>
+          <use href="#trainPlume" x="740" y="360" width="30" height="150" transform="rotate(54 755 510)"/>
+          <use href="#trainPlume" x="780" y="380" width="28" height="140" transform="rotate(68 794 520)"/>
+        </g>
+
+        <!-- Ocellus tüyleri — dış halka -->
+        <g filter="url(#featherTexture)">
+          <use href="#ocellus" x="310" y="200" width="100" height="133" transform="rotate(-68 360 333)"/>
+          <use href="#ocellus" x="355" y="165" width="108" height="144" transform="rotate(-54 409 309)"/>
+          <use href="#ocellus" x="400" y="135" width="115" height="153" transform="rotate(-40 457 289)"/>
+          <use href="#ocellus" x="450" y="110" width="120" height="160" transform="rotate(-26 510 270)"/>
+          <use href="#ocellus" x="500" y="92" width="125" height="167" transform="rotate(-12 562 258)"/>
+          <use href="#ocellus" x="555" y="80" width="128" height="171" transform="rotate(0 619 250)"/>
+          <use href="#ocellus" x="610" y="80" width="128" height="171" transform="rotate(0 674 250)"/>
+          <use href="#ocellus" x="665" y="92" width="125" height="167" transform="rotate(12 727 258)"/>
+          <use href="#ocellus" x="715" y="110" width="120" height="160" transform="rotate(26 775 270)"/>
+          <use href="#ocellus" x="760" y="135" width="115" height="153" transform="rotate(40 817 289)"/>
+          <use href="#ocellus" x="805" y="165" width="108" height="144" transform="rotate(54 859 309)"/>
+          <use href="#ocellus" x="850" y="200" width="100" height="133" transform="rotate(68 900 333)"/>
+        </g>
+
+        <!-- Üst ocellus — merkez, en büyük -->
+        <g filter="url(#glow)">
+          <use href="#ocellus" x="530" y="55" width="135" height="180" transform="rotate(-6 597 190)"/>
+          <use href="#ocellus" x="600" y="50" width="140" height="187" transform="rotate(4 670 188)"/>
+        </g>
+
+        <!-- Altın kenar detayları -->
+        <g fill="none" stroke="url(#featherGold)" stroke-width="1.2" opacity="0.5">
+          <path d="M360 340 Q400 280 440 240"/>
+          <path d="M420 320 Q470 250 520 210"/>
+          <path d="M480 300 Q540 220 600 180"/>
+          <path d="M540 290 Q620 200 680 170"/>
+          <path d="M600 290 Q680 200 740 170"/>
+          <path d="M660 300 Q720 220 780 210"/>
+          <path d="M720 320 Q770 250 820 240"/>
+          <path d="M780 340 Q820 280 860 260"/>
+        </g>
+      </g>
+
+      <!-- GÖVDE -->
+      <g id="body" filter="url(#softShadow)">
+        <!-- Kanat (kapalı) -->
+        <path d="M520 520 C480 500 440 510 420 540 C410 560 415 590 440 610 C470 630 510 620 540 590 C560 570 555 545 520 520Z"
+              fill="url(#bodySheen)" stroke="#062028" stroke-width="1" opacity="0.95"/>
+        <path d="M430 545 C450 530 480 525 510 535" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1.5"/>
+        <!-- Kanat tüyleri -->
+        <g stroke="#0a3040" stroke-width="0.8" fill="none" opacity="0.5">
+          <path d="M435 555 L455 545"/>
+          <path d="M440 570 L465 558"/>
+          <path d="M448 585 L475 572"/>
+          <path d="M458 598 L488 582"/>
+          <path d="M472 608 L505 590"/>
+        </g>
+
+        <!-- Göğüs -->
+        <ellipse cx="560" cy="555" rx="55" ry="70" fill="url(#breastGlow)" filter="url(#iridescent)"/>
+        <ellipse cx="545" cy="530" rx="35" ry="45" fill="url(#neckSheen)" opacity="0.6"/>
+
+        <!-- Boyun -->
+        <path d="M555 490 C545 460 548 420 560 390 C568 370 575 355 580 340"
+              fill="none" stroke="url(#neckSheen)" stroke-width="38" stroke-linecap="round"/>
+        <path d="M555 490 C545 460 548 420 560 390 C568 370 575 355 580 340"
+              fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="12" stroke-linecap="round"/>
+        <!-- Boyun tüy çizgileri -->
+        <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="0.8" fill="none">
+          <path d="M552 480 Q548 450 558 420"/>
+          <path d="M558 478 Q556 448 564 418"/>
+          <path d="M564 476 Q564 446 570 416"/>
+          <path d="M570 474 Q572 444 576 414"/>
+        </g>
+
+        <!-- Kafa -->
+        <ellipse cx="582" cy="318" rx="22" ry="26" fill="url(#neckSheen)" filter="url(#iridescent)"/>
+        <!-- Göz -->
+        <ellipse cx="592" cy="312" rx="5" ry="6" fill="#0a1018"/>
+        <ellipse cx="593" cy="310" rx="2" ry="2.5" fill="#ffffff" opacity="0.85"/>
+        <!-- Gaga -->
+        <path d="M598 322 C610 324 618 328 620 332 C615 334 605 333 598 328Z" fill="#2a2018"/>
+        <path d="M598 322 C610 324 618 328 620 332" fill="none" stroke="#1a1008" stroke-width="0.8"/>
+        <!-- Taç (crest) -->
+        <g fill="url(#crestGrad)" filter="url(#softShadow)">
+          <path d="M572 298 C568 270 560 248 558 230 C562 252 566 272 570 290Z"/>
+          <path d="M580 295 C576 265 574 240 576 218 C580 242 582 268 584 288Z"/>
+          <path d="M588 296 C586 262 588 235 592 212 C594 238 594 264 592 290Z"/>
+          <path d="M596 298 C598 268 602 242 608 222 C604 248 600 272 598 292Z"/>
+          <path d="M604 302 C610 275 618 252 626 238 C616 258 608 280 602 298Z"/>
+        </g>
+        <!-- Taç uçları — mavi noktalar -->
+        <g fill="#5ac8e0">
+          <circle cx="558" cy="228" r="3.5"/>
+          <circle cx="576" cy="216" r="3.5"/>
+          <circle cx="592" cy="210" r="3.5"/>
+          <circle cx="608" cy="220" r="3.5"/>
+          <circle cx="626" cy="236" r="3.5"/>
+        </g>
+
+        <!-- Gövde alt -->
+        <path d="M540 590 C520 620 510 660 520 700 C530 730 560 750 590 745 C620 740 640 710 635 670 C630 630 600 600 560 580Z"
+              fill="url(#bodySheen)" filter="url(#featherTexture)"/>
+        <path d="M545 600 C535 640 540 680 560 710" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="2"/>
+
+        <!-- Kuyruk kökü (kısa tüyler) -->
+        <g fill="#1a5870" opacity="0.8">
+          <ellipse cx="530" cy="620" rx="8" ry="18" transform="rotate(-30 530 620)"/>
+          <ellipse cx="545" cy="615" rx="8" ry="20" transform="rotate(-10 545 615)"/>
+          <ellipse cx="560" cy="612" rx="8" ry="22"/>
+          <ellipse cx="575" cy="615" rx="8" ry="20" transform="rotate(10 575 615)"/>
+          <ellipse cx="590" cy="620" rx="8" ry="18" transform="rotate(30 590 620)"/>
+        </g>
+      </g>
+
+      <!-- Bacaklar -->
+      <g id="legs">
+        <path d="M555 740 C552 780 548 820 545 845" fill="none" stroke="url(#legGrad)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M585 740 C588 780 592 820 595 845" fill="none" stroke="url(#legGrad)" stroke-width="7" stroke-linecap="round"/>
+        <!-- Diz eklemi -->
+        <circle cx="548" cy="790" r="4" fill="#7a6050"/>
+        <circle cx="590" cy="790" r="4" fill="#7a6050"/>
+        <!-- Ayak parmakları -->
+        <g stroke="#5a4030" stroke-width="2.5" stroke-linecap="round" fill="none">
+          <path d="M545 845 L535 855 M545 845 L545 858 M545 845 L555 854"/>
+          <path d="M595 845 L585 854 M595 845 L595 858 M595 845 L605 855"/>
+        </g>
+        <!-- Arka parmak (spur yok — dişi veya genç erkek görünümü yerine klasik erkek) -->
+        <path d="M538 845 L528 850" stroke="#5a4030" stroke-width="2" stroke-linecap="round"/>
+        <path d="M602 845 L612 850" stroke="#5a4030" stroke-width="2" stroke-linecap="round"/>
+      </g>
+
+      <!-- Ön plan bitki detayı -->
+      <g opacity="0.45">
+        <path d="M80 850 Q90 780 70 720 Q85 760 95 820 Q100 780 110 740 Q105 790 120 850Z" fill="#1a4828"/>
+        <path d="M1300 860 Q1290 790 1310 730 Q1295 770 1285 830 Q1280 790 1270 750 Q1275 800 1260 860Z" fill="#143820"/>
+        <ellipse cx="95" cy="855" rx="35" ry="8" fill="#0a2010" opacity="0.5"/>
+        <ellipse cx="1285" cy="858" rx="30" ry="7" fill="#0a2010" opacity="0.5"/>
+      </g>
+
+      <!-- Işık vurgusu -->
+      <ellipse cx="900" cy="200" rx="200" ry="120" fill="#fff8e0" opacity="0.04"/>
+    </svg>
+  </div>
+  <p class="caption">Pavo cristatus — Hint tavus kuşu</p>
+</body>
+</html>

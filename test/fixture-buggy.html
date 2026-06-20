@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Sayfa</title>
+  <style>
+    .btn { background: #00f; color: #00f; padding: 8px; }
+    #hero { height: 100vh; background: url(javascript:alert(1)); }
+  </style>
+</head>
+<body>
+  <div id="hero">
+    <h1>Hoşgeldin</h1>
+    <img src="logo.png">
+    <button class="btn" onclick="submit()">Gönder</button>
+  </div>
+  <form action="/api/contact" method="GET">
+    <input type="text" name="email" placeholder="email">
+    <input type="submit" value="OK">
+  </form>
+  <script>
+    function submit() {
+      var x = document.querySelector('input').value;
+      document.body.innerHTML = "Merhaba " + x;
+    }
+  </script>
+</body>
+</html>

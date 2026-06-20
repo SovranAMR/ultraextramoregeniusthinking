@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tavus Kuşu — Pavo cristatus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a1628;
+      font-family: "Georgia", "Times New Roman", serif;
+    }
+    .stage {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .caption {
+      color: rgba(220, 230, 210, 0.75);
+      font-size: clamp(11px, 1.4vw, 14px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 0.6rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+    svg.peacock {
+      width: min(96vw, 1180px);
+      height: min(88vh, 820px);
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,0.45));
+    }
+    .shimmer {
+      animation: iridescence 8s ease-in-out infinite;
+    }
+    @keyframes iridescence {
+      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+      33% { filter: hue-rotate(6deg) brightness(1.04); }
+      66% { filter: hue-rotate(-4deg) brightness(1.02); }
+    }
+    .train-feather {
+      transform-origin: 580px 520px;
+      animation: featherSway 6s ease-in-out infinite;
+    }
+    .train-feather:nth-child(odd) { animation-delay: -1.2s; }
+    .train-feather:nth-child(3n) { animation-delay: -2.8s; }
+    @keyframes featherSway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(0.35deg); }
+    }
+    .crest-tip { animation: crestBob 4s ease-in-out infinite; transform-origin: center bottom; }
+    @keyframes crestBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1.5px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <svg class="peacock" viewBox="0 0 1180 820" xmlns="http://www.w3.org/2000/svg" aria-label="Gerçekçi tavus kuşu illüstrasyonu — Pavo cristatus">
+      <defs>
+        <!-- Sky & meadow -->
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a3a5c"/>
+          <stop offset="45%" stop-color="#4a7a9a"/>
+          <stop offset="72%" stop-color="#8cb4a0"/>
+          <stop offset="100%" stop-color="#3d6b3a"/>
+        </linearGradient>
+        <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a8f42"/>
+          <stop offset="100%" stop-color="#2a5a28"/>
+        </linearGradient>
+        <radialGradient id="sunGlow" cx="78%" cy="18%" r="35%">
+          <stop offset="0%" stop-color="rgba(255,240,180,0.55)"/>
+          <stop offset="100%" stop-color="rgba(255,240,180,0)"/>
+        </radialGradient>
+
+        <!-- Body iridescence -->
+        <radialGradient id="breastGrad" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#6ef0d8"/>
+          <stop offset="25%" stop-color="#1a9a8a"/>
+          <stop offset="55%" stop-color="#0d5a72"/>
+          <stop offset="85%" stop-color="#083848"/>
+          <stop offset="100%" stop-color="#062830"/>
+        </radialGradient>
+        <linearGradient id="neckScaleGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0e6a58"/>
+          <stop offset="40%" stop-color="#1ab898"/>
+          <stop offset="70%" stop-color="#0a4870"/>
+          <stop offset="100%" stop-color="#063848"/>
+        </linearGradient>
+        <radialGradient id="bodyBronze" cx="40%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="#8a6840"/>
+          <stop offset="45%" stop-color="#5a4028"/>
+          <stop offset="100%" stop-color="#2a1810"/>
+        </radialGradient>
+        <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a5848"/>
+          <stop offset="50%" stop-color="#0a3848"/>
+          <stop offset="100%" stop-color="#061820"/>
+        </linearGradient>
+
+        <!-- Ocellus (eye spot) -->
+        <radialGradient id="ocellusCore" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#0a0810"/>
+          <stop offset="18%" stop-color="#1a1020"/>
+          <stop offset="28%" stop-color="#1a5088"/>
+          <stop offset="42%" stop-color="#2088c8"/>
+          <stop offset="58%" stop-color="#c89830"/>
+          <stop offset="72%" stop-color="#a87818"/>
+          <stop offset="88%" stop-color="#287848"/>
+          <stop offset="100%" stop-color="#1a5038"/>
+        </radialGradient>
+        <linearGradient id="featherBarb" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a6848"/>
+          <stop offset="40%" stop-color="#0a4838"/>
+          <stop offset="100%" stop-color="#062818"/>
+        </linearGradient>
+
+        <!-- Head -->
+        <radialGradient id="headBlue" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#3ab8d8"/>
+          <stop offset="50%" stop-color="#1868a0"/>
+          <stop offset="100%" stop-color="#0a2848"/>
+        </radialGradient>
+        <linearGradient id="beakGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#c8c0b0"/>
+          <stop offset="100%" stop-color="#686058"/>
+        </linearGradient>
+        <radialGradient id="eyeWhite" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f8f8f0"/>
+          <stop offset="100%" stop-color="#d0d0c8"/>
+        </radialGradient>
+
+        <!-- Filters -->
+        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.35"/>
+        </filter>
+        <filter id="featherTexture" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04 0.8" numOctaves="3" seed="7" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="specularBody" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+          <feSpecularLighting in="blur" surfaceScale="3" specularConstant="0.9" specularExponent="28" lighting-color="#a0f0e0" result="spec">
+            <fePointLight x="200" y="100" z="180"/>
+          </feSpecularLighting>
+          <feComposite in="spec" in2="SourceGraphic" operator="in" result="specOut"/>
+          <feBlend in="SourceGraphic" in2="specOut" mode="screen"/>
+        </filter>
+
+        <!-- Scale pattern for neck -->
+        <pattern id="neckScales" x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse">
+          <path d="M7,1 Q12,6 7,11 Q2,6 7,1" fill="none" stroke="rgba(20,120,100,0.45)" stroke-width="0.8"/>
+          <ellipse cx="7" cy="6" rx="4" ry="3.5" fill="url(#neckScaleGrad)" opacity="0.85"/>
+          <ellipse cx="7" cy="5" rx="2" ry="1.2" fill="rgba(160,240,220,0.25)"/>
+        </pattern>
+
+        <!-- Grass blades -->
+        <pattern id="grassPattern" x="0" y="0" width="28" height="24" patternUnits="userSpaceOnUse">
+          <path d="M4,24 Q6,12 5,0" stroke="#2a6828" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <path d="M14,24 Q16,10 15,2" stroke="#3a8838" stroke-width="1" fill="none" opacity="0.45"/>
+          <path d="M22,24 Q24,14 23,4" stroke="#1a5820" stroke-width="1.1" fill="none" opacity="0.5"/>
+        </pattern>
+      </defs>
+
+      <!-- Background -->
+      <rect width="1180" height="820" fill="url(#skyGrad)"/>
+      <rect width="1180" height="820" fill="url(#sunGlow)"/>
+      <rect x="0" y="580" width="1180" height="240" fill="url(#groundGrad)"/>
+      <rect x="0" y="600" width="1180" height="220" fill="url(#grassPattern)" opacity="0.6"/>
+
+      <!-- Distant trees -->
+      <ellipse cx="120" cy="560" rx="90" ry="55" fill="#1a4028" opacity="0.5"/>
+      <ellipse cx="980" cy="550" rx="110" ry="60" fill="#1a3820" opacity="0.45"/>
+      <ellipse cx="1050" cy="570" rx="70" ry="40" fill="#224830" opacity="0.4"/>
+
+      <!-- Bronze lower tail coverts (kuyruk alt örtü tüyleri) -->
+      <g opacity="0.92">
+        <path d="M440,540 Q500,520 560,535 Q620,548 600,575 Q540,590 470,565 Q430,555 440,540 Z" fill="#6a5030" stroke="#3a2818" stroke-width="0.5"/>
+        <path d="M455,548 Q510,538 555,548 Q590,558 575,572 Q530,582 480,568 Z" fill="#8a6840" opacity="0.7"/>
+        <path d="M468,555 Q515,548 548,555 Q575,562 562,572 Q520,578 478,568 Z" fill="#a88048" opacity="0.45"/>
+      </g>
+
+      <!-- Train layers (feathers injected by script: back → mid → front) -->
+      <g id="train-back" filter="url(#softShadow)" opacity="0.72"></g>
+      <g id="train-mid" filter="url(#softShadow)" opacity="0.88"></g>
+      <g id="train" filter="url(#softShadow)"></g>
+
+      <!-- Shadow on ground -->
+      <ellipse cx="520" cy="668" rx="220" ry="28" fill="rgba(0,0,0,0.28)"/>
+
+      <!-- Main body group -->
+      <g class="shimmer" filter="url(#specularBody)">
+        <!-- Tail coverts base (under train) -->
+        <path d="M480,510 Q520,480 560,500 Q600,520 580,560 Q540,580 480,540 Z"
+              fill="#1a4030" opacity="0.9"/>
+
+        <!-- Wing & primary remiges -->
+        <path d="M420,480 Q380,440 360,470 Q350,510 380,540 Q430,530 460,510 Q450,490 420,480 Z"
+              fill="url(#wingGrad)" stroke="#061018" stroke-width="0.8"/>
+        <g stroke-linecap="round" fill="none">
+          <path d="M368,478 Q340,455 318,468 Q308,488 328,502" stroke="#0a2838" stroke-width="5" opacity="0.85"/>
+          <path d="M378,488 Q352,468 332,478 Q322,495 342,508" stroke="#0a3040" stroke-width="4.5" opacity="0.8"/>
+          <path d="M388,498 Q365,482 348,488 Q338,502 358,515" stroke="#0a2838" stroke-width="4" opacity="0.75"/>
+          <path d="M398,508 Q378,495 362,498 Q354,510 372,522" stroke="#0a3040" stroke-width="3.5" opacity="0.7"/>
+          <path d="M408,518 Q390,508 375,508 Q368,518 385,528" stroke="#0a2838" stroke-width="3" opacity="0.65"/>
+        </g>
+        <path d="M390,490 Q370,470 365,490 Q375,510 395,515 Z" fill="#0a2838" opacity="0.7"/>
+        <path d="M400,505 Q385,495 382,508 Q392,518 408,512 Z" fill="#0a2838" opacity="0.6"/>
+        <path d="M415,518 Q400,508 398,520 Q408,528 422,522 Z" fill="#0a2838" opacity="0.55"/>
+
+        <!-- Body bronze back -->
+        <ellipse cx="500" cy="530" rx="72" ry="58" fill="url(#bodyBronze)" transform="rotate(-8 500 530)"/>
+        <ellipse cx="488" cy="518" rx="48" ry="38" fill="rgba(180,140,80,0.15)" transform="rotate(-8 488 518)"/>
+
+        <!-- Breast -->
+        <path d="M455,520 Q440,560 470,590 Q520,600 560,570 Q580,540 560,510 Q520,490 480,500 Q460,505 455,520 Z"
+              fill="url(#breastGrad)" stroke="#042830" stroke-width="0.6"/>
+        <g stroke="rgba(30,100,90,0.25)" stroke-width="0.6" fill="none">
+          <path d="M470,530 Q490,525 510,532"/><path d="M465,548 Q495,542 525,548"/>
+          <path d="M472,565 Q505,558 540,562"/><path d="M488,512 Q515,508 542,518"/>
+        </g>
+
+        <!-- Neck -->
+        <path d="M520,500 Q540,460 555,420 Q565,390 570,370 Q575,355 572,340"
+              fill="none" stroke="url(#neckScaleGrad)" stroke-width="38" stroke-linecap="round"/>
+        <path d="M520,500 Q540,460 555,420 Q565,390 570,370 Q575,355 572,340"
+              fill="none" stroke="url(#neckScales)" stroke-width="36" stroke-linecap="round" opacity="0.92"/>
+
+        <!-- Throat highlight -->
+        <path d="M535,490 Q548,450 558,410 Q562,385 560,360"
+              fill="none" stroke="rgba(120,220,200,0.35)" stroke-width="6" stroke-linecap="round"/>
+
+        <!-- Head -->
+        <ellipse cx="568" cy="332" rx="22" ry="26" fill="url(#headBlue)" transform="rotate(-12 568 332)"/>
+
+        <!-- Crest (taç tüyleri) -->
+        <g filter="url(#softShadow)">
+          <path class="crest-tip" d="M558,310 Q552,280 548,248 Q546,230 550,210" stroke="#1868a8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path class="crest-tip" d="M565,308 Q562,275 560,242 Q559,225 562,205" stroke="#2088c0" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path class="crest-tip" d="M572,310 Q574,278 576,245 Q577,228 574,208" stroke="#1868a8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path class="crest-tip" d="M580,312 Q586,282 590,252 Q592,235 588,215" stroke="#145890" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="548" cy="210" r="4" fill="#2898c8"/>
+          <circle cx="562" cy="205" r="4.5" fill="#30a8d8"/>
+          <circle cx="574" cy="208" r="4" fill="#2898c8"/>
+          <circle cx="588" cy="215" r="3.5" fill="#2080b0"/>
+        </g>
+
+        <!-- Eye -->
+        <ellipse cx="578" cy="328" rx="7" ry="8" fill="url(#eyeWhite)" transform="rotate(-8 578 328)"/>
+        <circle cx="580" cy="328" r="4.2" fill="#1a1018"/>
+        <circle cx="581" cy="327" r="1.2" fill="#f0f0e8"/>
+        <ellipse cx="574" cy="322" rx="9" ry="5" fill="none" stroke="#c82020" stroke-width="2.2" opacity="0.85" transform="rotate(-15 574 322)"/>
+
+        <!-- Beak -->
+        <path d="M588,332 Q610,328 618,334 Q612,340 592,342 Q586,338 588,332 Z" fill="url(#beakGrad)" stroke="#484038" stroke-width="0.5"/>
+        <path d="M618,334 Q622,336 620,340 Q614,338 612,335 Z" fill="#888078"/>
+
+        <!-- Nape -->
+        <path d="M548,318 Q538,335 545,348 Q555,342 560,325 Z" fill="#0a4868" opacity="0.8"/>
+      </g>
+
+      <!-- Legs -->
+      <g filter="url(#softShadow)">
+        <path d="M478,585 Q472,620 468,655" stroke="#686048" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M508,590 Q504,625 500,658" stroke="#686048" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <!-- Scales on legs -->
+        <g opacity="0.5" stroke="#504838" stroke-width="0.6" fill="none">
+          <path d="M470,610 Q474,610 478,610"/><path d="M466,625 Q470,625 474,625"/>
+          <path d="M502,615 Q506,615 510,615"/><path d="M498,630 Q502,630 506,630"/>
+        </g>
+        <!-- Feet & toes -->
+        <g fill="#807058" stroke="#504838" stroke-width="0.6">
+          <path d="M468,655 L458,668 L462,668 L468,658 Z"/>
+          <path d="M468,655 L468,672 L472,672 L472,658 Z"/>
+          <path d="M468,655 L478,670 L474,670 L470,660 Z"/>
+          <path d="M500,658 L488,672 L492,672 L498,662 Z"/>
+          <path d="M500,658 L500,674 L504,674 L504,662 Z"/>
+          <path d="M500,658 L512,672 L508,672 L504,662 Z"/>
+          <path d="M468,655 Q455,652 448,655" fill="none" stroke="#686048" stroke-width="2"/>
+          <path d="M500,658 Q513,655 520,658" fill="none" stroke="#686048" stroke-width="2"/>
+        </g>
+        <!-- Spur -->
+        <path d="M472,648 L468,642 L474,646 Z" fill="#908070"/>
+      </g>
+
+      <!-- Foreground grass tufts -->
+      <g opacity="0.85">
+        <path d="M340,680 Q345,650 342,620" stroke="#2a6828" stroke-width="2" fill="none"/>
+        <path d="M350,685 Q358,655 352,625" stroke="#3a8838" stroke-width="1.5" fill="none"/>
+        <path d="M780,675 Q785,645 782,618" stroke="#2a6828" stroke-width="2" fill="none"/>
+        <path d="M792,678 Q798,648 790,622" stroke="#1a5820" stroke-width="1.8" fill="none"/>
+      </g>
+    </svg>
+    <p class="caption">Pavo cristatus — Hint tavus kuşu</p>
+  </div>
+
+  <script>
+    (function renderTrain() {
+      const NS = 'http://www.w3.org/2000/svg';
+      const anchorX = 580;
+      const anchorY = 520;
+      const fanSpread = Math.PI * 0.92;
+      const startAngle = -Math.PI / 2 - fanSpread / 2;
+
+      const layers = [
+        { id: 'train-back', count: 42, lengthBase: 220, lengthAmp: 80, widthBase: 14, ocellus: false, hue: 0 },
+        { id: 'train-mid', count: 52, lengthBase: 260, lengthAmp: 100, widthBase: 16, ocellus: true, hue: 8 },
+        { id: 'train', count: 58, lengthBase: 280, lengthAmp: 120, widthBase: 18, ocellus: true, hue: 0 },
+      ];
+
+      function hueColor(base, shift) {
+        const colors = ['#3090c8', '#2898b0', '#38a878', '#c89830', '#a87818'];
+        const idx = Math.abs(Math.floor(shift)) % colors.length;
+        return colors[idx];
+      }
+
+      function addFeather(parent, i, total, layer) {
+        const t = i / (total - 1);
+        const angle = startAngle + fanSpread * t + (layer.id === 'train-back' ? (t - 0.5) * 0.04 : 0);
+        const length = layer.lengthBase + Math.sin(t * Math.PI) * layer.lengthAmp;
+        const width = layer.widthBase + Math.sin(t * Math.PI) * (layer.widthBase * 0.75);
+        const ocellusScale = 0.55 + Math.sin(t * Math.PI) * 0.55;
+        const tipX = anchorX + Math.cos(angle) * length;
+        const tipY = anchorY + Math.sin(angle) * length;
+        const ctrl1Dist = length * 0.35;
+        const ctrl2Dist = length * 0.72;
+        const perpX = -Math.sin(angle) * width;
+        const perpY = Math.cos(angle) * width;
+
+        const g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'train-feather');
+        g.setAttribute('style', `animation-delay: ${-(t * 4 + layer.hue * 0.01).toFixed(2)}s`);
+
+        const shaft = document.createElementNS(NS, 'line');
+        shaft.setAttribute('x1', anchorX);
+        shaft.setAttribute('y1', anchorY);
+        shaft.setAttribute('x2', tipX);
+        shaft.setAttribute('y2', tipY);
+        shaft.setAttribute('stroke', '#1a3828');
+        shaft.setAttribute('stroke-width', layer.id === 'train' ? '1.2' : '0.9');
+        shaft.setAttribute('opacity', '0.65');
+        g.appendChild(shaft);
+
+        const c1x = anchorX + Math.cos(angle) * ctrl1Dist + perpX * 0.3;
+        const c1y = anchorY + Math.sin(angle) * ctrl1Dist + perpY * 0.3;
+        const c2x = anchorX + Math.cos(angle) * ctrl2Dist + perpX;
+        const c2y = anchorY + Math.sin(angle) * ctrl2Dist + perpY;
+        const c2xR = anchorX + Math.cos(angle) * ctrl2Dist - perpX;
+        const c2yR = anchorY + Math.sin(angle) * ctrl2Dist - perpY;
+        const c1xR = anchorX + Math.cos(angle) * ctrl1Dist - perpX * 0.3;
+        const c1yR = anchorY + Math.sin(angle) * ctrl1Dist - perpY * 0.3;
+
+        const featherPath = document.createElementNS(NS, 'path');
+        featherPath.setAttribute('d',
+          `M ${anchorX} ${anchorY} ` +
+          `Q ${c1x} ${c1y} ${tipX + perpX * 0.15} ${tipY + perpY * 0.15} ` +
+          `Q ${c2x} ${c2y} ${tipX} ${tipY} ` +
+          `Q ${c2xR} ${c2yR} ${tipX - perpX * 0.15} ${tipY - perpY * 0.15} ` +
+          `Q ${c1xR} ${c1yR} ${anchorX} ${anchorY} Z`
+        );
+        featherPath.setAttribute('fill', layer.ocellus ? 'url(#featherBarb)' : '#1a4838');
+        featherPath.setAttribute('stroke', '#0a2018');
+        featherPath.setAttribute('stroke-width', '0.4');
+        featherPath.setAttribute('opacity', (0.78 + t * 0.15).toFixed(2));
+        if (layer.id === 'train') featherPath.setAttribute('filter', 'url(#featherTexture)');
+        g.appendChild(featherPath);
+
+        const barbCount = layer.id === 'train-back' ? 5 : 9;
+        for (let b = 1; b < barbCount; b++) {
+          const bt = b / barbCount;
+          const bx = anchorX + Math.cos(angle) * length * bt;
+          const by = anchorY + Math.sin(angle) * length * bt;
+          const bw = width * (1 - bt * 0.35);
+          const barb = document.createElementNS(NS, 'line');
+          barb.setAttribute('x1', bx - Math.sin(angle) * bw);
+          barb.setAttribute('y1', by + Math.cos(angle) * bw);
+          barb.setAttribute('x2', bx + Math.sin(angle) * bw);
+          barb.setAttribute('y2', by - Math.cos(angle) * bw);
+          barb.setAttribute('stroke', '#143828');
+          barb.setAttribute('stroke-width', '0.45');
+          barb.setAttribute('opacity', '0.38');
+          g.appendChild(barb);
+        }
+
+        // Filament tips
+        for (let f = 0; f < 5; f++) {
+          const ft = 0.88 + f * 0.025;
+          const fx = anchorX + Math.cos(angle) * length * ft;
+          const fy = anchorY + Math.sin(angle) * length * ft;
+          const fil = document.createElementNS(NS, 'line');
+          const spread = (f - 2) * 2.5;
+          fil.setAttribute('x1', fx);
+          fil.setAttribute('y1', fy);
+          fil.setAttribute('x2', fx + Math.cos(angle + 0.08) * 12 + spread);
+          fil.setAttribute('y2', fy + Math.sin(angle + 0.08) * 12);
+          fil.setAttribute('stroke', '#1a5038');
+          fil.setAttribute('stroke-width', '0.35');
+          fil.setAttribute('opacity', '0.5');
+          g.appendChild(fil);
+        }
+
+        if (layer.ocellus) {
+          const ox = anchorX + Math.cos(angle) * length * 0.58;
+          const oy = anchorY + Math.sin(angle) * length * 0.58;
+          const or = 22 * ocellusScale * (layer.id === 'train-mid' ? 0.88 : 1);
+          const rot = (angle * 180 / Math.PI + 90).toFixed(1);
+          const ringColor = hueColor('#3090c8', i + layer.hue);
+
+          const bronze = document.createElementNS(NS, 'ellipse');
+          bronze.setAttribute('cx', ox);
+          bronze.setAttribute('cy', oy);
+          bronze.setAttribute('rx', or * 1.35);
+          bronze.setAttribute('ry', or * 1.18);
+          bronze.setAttribute('fill', 'none');
+          bronze.setAttribute('stroke', '#b89028');
+          bronze.setAttribute('stroke-width', (3 * ocellusScale).toFixed(1));
+          bronze.setAttribute('opacity', '0.75');
+          bronze.setAttribute('transform', `rotate(${rot} ${ox} ${oy})`);
+          g.appendChild(bronze);
+
+          const ocellusOuter = document.createElementNS(NS, 'ellipse');
+          ocellusOuter.setAttribute('cx', ox);
+          ocellusOuter.setAttribute('cy', oy);
+          ocellusOuter.setAttribute('rx', or * 1.15);
+          ocellusOuter.setAttribute('ry', or);
+          ocellusOuter.setAttribute('fill', 'url(#ocellusCore)');
+          ocellusOuter.setAttribute('transform', `rotate(${rot} ${ox} ${oy})`);
+          g.appendChild(ocellusOuter);
+
+          const ocellusRing = document.createElementNS(NS, 'ellipse');
+          ocellusRing.setAttribute('cx', ox);
+          ocellusRing.setAttribute('cy', oy);
+          ocellusRing.setAttribute('rx', or * 0.55);
+          ocellusRing.setAttribute('ry', or * 0.48);
+          ocellusRing.setAttribute('fill', 'none');
+          ocellusRing.setAttribute('stroke', ringColor);
+          ocellusRing.setAttribute('stroke-width', (2.5 * ocellusScale).toFixed(1));
+          ocellusRing.setAttribute('opacity', '0.92');
+          ocellusRing.setAttribute('transform', `rotate(${rot} ${ox} ${oy})`);
+          g.appendChild(ocellusRing);
+
+          const ocellusPupil = document.createElementNS(NS, 'circle');
+          ocellusPupil.setAttribute('cx', ox);
+          ocellusPupil.setAttribute('cy', oy);
+          ocellusPupil.setAttribute('r', or * 0.18);
+          ocellusPupil.setAttribute('fill', '#080810');
+          g.appendChild(ocellusPupil);
+
+          const ocellusShine = document.createElementNS(NS, 'circle');
+          ocellusShine.setAttribute('cx', ox + or * 0.12);
+          ocellusShine.setAttribute('cy', oy - or * 0.1);
+          ocellusShine.setAttribute('r', or * 0.06);
+          ocellusShine.setAttribute('fill', 'rgba(255,255,255,0.38)');
+          g.appendChild(ocellusShine);
+        }
+
+        parent.appendChild(g);
+      }
+
+      layers.forEach(function (layer) {
+        const el = document.getElementById(layer.id);
+        if (!el) return;
+        for (let i = 0; i < layer.count; i++) {
+          addFeather(el, i, layer.count, layer);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

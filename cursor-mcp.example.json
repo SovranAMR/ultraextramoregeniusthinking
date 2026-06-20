@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ultra-thinking": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/to/ultraextramoregeniusthinking/dist/server.js"]
+    }
+  }
+}
