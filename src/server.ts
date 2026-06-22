@@ -25,7 +25,9 @@ import { getPassFocus } from "./thinking/pass-focus.js";
 import {
   validatePassAnswer,
   buildMetaRejectionMessage,
+  buildStagnationRejectionMessage,
 } from "./thinking/answer-guard.js";
+import { detectLocale } from "./thinking/locale/index.js";
 
 const MODE_SCHEMA = z.enum(MODE_ENUM);
 const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
@@ -150,7 +152,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
       content: [
         {
           type: "text" as const,
-          text: buildMetaRejectionMessage(validation, nextPassNumber),
+          text: buildMetaRejectionMessage(validation, nextPassNumber, session.language),
         },
       ],
       isError: true,
@@ -163,14 +165,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
       content: [
         {
           type: "text" as const,
-          text: [
-            `# RED — Pass ${nextPassNumber} cevabı öncekiyle aynı`,
-            ``,
-            readCopy
-              ? `Anti-stagnation: read pass önceki pass ile içerik tekrarı — dosya referansı yeterli değil.`
-              : `Anti-stagnation: önceki pass ile birebir aynı cevap gönderilemez.`,
-            `Bu pass'in odağına göre somut yeni iyileştirme yap, sonra think_next tekrar çağır.`,
-          ].join("\n"),
+          text: buildStagnationRejectionMessage(nextPassNumber, readCopy, session.language),
         },
       ],
       isError: true,
@@ -271,7 +266,10 @@ async function main(): Promise<void> {
       }
 
       const cfg = resolveMode(modeKey);
-      const session = createSession(question, cfg.mode, "tr", conversationContext);
+      const sessionLang = args.user_message
+        ? detectLocale(args.user_message)
+        : detectLocale(question);
+      const session = createSession(question, cfg.mode, sessionLang, conversationContext);
 
       return {
         content: [

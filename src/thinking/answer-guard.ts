@@ -1,3 +1,5 @@
+import { getRejectionBundle, type Locale } from "./locale/index.js";
+
 export interface AnswerValidation {
   valid: boolean;
   isMeta: boolean;
@@ -152,17 +154,33 @@ export const SUBMIT_ANSWER_RULE = [
 export function buildMetaRejectionMessage(
   validation: AnswerValidation,
   passNumber: number,
+  locale: Locale = "tr",
 ): string {
+  const r = getRejectionBundle(locale);
   return [
-    `# RED — Pass ${passNumber} cevabı kabul edilmedi`,
+    r.metaTitle(passNumber),
     ``,
-    `Gönderdiğin metin **iş logu/meta** gibi görünüyor, teslim özeti değil.`,
+    r.metaIntro,
     ``,
-    `Sorunlar:`,
-    ...validation.reasons.map((r) => `- ${r}`),
+    r.problemsLabel,
+    ...validation.reasons.map((reason) => `- ${reason}`),
     ``,
     SUBMIT_ANSWER_RULE,
     ``,
-    `**Şimdi:** Bu pass'in işini yap (gerekirse Read/Write/Shell), sonra think_next'i **somut özet** ile tekrar çağır.`,
+    r.nowDo,
+  ].join("\n");
+}
+
+export function buildStagnationRejectionMessage(
+  passNumber: number,
+  readCopy: boolean,
+  locale: Locale = "tr",
+): string {
+  const r = getRejectionBundle(locale);
+  return [
+    r.stagnationTitle(passNumber),
+    ``,
+    readCopy ? r.stagnationReadCopy : r.stagnationSame,
+    r.stagnationResubmit,
   ].join("\n");
 }

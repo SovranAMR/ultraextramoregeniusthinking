@@ -21,6 +21,7 @@ import {
 import {
   validatePassAnswer,
   buildMetaRejectionMessage,
+  buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
 
@@ -109,6 +110,10 @@ describe("locale mode parsing", () => {
     const p = parseThinkingRequest("im maximal modus denken: postgres jsonb migration");
     assert.equal(p.mode, "max_thinking");
     assert.equal(detectLocale("im maximal modus denken"), "de");
+  });
+
+  test("de use-case suggests medium for bug fix", () => {
+    assert.equal(suggestModeFromUseCase("warum schlägt dieser test fehl", "de"), "medium_thinking");
   });
 
   test("ar: فكر max", () => {
@@ -601,6 +606,28 @@ describe("task kind & answer guard", () => {
     assert.match(msg, /RED — Pass 2/);
     assert.match(msg, /Meta log/i);
     assert.match(msg, /think_next/i);
+  });
+
+  test("de rejection message uses German locale bundle", () => {
+    const v = validatePassAnswer("Plan: dosyayı okuyacağım, eksikleri bulacağım.", 2, "read");
+    const msg = buildMetaRejectionMessage(v, 2, "de");
+    assert.match(msg, /RED — Pass 2 Antwort abgelehnt/);
+    assert.match(msg, /Arbeitslog\/Meta/);
+    assert.match(msg, /think_next/i);
+  });
+
+  test("de stagnation rejection uses German locale", () => {
+    const msg = buildStagnationRejectionMessage(2, true, "de");
+    assert.match(msg, /Antwort identisch mit vorheriger/);
+    assert.match(msg, /Anti-stagnation/);
+    assert.match(msg, /think_next/i);
+  });
+
+  test("session stores de locale from question", () => {
+    const s = createSession("warum schlägt dieser test fehl", "medium_thinking", "de");
+    assert.equal(s.language, "de");
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.language, "de");
   });
 });
 

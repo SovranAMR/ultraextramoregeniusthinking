@@ -14,6 +14,17 @@ export interface UseCaseSnippet {
   suggestedMode: LocaleModeId;
 }
 
+export interface RejectionBundle {
+  metaTitle: (pass: number) => string;
+  metaIntro: string;
+  problemsLabel: string;
+  nowDo: string;
+  stagnationTitle: (pass: number) => string;
+  stagnationReadCopy: string;
+  stagnationSame: string;
+  stagnationResubmit: string;
+}
+
 export interface LocaleBundle {
   code: Locale;
   modeAliases: Record<string, LocaleModeId>;
@@ -21,25 +32,98 @@ export interface LocaleBundle {
   stripPatterns: RegExp[];
   useCaseSnippets: UseCaseSnippet[];
   detectHints: RegExp[];
+  rejection: RejectionBundle;
 }
 
 const USE_CASE_MATRIX: UseCaseSnippet[] = [
-  { id: "bug_fix", trigger: /bu test neden fail|why (?:does )?this test fail/i, suggestedMode: "medium_thinking" },
-  { id: "refactor", trigger: /bu modülü toparla|refactor this module/i, suggestedMode: "more_thinking" },
+  {
+    id: "bug_fix",
+    trigger:
+      /bu test neden fail|why (?:does )?this test fail|warum schlägt dieser test fehl|لماذا يفشل هذا الاختبار/i,
+    suggestedMode: "medium_thinking",
+  },
+  {
+    id: "refactor",
+    trigger: /bu modülü toparla|refactor this module|dieses modul refaktorieren|أعد هيكلة هذا الوحدة/i,
+    suggestedMode: "more_thinking",
+  },
   {
     id: "migration",
     trigger: /postgres jsonb geçiş|postgres jsonb migration/i,
     suggestedMode: "max_thinking",
   },
-  { id: "review", trigger: /auth bypass var mı|auth bypass/i, suggestedMode: "max_thinking" },
-  { id: "incident", trigger: /prod 500 root cause|prod.*500.*root cause/i, suggestedMode: "max_thinking" },
-  { id: "feature", trigger: /webhook retry ekle|add webhook retry/i, suggestedMode: "medium_thinking" },
+  { id: "review", trigger: /auth bypass var mı|auth bypass|مراجعة auth/i, suggestedMode: "max_thinking" },
+  {
+    id: "incident",
+    trigger: /prod 500 root cause|prod.*500.*root cause|prod.*500.*ursache/i,
+    suggestedMode: "max_thinking",
+  },
+  {
+    id: "feature",
+    trigger: /webhook retry ekle|add webhook retry|webhook retry hinzufügen|إضافة webhook retry/i,
+    suggestedMode: "medium_thinking",
+  },
   {
     id: "analysis",
-    trigger: /monolith mi micro mu|monolith vs micro/i,
+    trigger: /monolith mi micro mu|monolith vs micro|monolith oder micro/i,
     suggestedMode: "more_thinking",
   },
 ];
+
+const REJECTION_TR: RejectionBundle = {
+  metaTitle: (pass) => `# RED — Pass ${pass} cevabı kabul edilmedi`,
+  metaIntro: "Gönderdiğin metin **iş logu/meta** gibi görünüyor, teslim özeti değil.",
+  problemsLabel: "Sorunlar:",
+  nowDo:
+    "**Şimdi:** Bu pass'in işini yap (gerekirse Read/Write/Shell), sonra think_next'i **somut özet** ile tekrar çağır.",
+  stagnationTitle: (pass) => `# RED — Pass ${pass} cevabı öncekiyle aynı`,
+  stagnationReadCopy:
+    "Anti-stagnation: read pass önceki pass ile içerik tekrarı — dosya referansı yeterli değil.",
+  stagnationSame: "Anti-stagnation: önceki pass ile birebir aynı cevap gönderilemez.",
+  stagnationResubmit:
+    "Bu pass'in odağına göre somut yeni iyileştirme yap, sonra think_next tekrar çağır.",
+};
+
+const REJECTION_EN: RejectionBundle = {
+  metaTitle: (pass) => `# RED — Pass ${pass} answer rejected`,
+  metaIntro: "Your text looks like a **work log/meta**, not a deliverable summary.",
+  problemsLabel: "Issues:",
+  nowDo:
+    "**Now:** Complete this pass (Read/Write/Shell if needed), then call think_next again with a **concrete summary**.",
+  stagnationTitle: (pass) => `# RED — Pass ${pass} answer identical to previous`,
+  stagnationReadCopy:
+    "Anti-stagnation: read pass repeats previous content — file reference alone is not enough.",
+  stagnationSame: "Anti-stagnation: cannot submit the exact same answer as the previous pass.",
+  stagnationResubmit:
+    "Make a concrete new improvement for this pass focus, then call think_next again.",
+};
+
+const REJECTION_DE: RejectionBundle = {
+  metaTitle: (pass) => `# RED — Pass ${pass} Antwort abgelehnt`,
+  metaIntro: "Dein Text wirkt wie ein **Arbeitslog/Meta**, nicht wie eine Lieferzusammenfassung.",
+  problemsLabel: "Probleme:",
+  nowDo:
+    "**Jetzt:** Pass abschließen (Read/Write/Shell falls nötig), dann think_next mit **konkreter Zusammenfassung** erneut aufrufen.",
+  stagnationTitle: (pass) => `# RED — Pass ${pass} Antwort identisch mit vorheriger`,
+  stagnationReadCopy:
+    "Anti-stagnation: Read-Pass wiederholt vorherigen Inhalt — Dateireferenz allein reicht nicht.",
+  stagnationSame: "Anti-stagnation: identische Antwort wie im vorherigen Pass ist nicht erlaubt.",
+  stagnationResubmit:
+    "Konkrete neue Verbesserung für diesen Pass-Fokus, dann think_next erneut aufrufen.",
+};
+
+const REJECTION_AR: RejectionBundle = {
+  metaTitle: (pass) => `# RED — تم رفض إجابة Pass ${pass}`,
+  metaIntro: "يبدو أن النص **سجل عمل/وصف meta** وليس ملخص تسليم.",
+  problemsLabel: "المشاكل:",
+  nowDo:
+    "**الآن:** أكمل هذا pass (Read/Write/Shell إن لزم)، ثم استدعِ think_next ب**ملخص ملموس**.",
+  stagnationTitle: (pass) => `# RED — إجابة Pass ${pass} مطابقة للسابقة`,
+  stagnationReadCopy:
+    "Anti-stagnation: pass القراءة يكرر المحتوى السابق — مرجع الملف لا يكفي.",
+  stagnationSame: "Anti-stagnation: لا يمكن إرسال نفس إجابة pass السابق.",
+  stagnationResubmit: "تحسين ملموس جديد لهذا pass، ثم استدعِ think_next مرة أخرى.",
+};
 
 export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
   tr: {
@@ -70,6 +154,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
       /fail|toparla|geçiş|bypass|500|webhook|monolith/i.test(s.trigger.source),
     ),
     detectHints: [/düşün/i, /modu mcp/i, /kolay|orta|ileri|maksimum/i],
+    rejection: REJECTION_TR,
   },
   en: {
     code: "en",
@@ -90,6 +175,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
       /why|refactor|migration|bypass|root cause|webhook|monolith vs/i.test(s.trigger.source),
     ),
     detectHints: [/\bthink\b/i, /\bmode\b/i, /\beasy thinking\b/i],
+    rejection: REJECTION_EN,
   },
   de: {
     code: "de",
@@ -108,8 +194,11 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
       /(?:^|\s)(?:einfach|mittel|mehr|maximal|easy|medium|more|max)\s+modus\s+denken[:\s]*/gi,
       /(?:^|\s)im\s+(?:einfach|mittel|mehr|maximal|easy|medium|more|max)\s+modus\s+denken[:\s]*/gi,
     ],
-    useCaseSnippets: [],
+    useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
+      /schlägt|modul refaktor|migration|bypass|ursache|webhook|monolith oder/i.test(s.trigger.source),
+    ),
     detectHints: [/\bdenken\b/i, /\bmodus\b/i, /\beinfach\b/i, /\bmittel\b/i],
+    rejection: REJECTION_DE,
   },
   ar: {
     code: "ar",
@@ -127,8 +216,11 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
       /(?:^|\s)(?:فكر|think)\s+(?:in\s+)?(?:easy|medium|more|max|سهل|متوسط|أكثر|أقصى)[:\s]*/gi,
       /(?:^|\s)(?:easy|medium|more|max|سهل|متوسط|أكثر|أقصى)\s+(?:وضع\s+)?(?:فكر|think)[:\s]*/gi,
     ],
-    useCaseSnippets: [],
+    useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
+      /يفشل|هيكلة|مراجعة|webhook|الوحدة/i.test(s.trigger.source),
+    ),
     detectHints: [/[\u0600-\u06FF]/, /فكر/],
+    rejection: REJECTION_AR,
   },
 };
 
@@ -141,6 +233,10 @@ export function detectLocale(text: string): Locale {
 
 export function getLocaleBundle(locale: Locale): LocaleBundle {
   return LOCALE_BUNDLES[locale];
+}
+
+export function getRejectionBundle(locale: Locale): RejectionBundle {
+  return LOCALE_BUNDLES[locale].rejection;
 }
 
 export function mergeModeAliases(): Record<string, LocaleModeId> {

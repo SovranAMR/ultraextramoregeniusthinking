@@ -6,6 +6,7 @@ import type { ThinkingMode } from "./modes.js";
 import { resolveMode } from "./modes.js";
 import type { TaskKind } from "./task-kind.js";
 import { detectTaskKind } from "./task-kind.js";
+import type { Locale } from "./locale/index.js";
 
 export interface ThinkingRound {
   round: number;
@@ -22,7 +23,7 @@ export interface ThinkingSession {
   totalPasses: number;
   currentRound: number;
   rounds: ThinkingRound[];
-  language: "tr" | "en";
+  language: Locale;
   createdAt: string;
   updatedAt: string;
   completed: boolean;
@@ -41,7 +42,7 @@ function sessionPath(id: string): string {
 export function createSession(
   question: string,
   mode: ThinkingMode,
-  language: "tr" | "en" = "tr",
+  language: Locale = "tr",
   conversationContext?: string,
 ): ThinkingSession {
   ensureSessionDir();
