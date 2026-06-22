@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T08:42:00.338Z",
-  "runCount": 22,
+  "lastRun": "2026-06-22T08:50:00.288Z",
+  "runCount": 23,
   "roadmapPhase": "product",
   "roadmapDone": { "basiret": true, "i18n": true, "product": false },
   "fazAProgress": {
@@ -21,18 +21,18 @@
   },
   "fazCProgress": {
     "c1_ultra_thinking_root_env": true,
-    "c2_semver_banner": false,
+    "c2_semver_banner": true,
     "c3_mcp_tool_schema_docs": false
   },
-  "lastFocus": "C1: ULTRA_THINKING_ROOT env + mcp-config örneği",
+  "lastFocus": "C2: semver banner tutarlılığı",
   "lastFiles": [
-    "src/thinking/session.ts",
-    "src/cli/index.ts",
-    "cursor-mcp.example.json"
+    "src/version.ts",
+    "src/server.ts",
+    "src/cli/index.ts"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "Faz C — semver banner tutarlılığı"
+  "nextRisk": "Faz C — MCP tool schema stabil dokümantasyon"
 }
