@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T10:46:00.295Z",
-  "runCount": 48,
+  "lastRun": "2026-06-22T10:48:00.282Z",
+  "runCount": 49,
   "roadmapPhase": "orchestration",
   "roadmapDone": {
     "basiret": true,
@@ -17,11 +17,11 @@
     "f4_plan_progress": true,
     "f5_natural_language": true,
     "f6_small_jobs_unchanged": true,
-    "f7_integration_test": false,
+    "f7_integration_test": true,
     "f8_version_bump": false
   },
-  "lastFocus": "F6: küçük işler — bug fix/tek dosya/kısa soru tek oturum, plan guard",
-  "lastFiles": ["src/thinking/orchestration-nl.ts", "test/thinking-smoke.mjs"],
+  "lastFocus": "F7: 3 adımlı plan entegrasyon testi — adım oturumu, özet, bağlam taşınması",
+  "lastFiles": ["test/thinking-smoke.mjs", "docs/automation-state.json"],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,

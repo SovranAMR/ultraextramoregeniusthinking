@@ -1267,6 +1267,81 @@ describe("orchestration plan progress (F4)", () => {
   });
 });
 
+describe("orchestration integration (F7)", () => {
+  function completeStepViaThinkNext(session, finalAnswer) {
+    for (let i = 1; i < session.totalPasses; i++) {
+      session = submitAnswer(
+        session,
+        `Pass ${i}: src/module/step.ts okundu (42 satır), önceki adım kararları gözden geçirildi.`,
+      );
+    }
+    const completion = handleThinkNext(session.id, finalAnswer);
+    assert.notEqual(completion.isError, true);
+    return completion;
+  }
+
+  test("3-step plan: step sessions, summaries, and context carry through all steps", () => {
+    const plan = createPlan("Auth modülü migration", [
+      { title: "Mevcut akışı haritala", purpose: "Giriş, token yenileme ve oturum kapanışını belgele." },
+      { title: "Hedef API tasarımı", purpose: "Modül sınırları ve geriye uyumluluk kurallarını netleştir." },
+      { title: "Kademeli geçiş planı", purpose: "Feature flag ve rollback adımlarını sırala." },
+    ]);
+    assert.equal(plan.steps.length, 3);
+    assert.doesNotMatch(plan.title, /oyun|minecraft|tavus/i);
+
+    const step1 = createStepSession(plan.id, 1, "easy");
+    assert.ok("session" in step1);
+    assert.equal(step1.session.conversationContext, undefined);
+
+    completeStepViaThinkNext(
+      step1.session,
+      "Seçilen: JWT + refresh token. Reddedilen: session cookie-only. src/auth/token.ts: mevcut akış haritalandı.",
+    );
+
+    let reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[0].status, "completed");
+    assert.match(reloaded?.steps[0].summary ?? "", /JWT \+ refresh token/);
+    assert.equal(getPlanProgress(reloaded).completedCount, 1);
+    assert.equal(getPlanProgress(reloaded).nextStep?.step, 2);
+
+    const step2 = createStepSession(plan.id, 2, "easy");
+    assert.ok("session" in step2);
+    assert.match(step2.session.conversationContext ?? "", /JWT \+ refresh token/);
+    assert.match(step2.session.conversationContext ?? "", /session cookie-only/);
+    assert.doesNotMatch(step2.session.conversationContext ?? "", /Feature flag/i);
+
+    completeStepViaThinkNext(
+      step2.session,
+      "Seçilen: v2 REST facade. Reddedilen: GraphQL katmanı. src/auth/facade.ts: public API sınırları tanımlandı.",
+    );
+
+    reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[1].status, "completed");
+    assert.match(reloaded?.steps[1].summary ?? "", /v2 REST facade/);
+    assert.equal(getPlanProgress(reloaded).completedCount, 2);
+    assert.equal(getPlanProgress(reloaded).nextStep?.step, 3);
+
+    const step3 = createStepSession(plan.id, 3, "easy");
+    assert.ok("session" in step3);
+    assert.match(step3.session.conversationContext ?? "", /JWT \+ refresh token/);
+    assert.match(step3.session.conversationContext ?? "", /v2 REST facade/);
+    assert.match(step3.session.conversationContext ?? "", /GraphQL katmanı/);
+
+    const completion = completeStepViaThinkNext(
+      step3.session,
+      "Seçilen: dual-write + feature flag. Reddedilen: big-bang cutover. src/auth/migration.ts: kademeli geçiş adımları sıralandı.",
+    );
+    assert.match(completion.content[0].text, /Plan tamamlandı \(3\/3\)/);
+
+    reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[2].status, "completed");
+    assert.match(reloaded?.steps[2].summary ?? "", /dual-write \+ feature flag/);
+    assert.equal(getPlanProgress(reloaded).allComplete, true);
+    assert.equal(getPlanProgress(reloaded).nextStep, null);
+    assert.match(formatPlanProgress(reloaded), /Tüm adımlar tamamlandı/);
+  });
+});
+
 describe("CLI mcp-config", () => {
   test("mcp-config prints absolute SERVER_PATH and ULTRA_THINKING_ROOT", () => {
     const pkgRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
