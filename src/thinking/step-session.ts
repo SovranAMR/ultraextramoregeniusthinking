@@ -3,7 +3,56 @@ import { resolveMode } from "./modes.js";
 import type { Locale } from "./locale/index.js";
 import { detectLocale } from "./locale/index.js";
 import { loadPlan, savePlan, type Plan, type PlanStep } from "./plan.js";
-import { createSession, saveSession, type ThinkingSession } from "./session.js";
+import { createSession, saveSession, submitAnswer, type ThinkingSession } from "./session.js";
+
+const FILE_REF_PATTERN =
+  /\b(?:[\w.-]+\/)+[\w.-]+\.(?:ts|tsx|js|jsx|mjs|py|go|rs|json|yaml|yml|md|css|html)\b/gi;
+
+function extractFileRefs(...texts: string[]): string[] {
+  const files = new Set<string>();
+  for (const text of texts) {
+    for (const match of text.matchAll(FILE_REF_PATTERN)) {
+      files.add(match[0]);
+    }
+  }
+  return [...files];
+}
+
+/** F3: adım oturumu final cevabından karar özeti üretir */
+export function buildStepSummary(session: ThinkingSession): string {
+  const finalAnswer = session.rounds.at(-1)?.answer.trim() ?? "";
+  if (!finalAnswer) return "Tamamlandı — karar özeti yok.";
+
+  if (/seçilen\s*:/i.test(finalAnswer) || /reddedilen\s*:/i.test(finalAnswer)) {
+    return finalAnswer;
+  }
+
+  const fileRefs = extractFileRefs(...session.rounds.map((r) => r.answer));
+  const parts = [`Seçilen: ${finalAnswer}`];
+  if (fileRefs.length > 0) {
+    parts.push(`Etkilenen: ${fileRefs.join(", ")}`);
+  }
+  return parts.join(". ");
+}
+
+/** F3: tamamlanan adım oturumunun karar özetini plana yazar */
+export function completePlanStep(
+  session: ThinkingSession,
+): { plan: Plan; step: PlanStep } | null {
+  if (!session.planId || !session.planStep || !session.completed) return null;
+
+  const plan = loadPlan(session.planId);
+  if (!plan) return null;
+
+  const step = plan.steps.find((s) => s.step === session.planStep);
+  if (!step) return null;
+
+  step.summary = buildStepSummary(session);
+  step.status = "completed";
+  savePlan(plan);
+
+  return { plan, step };
+}
 
 export type StepSessionError = "plan_not_found" | "step_not_found";
 

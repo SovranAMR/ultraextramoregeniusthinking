@@ -26,6 +26,7 @@ import {
   buildStagnationRejectionMessage,
 } from "./thinking/answer-guard.js";
 import { buildServerInstructions, detectLocale } from "./thinking/locale/index.js";
+import { completePlanStep } from "./thinking/step-session.js";
 import { MCP_STDIO_BANNER, PKG_VERSION } from "./version.js";
 
 const STAGNATION_STOP_WORDS = new Set(["için", "ile", "ve", "bir", "the", "and"]);
@@ -131,8 +132,15 @@ export function handleThinkNext(sessionId: string, answer: string) {
   const updated = submitAnswer(session, answer);
 
   if (updated.completed) {
+    let text = buildCompletionDirective(updated);
+    if (updated.planId && updated.planStep) {
+      const done = completePlanStep(updated);
+      if (done) {
+        text += `\n\n---\nPlan adım ${done.step.step} tamamlandı — karar özeti plana kaydedildi.`;
+      }
+    }
     return {
-      content: [{ type: "text" as const, text: buildCompletionDirective(updated) }],
+      content: [{ type: "text" as const, text }],
     };
   }
 

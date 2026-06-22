@@ -40,6 +40,8 @@ import {
   createStepSession,
   buildPriorStepContext,
   buildStepQuestion,
+  buildStepSummary,
+  completePlanStep,
 } from "../dist/thinking/step-session.js";
 
 describe("thinking modes", () => {
@@ -959,6 +961,93 @@ describe("orchestration step session (F2)", () => {
     assert.match(q, /Servis katmanı refaktörü/);
     assert.match(q, /Bağımlılık analizi/);
     assert.doesNotMatch(q, /oyun|minecraft|tavus/i);
+  });
+});
+
+describe("orchestration step completion (F3)", () => {
+  test("completePlanStep writes summary and marks step completed", () => {
+    const plan = createPlan("Auth modülü migration", [
+      { title: "Mevcut akışı haritala", purpose: "Giriş ve token yenilemeyi belgele." },
+      { title: "Hedef API tasarımı", purpose: "Geriye uyumluluk kurallarını netleştir." },
+    ]);
+    const result = createStepSession(plan.id, 1, "easy");
+    assert.ok("session" in result);
+    let session = result.session;
+
+    for (let i = 1; i <= session.totalPasses; i++) {
+      session = submitAnswer(
+        session,
+        i === session.totalPasses
+          ? "Seçilen: JWT + refresh token. Reddedilen: session cookie-only. Etkilenen: src/auth/token.ts"
+          : `Pass ${i}: src/auth/token.ts okundu, mevcut akış haritalandı.`,
+      );
+    }
+    assert.equal(session.completed, true);
+
+    const done = completePlanStep(session);
+    assert.ok(done);
+    assert.equal(done.step.status, "completed");
+    assert.match(done.step.summary, /JWT \+ refresh token/);
+    assert.match(done.step.summary, /session cookie-only/);
+    assert.match(done.step.summary, /src\/auth\/token\.ts/);
+
+    const reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[0].status, "completed");
+    assert.match(reloaded?.steps[0].summary ?? "", /JWT \+ refresh token/);
+  });
+
+  test("handleThinkNext on step session completion persists summary for next step", () => {
+    const plan = createPlan("Checkout flow yeniden tasarımı", [
+      { title: "Mevcut akışı haritala", purpose: "Sepet ve ödeme adımlarını belgele." },
+      { title: "Hedef API tasarımı", purpose: "Endpoint sınırları ve hata sözleşmesini netleştir." },
+    ]);
+    const first = createStepSession(plan.id, 1, "easy");
+    assert.ok("session" in first);
+    let session = first.session;
+
+    for (let i = 1; i <= session.totalPasses; i++) {
+      const answer =
+        i === session.totalPasses
+          ? "Seçilen: sepet state machine. Reddedilen: ad-hoc callback zinciri. src/checkout/cart.ts: state geçişleri ve rollback hook tanımlandı."
+          : `Pass ${i}: src/checkout/cart.ts okundu (120 satır), sepet ve ödeme adımları listelendi.`;
+      if (i < session.totalPasses) {
+        session = submitAnswer(session, answer);
+      } else {
+        const completion = handleThinkNext(session.id, answer);
+        assert.notEqual(completion.isError, true);
+        assert.match(completion.content[0].text, /karar özeti plana kaydedildi/i);
+      }
+    }
+
+    const reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[0].status, "completed");
+    assert.match(reloaded?.steps[0].summary ?? "", /sepet state machine/);
+
+    const second = createStepSession(plan.id, 2, "easy");
+    assert.ok("session" in second);
+    assert.match(second.session.conversationContext ?? "", /sepet state machine/);
+    assert.match(second.session.conversationContext ?? "", /ad-hoc callback zinciri/);
+  });
+
+  test("buildStepSummary derives file refs when answer is unstructured", () => {
+    const plan = createPlan("Servis katmanı refaktörü", [
+      { title: "Bağımlılık analizi", purpose: "Modül sınırlarını çıkar." },
+    ]);
+    const result = createStepSession(plan.id, 1, "easy");
+    assert.ok("session" in result);
+    let session = result.session;
+    for (let i = 1; i <= session.totalPasses; i++) {
+      session = submitAnswer(
+        session,
+        i === session.totalPasses
+          ? "Facade pattern ile modül sınırları netleştirildi."
+          : "src/service/registry.ts okundu, bağımlılık grafiği çıkarıldı.",
+      );
+    }
+    const summary = buildStepSummary(session);
+    assert.match(summary, /Seçilen:/);
+    assert.match(summary, /Facade pattern/);
+    assert.match(summary, /src\/service\/registry\.ts/);
   });
 });
 
