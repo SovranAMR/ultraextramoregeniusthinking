@@ -1,75 +1,90 @@
-# Ultra Thinking — Kusursuzluk Turu (10dk)
+# Ultra Thinking — Otonom Bakım (10dk)
 
-Tek koşuluk döngü. Chat açık bırakma. GitHub/PR/push YASAK — sadece local değişiklik.
+Tek koşuluk. Chat açma, bitir.
+
+**Sürüm:** 1.7.0 · **Roadmap:** A–E tamam → **idle / bakım modu**
+
+---
 
 ## 0) Hafıza
 
-1. `docs/automation-state.json` oku — önceki koşu, son odak, tekrar sayacı
-2. Bu koşunun başlangıç SHA'sını not et (`git rev-parse HEAD` veya working tree hash)
+1. `docs/automation-state.json` oku
+2. `git pull origin main`
+3. `npm run build && npm test`
 
-## 1) Gate (sıra değişmez)
+---
 
-```bash
-npm run build && npm test
-```
+## 1) Varsayılan: NO-OP
 
-Kırmızıysa: **sadece** kırmızıyı düzelt, başka iş yok. Bitir.
+Gate yeşil + `roadmapDone.ship: true` ise:
 
-## 2) Kırmızı çizgiler
+- **Commit yok, push yok, dosya değişikliği yok**
+- Çıktı (max 2 cümle): *"NO-OP — v1.7.0 sağlıklı, bakım gerekmiyor."*
+- State-only commit **yasak**
 
-- Yeni modül/dosya EKLEME (zorunlu test/fix hariç — max 1 dosya, gerekçeli)
-- Mimari dallandırma YASAK: abstraction, factory, plugin, yeni katman
-- Mock/demo/sahte veri YASAK
-- README/markdown genişletme YASAK (kod değişmediyse dokunma)
-- `git push`, remote, PR, GitHub CLI YASAK
-- Aynı turda 3+ dosya değiştirme YASAK
-- Feature creep YASAK (yeni MCP tool, yeni mod, CLI genişletme)
+Sadece aşağıdaki tetikleyicilerden biri varsa devam et.
 
-## 3) Odak tarama (sadece bunlar)
+---
 
-Öncelik sırası — ilk bulduğun zayıf noktayı al, diğerlerine atlama:
+## 2) Ne zaman müdahale et
 
-1. **Doğruluk** — `answer-guard`, `session`, meta-reject, stagnation, task-kind edge case
-2. **Test** — `test/thinking-smoke.mjs` gerçek davranış eksikleri
-3. **Prompt/disiplin** — agent'ın pass döngüsünü bozan belirsiz direktif
-4. **Tip/kod** — gereksiz tekrar, zayıf isim, küçük bug
-5. **Sadeleştirme** — fazla satır, gereksiz branch (silerek iyileştir)
+| Tetik | Ne yap |
+|-------|--------|
+| Test kırmızı | Sadece kırığı düzelt, bitir |
+| `escalate: true` (state) | `lastFocus` / `nextRisk` oku, tek fix |
+| Açık bug (guard/session/locale) | Max 1-2 dosya, gerçek fix |
 
-`src/` dışına dokunma. `test/tavuskusu*.html`, `test/demo-*.html` demo çıktıları — dokunma.
+**YASAK (idle):**
+- Yeni feature, mod, MCP tool, CLI genişletme
+- Mimari refactor, yeni modül
+- README/markdown (kod değişmediyse)
+- answer-guard parlatma (test kırmadıkça)
+- Extension iskeleti bu repoda
+- Sadece state/json commit
 
-## 4) Tek adım kuralı
+---
 
-Koşu başına **EN FAZLA 1** odaklı iyileştirme:
+## 3) Tamamlanan roadmap (referans — tekrarlama)
 
-- Küçük diff, yüksek etki
-- Değişiklikten sonra `npm run build && npm test` tekrar
-- Aynı issue 2 koşuda çözülmediyse `automation-state.json`'da `escalate: true` yaz, bu turda başka şeye geçme
+| Faz | Durum |
+|-----|--------|
+| Guard + basiret + i18n + product + polish | ✅ |
+| Faz E ship (E1–E8, v1.7.0) | ✅ |
 
-## 5) Değişiklik yoksa
+Yeni faz (**F**) manuel tanımlanana kadar idle kal.
 
-Kod sağlıklıysa dosya değiştirme. `automation-state.json` güncelle:
+---
 
-- `lastRun`, `lastFocus: "none"`, `health: "ok"`, `nextRisk` (1 cümle)
+## 4) Koşu disiplini
 
-## 6) State güncelle (her koşu sonu)
+- Max 1 fix, max 2-3 dosya
+- Mock yasak
+- `main` commit + push (sadece gerçek kod fix'i varsa)
 
-`docs/automation-state.json`:
+---
+
+## 5) State (NO-OP hariç)
 
 ```json
 {
-  "lastRun": "ISO timestamp",
-  "lastFocus": "kısa açıklama veya none",
-  "lastFiles": ["path"],
+  "lastRun": "<ISO8601>",
+  "runCount": <+1>,
+  "roadmapPhase": "idle",
+  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": true, "ship": true },
+  "lastFocus": "fix: … veya none",
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "bir sonraki micro-risk",
-  "runCount": N
+  "productScope": "code-first"
 }
 ```
 
-## 7) Çıktı (kısa)
+NO-OP'ta state güncellemesi **opsiyonel** — ayrı commit atma.
 
-- Yaptıysan: ne düzelttin, hangi dosya, test sonucu (max 5 cümle)
-- Yapmadıysan: neden sağlıklı, sonraki risk (max 3 cümle)
+---
 
-Türkçe, robot değil, boş övgü yok.
+## 6) Çıktı
+
+Fix yaptıysan: ne · dosya · test.  
+NO-OP ise: 2 cümle, bitti.
+
+Türkçe, kısa.

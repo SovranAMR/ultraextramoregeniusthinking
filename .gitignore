@@ -2,3 +2,12 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# A/B test çıktıları (chat'lerin ürettiği dosyalar)
+test/ab-round3/max/rate-limit.mjs
+test/ab-round3/plain/rate-limit.mjs
+
+# Eski görsel demo artefact'ları
+test/tavuskusu*.html
+test/tavuskusu*.md
+test/demo-*.html
