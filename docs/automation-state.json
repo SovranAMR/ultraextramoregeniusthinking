@@ -1,13 +1,13 @@
 {
-  "lastRun": "2026-06-22T10:04:00.305Z",
-  "runCount": 41,
-  "roadmapPhase": "ship",
+  "lastRun": "2026-06-22T10:08:00.331Z",
+  "runCount": 42,
+  "roadmapPhase": "idle",
   "roadmapDone": {
     "basiret": true,
     "i18n": true,
     "product": true,
     "polish": true,
-    "ship": false
+    "ship": true
   },
   "fazEProgress": {
     "e1_de_ar_parse": true,
@@ -17,14 +17,13 @@
     "e5_npm_files_field": true,
     "e6_use_case_snippets": true,
     "e7_locale_dead_code": true,
-    "e8_version_170": false
+    "e8_version_170": true
   },
-  "lastFocus": "E7: locale dead export/key audit",
+  "lastFocus": "E8: semver 1.7.0 bump",
   "lastFiles": [
-    "src/thinking/locale/index.ts",
-    "src/thinking/locale/pass-plans.ts",
-    "src/thinking/locale/creative-plans.ts",
-    "src/thinking/locale/analysis-plans.ts"
+    "package.json",
+    "package-lock.json",
+    "src/version.ts"
   ],
   "testsPass": true,
   "escalate": false,
