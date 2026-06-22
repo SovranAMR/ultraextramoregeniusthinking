@@ -53,6 +53,7 @@ import {
 import {
   parseOrchestrationRequest,
   isOrchestrationTrigger,
+  isSmallJob,
   formatOrchestrationNlHints,
 } from "../dist/thinking/orchestration-nl.js";
 
@@ -1125,12 +1126,6 @@ describe("orchestration natural language (F5)", () => {
     assert.equal(p.intent, "plan_progress");
   });
 
-  test("small job does not trigger orchestration", () => {
-    assert.equal(isOrchestrationTrigger("bu test neden fail oluyor"), false);
-    assert.equal(parseOrchestrationRequest("fix null guard in src/auth.ts").intent, "none");
-    assert.equal(parseOrchestrationRequest("refactor this function").intent, "none");
-  });
-
   test("category-neutral — no sector-specific product names required", () => {
     const p = parseOrchestrationRequest(
       "faz faz götür, her adımı more düşün: veri katmanı migration",
@@ -1148,6 +1143,51 @@ describe("orchestration natural language (F5)", () => {
     assert.match(en, /ORCHESTRATION/);
     assert.match(en, /think each step in max mode/);
     assert.match(formatOrchestrationNlHints("en"), /plan progress/);
+  });
+});
+
+describe("orchestration small jobs (F6)", () => {
+  test("isSmallJob detects bug fix, single file, short question", () => {
+    assert.equal(isSmallJob("fix null guard in src/auth.ts"), true);
+    assert.equal(isSmallJob("bu test neden fail oluyor"), true);
+    assert.equal(isSmallJob("refactor this function"), true);
+    assert.equal(isSmallJob("minor bug in src/utils/validate.ts"), true);
+    assert.equal(isSmallJob("plan çıkar, her adımı max düşün: auth modülü migration"), false);
+    assert.equal(isSmallJob("faz faz götür: veri katmanı migration"), false);
+  });
+
+  test("small job does not trigger orchestration even with plan keywords", () => {
+    assert.equal(isOrchestrationTrigger("bu test neden fail oluyor"), false);
+    assert.equal(parseOrchestrationRequest("fix null guard in src/auth.ts").intent, "none");
+    assert.equal(parseOrchestrationRequest("refactor this function").intent, "none");
+    assert.equal(
+      parseOrchestrationRequest("plan first: fix null guard in src/auth.ts").intent,
+      "none",
+    );
+    assert.equal(
+      parseOrchestrationRequest("break this into steps: fix typo in README.md").intent,
+      "none",
+    );
+  });
+
+  test("small job stays single think session without plan link", () => {
+    const s = createSession("fix null guard in src/auth.ts", "easy_thinking", "en");
+    assert.equal(s.planId, undefined);
+    assert.equal(s.planStep, undefined);
+    assert.equal(isOrchestrationTrigger(s.question), false);
+  });
+
+  test("big job triggers still create plan intent", () => {
+    const p = parseOrchestrationRequest(
+      "plan çıkar, her adımı max düşün: auth modülü migration",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(isSmallJob(p.originalText), false);
+  });
+
+  test("server hints mention small jobs use single session", () => {
+    assert.match(formatOrchestrationNlHints("tr"), /Küçük iş.*tek think oturumu/i);
+    assert.match(formatOrchestrationNlHints("en"), /Small jobs.*single think session/i);
   });
 });
 

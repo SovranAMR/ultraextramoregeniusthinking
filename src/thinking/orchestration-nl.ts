@@ -152,6 +152,51 @@ function stripTriggers(text: string): string {
   return result;
 }
 
+const SMALL_JOB_SIGNALS: RegExp[] = [
+  /\b(bug\s*fix|hotfix|quick\s+fix|typo|lint\s+error|null\s+guard|null\s+check)\b/i,
+  /\b(fix|düzelt|patch)\b.*\b(?:src\/|\.(?:ts|tsx|js|jsx|mjs|py)|function|method|class|test)\b/i,
+  /\b(?:src\/|\.(?:ts|tsx|js|jsx|mjs|py)|function|method|class|test)\b.*\b(fix|düzelt|patch|guard|refactor)\b/i,
+  /\b(refactor\s+(?:this|the|tek)\s+(?:function|method|class|dosya|file))\b/i,
+  /\b(tek\s+dosya|single\s+file|one\s+file|this\s+file|bu\s+dosya)\b/i,
+  /\b(fail(?:ing)?\s+test|test\s+fail|bu\s+test\s+neden|why\s+(?:does|is)\s+(?:this|the)\s+test)\b/i,
+  /\b(küçük|small|minor)\s+(?:fix|refactor|change|değişiklik|bug)\b/i,
+  /\b(neden\s+(?:fail|başarısız|kırılıyor|patlıyor))\b/i,
+];
+
+/** Büyük iş kapsamı — küçük iş guard'ını devre dışı bırakır */
+const BIG_JOB_SCOPE: RegExp[] = [
+  /(?:sıfırdan|baştan|from\s+scratch|build\s+from\s+scratch|design\s+from\s+scratch)/i,
+  /\bfaz\s+faz\b/i,
+  /\bphase\s+by\s+phase\b/i,
+  /\b(?:tüm|whole|entire|full)\s+(?:modül|module|system|sistem|stack|platform)\b/i,
+  /\b(?:end\s+to\s+end|uçtan\s+uca|kapsamlı|comprehensive)\b/i,
+  /\b(?:migration|geçiş)\s+(?:plan|roadmap|strateji)\b/i,
+  /\b(?:3|üç|three|multiple|birden\s+fazla)\s+(?:adım|step|phase|faz)\b/i,
+];
+
+const FILE_REF_PATTERN =
+  /\b(?:[\w.-]+\/)+[\w.-]+\.(?:ts|tsx|js|jsx|mjs|py|go|rs|json|yaml|yml|md|css|html)\b/gi;
+
+/** F6: bug fix, tek dosya, kısa soru — plan/orkestrasyon tetiklenmez, tek oturum */
+export function isSmallJob(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  if (BIG_JOB_SCOPE.some((p) => p.test(trimmed))) return false;
+
+  const fileRefs = [...trimmed.matchAll(FILE_REF_PATTERN)];
+  const hasSmallSignal = SMALL_JOB_SIGNALS.some((p) => p.test(trimmed));
+  const isShort = trimmed.length <= 140;
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+
+  if (hasSmallSignal && (isShort || fileRefs.length === 1)) return true;
+  if (fileRefs.length === 1 && isShort && wordCount <= 18) return true;
+  if (isShort && wordCount <= 10 && /\b(fix|bug|refactor|guard|test|patch|typo)\b/i.test(trimmed)) {
+    return true;
+  }
+
+  return false;
+}
+
 export function isOrchestrationTrigger(text: string): boolean {
   return parseOrchestrationRequest(text).intent !== "none";
 }
@@ -194,6 +239,7 @@ export function parseOrchestrationRequest(text: string): ParsedOrchestrationRequ
 
   const planHit = firstMatch(trimmed, PLAN_CREATE_PATTERNS);
   if (planHit) {
+    if (isSmallJob(trimmed)) return base;
     return {
       ...base,
       intent: "create_plan",
@@ -214,6 +260,7 @@ export function formatOrchestrationNlHints(locale: "tr" | "en" = "tr"): string {
       '• "create a plan, think each step in max mode: [project scope]"',
       '• "plan first, deep think each step: [system design]"',
       '• "think step 2 in max mode" / "plan progress"',
+      "• Small jobs (bug fix, single file, short question) → single think session, no plan",
     ].join("\n");
   }
   return [
@@ -221,5 +268,6 @@ export function formatOrchestrationNlHints(locale: "tr" | "en" = "tr"): string {
     '• "plan çıkar, her adımı max düşün: [proje kapsamı]"',
     '• "önce plan, her adımı derin düşün: [sistem tasarımı]"',
     '• "adım 2 max düşün" / "plan ilerlemesi"',
+    "• Küçük iş (bug fix, tek dosya, kısa soru) → tek think oturumu, plan yok",
   ].join("\n");
 }
