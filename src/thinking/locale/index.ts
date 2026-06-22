@@ -12,6 +12,10 @@ export interface UseCaseSnippet {
   id: string;
   trigger: RegExp;
   suggestedMode: LocaleModeId;
+  /** Server instructions örneği (TR) */
+  exampleTr?: string;
+  /** Server instructions örneği (EN) */
+  exampleEn?: string;
 }
 
 export interface RejectionBundle {
@@ -76,12 +80,23 @@ export interface LocaleBundle {
   serverInstructions: string;
 }
 
+const MODE_PASS_COUNT: Record<LocaleModeId, number> = {
+  easy_thinking: 3,
+  medium_thinking: 5,
+  more_thinking: 7,
+  max_thinking: 10,
+};
+
+const CODE_FIRST_SNIPPET_IDS = ["bug_fix", "review", "migration"] as const;
+
 const USE_CASE_MATRIX: UseCaseSnippet[] = [
   {
     id: "bug_fix",
     trigger:
       /bu test neden fail|why (?:does )?this test fail|warum schlägt dieser test fehl|لماذا يفشل هذا الاختبار/i,
     suggestedMode: "medium_thinking",
+    exampleTr: "bu test neden fail",
+    exampleEn: "why does this test fail",
   },
   {
     id: "refactor",
@@ -92,8 +107,16 @@ const USE_CASE_MATRIX: UseCaseSnippet[] = [
     id: "migration",
     trigger: /postgres jsonb geçiş|postgres jsonb migration/i,
     suggestedMode: "max_thinking",
+    exampleTr: "postgres jsonb geçiş",
+    exampleEn: "postgres jsonb migration",
   },
-  { id: "review", trigger: /auth bypass var mı|auth bypass|مراجعة auth/i, suggestedMode: "max_thinking" },
+  {
+    id: "review",
+    trigger: /auth bypass var mı|auth bypass|مراجعة auth/i,
+    suggestedMode: "max_thinking",
+    exampleTr: "auth bypass var mı",
+    exampleEn: "is there an auth bypass",
+  },
   {
     id: "incident",
     trigger: /prod 500 root cause|prod.*500.*root cause|prod.*500.*ursache/i,
@@ -789,8 +812,27 @@ export function getRejectionBundle(locale: Locale): RejectionBundle {
   return LOCALE_BUNDLES[locale].rejection;
 }
 
+function formatUseCaseExamplesForInstructions(locale: "tr" | "en"): string {
+  const header =
+    locale === "tr"
+      ? "CODE-FIRST ÖRNEKLER (mod otomatik önerilir):"
+      : "CODE-FIRST EXAMPLES (mode auto-suggested):";
+  const lines = CODE_FIRST_SNIPPET_IDS.map((id) => {
+    const snippet = USE_CASE_MATRIX.find((s) => s.id === id);
+    if (!snippet) return null;
+    const example = locale === "tr" ? snippet.exampleTr : snippet.exampleEn;
+    if (!example) return null;
+    const modeKey = snippet.suggestedMode.replace("_thinking", "");
+    const passes = MODE_PASS_COUNT[snippet.suggestedMode];
+    return `• "${example}" → ${modeKey} (${passes} pass)`;
+  }).filter((line): line is string => line !== null);
+  return ["", header, ...lines].join("\n");
+}
+
 export function getServerInstructions(locale: Locale = "tr"): string {
-  return LOCALE_BUNDLES[locale].serverInstructions;
+  const base = LOCALE_BUNDLES[locale].serverInstructions;
+  const examplesLocale: "tr" | "en" = locale === "tr" ? "tr" : "en";
+  return base + formatUseCaseExamplesForInstructions(examplesLocale);
 }
 
 /** Server instructions bundle: TR or EN (de/ar → EN copy). */

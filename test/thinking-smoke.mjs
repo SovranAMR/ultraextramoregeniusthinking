@@ -771,6 +771,19 @@ describe("server instructions locale", () => {
     const text = getServerInstructions(serverInstructionsLocale(locale));
     assert.match(text, /improves answer quality/);
   });
+
+  test("code-first use-case snippets in server instructions", () => {
+    const tr = buildServerInstructions({ sessionLanguage: "tr" });
+    assert.match(tr, /CODE-FIRST ÖRNEKLER/);
+    assert.match(tr, /bu test neden fail/);
+    assert.match(tr, /auth bypass var mı/);
+    assert.match(tr, /postgres jsonb geçiş/);
+    const en = buildServerInstructions({ question: "think in max mode" });
+    assert.match(en, /CODE-FIRST EXAMPLES/);
+    assert.match(en, /why does this test fail/);
+    assert.match(en, /is there an auth bypass/);
+    assert.match(en, /postgres jsonb migration/);
+  });
 });
 
 describe("basiret layer", () => {

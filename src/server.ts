@@ -25,7 +25,7 @@ import {
   buildMetaRejectionMessage,
   buildStagnationRejectionMessage,
 } from "./thinking/answer-guard.js";
-import { detectLocale, getServerInstructions, resolveServerLocale, serverInstructionsLocale } from "./thinking/locale/index.js";
+import { buildServerInstructions, detectLocale } from "./thinking/locale/index.js";
 import { MCP_STDIO_BANNER, PKG_VERSION } from "./version.js";
 
 const STAGNATION_STOP_WORDS = new Set(["için", "ile", "ve", "bir", "the", "and"]);
@@ -69,9 +69,7 @@ function isStagnantAnswer(
   return false;
 }
 
-const SERVER_INSTRUCTIONS = getServerInstructions(
-  serverInstructionsLocale(resolveServerLocale()),
-);
+const SERVER_INSTRUCTIONS = buildServerInstructions();
 
 export function handleThinkNext(sessionId: string, answer: string) {
   const session = loadSession(sessionId);
