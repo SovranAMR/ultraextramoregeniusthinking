@@ -46,19 +46,19 @@ const EASY_PASSES: PassFocus[] = [
     execution: "read",
     tasks: [
       "İlgili dosyaları Read/Grep ile oku — eksikleri gerçek koda göre bul.",
-      "Mantık hatalarını, çelişkileri düzelt.",
+      "Mantık hatalarını, çelişkileri düzelt — gerekirse Write/StrReplace ile uygula.",
       "Kullanıcı isteğine sadık mı kontrol et.",
     ],
   },
   {
     pass: 3,
-    title: "Uygulama & Final",
-    lens: "implement_final",
-    execution: "write",
+    title: "Doğrulama & Final",
+    lens: "verify_final",
+    execution: "verify",
     tasks: [
-      "Görev kod/dosya gerektiriyorsa: Write/StrReplace ile uygula.",
-      "Gereksiz uzatmayı temizle, yapıyı netleştir.",
-      "Risk/bilinmeyen varsa belirt. Final cevap + yapılan dosya değişiklikleri.",
+      "Pass 2'deki düzeltmeleri Shell ile test/build et — kırık bırakma.",
+      "Eksik kod varsa Write/StrReplace ile tamamla, sonra tekrar doğrula.",
+      "Final cevap + değişen dosya listesi + test/build özeti.",
     ],
   },
 ];

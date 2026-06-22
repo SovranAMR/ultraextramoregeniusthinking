@@ -1,11 +1,11 @@
 {
-  "roadmapPhase": "basiret",
+  "roadmapPhase": "i18n",
   "productScope": "code-first",
-  "lastRun": "2026-06-22T08:20:00.270Z",
-  "lastFocus": "basiret.ts adaptif yargı katmanı + prompts entegrasyonu",
-  "lastFiles": ["src/thinking/basiret.ts", "src/thinking/prompts.ts", "test/thinking-smoke.mjs"],
+  "lastRun": "2026-06-22T08:22:00.287Z",
+  "lastFocus": "easy code planına verify pass — tüm modlarda basiret gereksinimi tamam",
+  "lastFiles": ["src/thinking/pass-focus.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "easy code planında verify pass yok — Faz A tamamlanması için pass-focus güncellemesi gerekebilir",
-  "runCount": 14
+  "nextRisk": "Faz B — tr/en locale bundle ve mod tetikleyicileri",
+  "runCount": 15
 }

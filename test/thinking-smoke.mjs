@@ -384,31 +384,34 @@ describe("task kind & answer guard", () => {
   });
 
   test("handleThinkNext RED when write pass lacks artifact reference", () => {
-    const s = createSession("Test write artifact", "easy_thinking", "tr");
+    const s = createSession("Test write artifact", "medium_thinking", "tr");
     submitAnswer(
       s,
       "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
     );
-
     handleThinkNext(
       s.id,
       "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/foo.html review: z-index çakışması ve eksik aria-label bulundu, düzeltme listesi çıkarıldı.",
     );
 
     const noArtifact =
       "Kod iyileştirildi, mantık hatası düzeltildi ve yapı netleştirildi.";
     const result = handleThinkNext(s.id, noArtifact);
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /RED — Pass 4/);
     assert.match(result.content[0].text, /artifact referansı yok/i);
     assert.match(result.content[0].text, /think_next/i);
 
     const loaded = loadSession(s.id);
-    assert.equal(loaded.currentRound, 2);
+    assert.equal(loaded.currentRound, 3);
   });
 
   test("handleThinkNext RED when write pass lacks change detail", () => {
-    const s = createSession("Test write detail", "easy_thinking", "tr");
+    const s = createSession("Test write detail", "medium_thinking", "tr");
     submitAnswer(
       s,
       "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
@@ -416,20 +419,24 @@ describe("task kind & answer guard", () => {
     handleThinkNext(
       s.id,
       "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/foo.html review: z-index çakışması bulundu, düzeltme listesi çıkarıldı.",
     );
 
     const vagueWrite = "src/server.ts güncellendi.";
     const result = handleThinkNext(s.id, vagueWrite);
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /RED — Pass 4/);
     assert.match(result.content[0].text, /somut değişiklik detayı yok/i);
 
     const loaded = loadSession(s.id);
-    assert.equal(loaded.currentRound, 2);
+    assert.equal(loaded.currentRound, 3);
   });
 
   test("handleThinkNext RED when write pass uses generic verb colon padding", () => {
-    const s = createSession("Test write colon padding", "easy_thinking", "tr");
+    const s = createSession("Test write colon padding", "medium_thinking", "tr");
     submitAnswer(
       s,
       "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
@@ -437,17 +444,21 @@ describe("task kind & answer guard", () => {
     handleThinkNext(
       s.id,
       "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/foo.html review: z-index çakışması bulundu, düzeltme listesi çıkarıldı.",
     );
 
     const colonPadding =
       "src/server.ts güncellendi: birkaç küçük düzeltme yapıldı ve kaydedildi.";
     const result = handleThinkNext(s.id, colonPadding);
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /RED — Pass 4/);
     assert.match(result.content[0].text, /somut değişiklik detayı yok/i);
 
     const loaded = loadSession(s.id);
-    assert.equal(loaded.currentRound, 2);
+    assert.equal(loaded.currentRound, 3);
   });
 
   test("handleThinkNext RED when verify pass lacks artifact reference", () => {
@@ -561,6 +572,29 @@ describe("task kind & answer guard", () => {
 });
 
 describe("basiret layer", () => {
+  test("easy code plan has verify and evaluation passes", () => {
+    const plan = getPassPlan("easy_thinking", "code");
+    const req = planMeetsCodeBasiretRequirements(plan);
+    assert.equal(req.hasVerify, true);
+    assert.equal(req.hasEvaluation, true);
+  });
+
+  test("easy verify refinement includes verify-before-next", () => {
+    const s = createSession("bu test neden fail", "easy_thinking", "tr");
+    let current = s;
+    for (let i = 0; i < 2; i++) {
+      current = submitAnswer(
+        current,
+        i === 0
+          ? "test/foo.ts için ilk taslak: null guard ve async error handling planlandı."
+          : "test/foo.ts okundu (42 satır). null guard eksik ve async edge case riski tespit edildi.",
+      );
+    }
+    const r3 = buildRefinementDirective(current);
+    assert.match(r3, /Verify-before-next/);
+    assert.match(r3, /Pass 3\/3/);
+  });
+
   test("max code plan has verify and evaluation passes", () => {
     const plan = getPassPlan("max_thinking", "code");
     const req = planMeetsCodeBasiretRequirements(plan);
