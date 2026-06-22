@@ -256,6 +256,16 @@ describe("task kind & answer guard", () => {
     assert.match(v.reasons.join(" "), /artifact referansı yok/i);
   });
 
+  test("rejects verify pass without artifact reference", () => {
+    const v = validatePassAnswer(
+      "Testler geçti, build başarılı, kod doğrulandı.",
+      5,
+      "verify",
+    );
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /artifact referansı yok/i);
+  });
+
   test("creative wins when weak code keyword also matches", () => {
     assert.equal(
       detectTaskKind("tavus kuşu svg çiz, dosya oluştur"),
@@ -323,6 +333,36 @@ describe("task kind & answer guard", () => {
 
     const loaded = loadSession(s.id);
     assert.equal(loaded.currentRound, 2);
+  });
+
+  test("handleThinkNext RED when verify pass lacks artifact reference", () => {
+    const s = createSession("Test verify artifact", "medium_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/bar.ts için ilk taslak: 3 modül yapısı, export ve tip tanımları planlandı.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/bar.ts okundu (120 satır). Eksik error handling ve tip boşluğu tespit edildi.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/bar.ts review: null check eksik, async edge case riski bulundu ve düzeltme listesi çıkarıldı.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/bar.ts güncellendi (145 satır). null guard ve async try-catch eklendi.",
+    );
+
+    const noArtifact = "Testler geçti, build başarılı, kod doğrulandı.";
+    const result = handleThinkNext(s.id, noArtifact);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 5/);
+    assert.match(result.content[0].text, /artifact referansı yok/i);
+    assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 4);
   });
 
   test("handleThinkNext RED when meta log submitted", () => {
