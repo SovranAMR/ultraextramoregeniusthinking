@@ -1,16 +1,14 @@
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
 import {
   THINKING_MODES,
-  MODE_ENUM,
-  SHORT_MODE_ENUM,
   resolveMode,
   parseThinkingRequest,
   resolveQuestion,
   formatUserExamples,
 } from "./thinking/modes.js";
+import { THINK_TOOL, THINK_NEXT_TOOL } from "./mcp-tool-schema.js";
 import {
   createSession,
   loadSession,
@@ -29,9 +27,6 @@ import {
 } from "./thinking/answer-guard.js";
 import { detectLocale, getServerInstructions, resolveServerLocale } from "./thinking/locale/index.js";
 import { MCP_STDIO_BANNER, PKG_VERSION } from "./version.js";
-
-const MODE_SCHEMA = z.enum(MODE_ENUM);
-const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
 
 const STAGNATION_STOP_WORDS = new Set(["için", "ile", "ve", "bir", "the", "and"]);
 
@@ -167,29 +162,10 @@ async function main(): Promise<void> {
   );
 
   server.registerTool(
-    "think",
+    THINK_TOOL.name,
     {
-      description: [
-        "Thinking başlatır. Mod: easy/medium/more/max.",
-        "Kullanıcı sadece 'max de düşün' derse conversation_context ile chat özetini ZORUNLU geç.",
-      ].join(" "),
-      inputSchema: {
-        user_message: z
-          .string()
-          .optional()
-          .describe('Kullanıcının tam mesajı. Örn: "düşünme modu mcp max de düşün"'),
-        conversation_context: z
-          .string()
-          .optional()
-          .describe(
-            "Chat geçmişi özeti. Kullanıcı konuyu tekrar yazmadıysa ZORUNLU — agent buraya özet geçer.",
-          ),
-        question: z.string().optional().describe("Soru (user_message yoksa)"),
-        mode: z
-          .union([MODE_SCHEMA, SHORT_MODE_SCHEMA])
-          .optional()
-          .describe("easy | medium | more | max"),
-      },
+      description: THINK_TOOL.description,
+      inputSchema: THINK_TOOL.inputSchema,
     },
     async (args) => {
       let question: string;
@@ -251,18 +227,10 @@ async function main(): Promise<void> {
   );
 
   server.registerTool(
-    "think_next",
+    THINK_NEXT_TOOL.name,
     {
-      description:
-        "Pass cevabını gönder. Bitmediyse sonraki pass direktifi, bittiyse final cevap.",
-      inputSchema: {
-        session_id: z.string(),
-        answer: z
-          .string()
-          .describe(
-            "Bu pass teslim özeti — iş logu değil: ne yapıldı, hangi dosya, ne değişti",
-          ),
-      },
+      description: THINK_NEXT_TOOL.description,
+      inputSchema: THINK_NEXT_TOOL.inputSchema,
     },
     async (args) => handleThinkNext(args.session_id, args.answer),
   );
