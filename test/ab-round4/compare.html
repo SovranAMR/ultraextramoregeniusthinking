@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A/B Round 4 — Max vs Plain</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #1a1a2e;
+      color: #e8e8e8;
+      min-height: 100vh;
+    }
+    header {
+      padding: 12px 20px;
+      background: #16213e;
+      border-bottom: 1px solid #333;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .badge-max { background: #6366f1; color: #fff; }
+    .badge-plain { background: #64748b; color: #fff; }
+    .hint { font-size: 0.8rem; color: #94a3b8; margin-left: auto; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: calc(100vh - 52px);
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; height: auto; }
+      .pane { min-height: 70vh; }
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #333;
+      overflow: hidden;
+    }
+    .pane:last-child { border-right: none; }
+    .pane-label {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #0f0f1a;
+      border-bottom: 1px solid #333;
+    }
+    .pane-label.max { color: #a5b4fc; }
+    .pane-label.plain { color: #cbd5e1; }
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+    .missing {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      background: #0d0d14;
+    }
+    .missing code {
+      display: block;
+      margin-top: 8px;
+      color: #818cf8;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>A/B Round 4 — Sistem Durumu Dashboard</h1>
+    <span class="badge badge-max">Max MCP</span>
+    <span class="badge badge-plain">Düz chat</span>
+    <span class="hint">Brief: test/ab-round4/BRIEF.md</span>
+  </header>
+  <div class="grid">
+    <div class="pane">
+      <div class="pane-label max">← Max thinking (dashboard.html)</div>
+      <iframe id="frame-max" title="Max MCP çıktısı" src="max/dashboard.html"></iframe>
+      <div id="miss-max" class="missing" hidden>
+        Henüz yok.<code>test/ab-round4/max/dashboard.html</code>
+        Chat A bitince sayfayı yenile (F5).
+      </div>
+    </div>
+    <div class="pane">
+      <div class="pane-label plain">→ Düz chat (dashboard.html)</div>
+      <iframe id="frame-plain" title="Plain chat çıktısı" src="plain/dashboard.html"></iframe>
+      <div id="miss-plain" class="missing" hidden>
+        Henüz yok.<code>test/ab-round4/plain/dashboard.html</code>
+        Chat B bitince sayfayı yenile (F5).
+      </div>
+    </div>
+  </div>
+  <script>
+    function checkFrame(id, missId) {
+      const frame = document.getElementById(id);
+      const miss = document.getElementById(missId);
+      frame.addEventListener("error", () => {
+        frame.hidden = true;
+        miss.hidden = false;
+      });
+      frame.addEventListener("load", () => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc || !doc.body || doc.body.innerText.trim().length < 20) {
+            frame.hidden = true;
+            miss.hidden = false;
+          }
+        } catch {
+          /* cross-origin — file exists, show iframe */
+        }
+      });
+      fetch(frame.getAttribute("src"), { method: "HEAD" })
+        .then((r) => {
+          if (!r.ok) {
+            frame.hidden = true;
+            miss.hidden = false;
+          }
+        })
+        .catch(() => {
+          frame.hidden = true;
+          miss.hidden = false;
+        });
+    }
+    checkFrame("frame-max", "miss-max");
+    checkFrame("frame-plain", "miss-plain");
+  </script>
+</body>
+</html>

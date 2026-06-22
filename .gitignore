@@ -6,6 +6,8 @@ dist/
 # A/B test çıktıları (chat'lerin ürettiği dosyalar)
 test/ab-round3/max/rate-limit.mjs
 test/ab-round3/plain/rate-limit.mjs
+test/ab-round4/max/dashboard.html
+test/ab-round4/plain/dashboard.html
 
 # Eski görsel demo artefact'ları
 test/tavuskusu*.html
