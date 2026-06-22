@@ -16,6 +16,7 @@ import {
   loadSession,
   submitAnswer,
 } from "./thinking/session.js";
+import { MCP_STARTUP_BANNER, PACKAGE_VERSION } from "./version.js";
 import {
   buildStartDirective,
   buildRefinementDirective,
@@ -160,7 +161,7 @@ async function main(): Promise<void> {
   const server = new McpServer(
     {
       name: "ultra-extra-more-genius-thinking",
-      version: "1.6.0",
+      version: PACKAGE_VERSION,
     },
     { instructions: SERVER_INSTRUCTIONS },
   );
@@ -268,7 +269,7 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("ultra-thinking MCP v1.6.0 — stdio");
+  console.error(MCP_STARTUP_BANNER);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
