@@ -752,6 +752,21 @@ describe("basiret layer", () => {
     assert.doesNotMatch(hint, /Verify-before-next/);
   });
 
+  test("analysis task uses evidence verify basiret not shell test rule", () => {
+    const hint = getBasiretHint("analysis", "verify");
+    assert.match(hint, /analiz|kanıt|iddia/i);
+    assert.doesNotMatch(hint, /Shell ile test\/build|Verify-before-next \(kesin\)/i);
+  });
+
+  test("analysis max plan has no write or code-review passes", () => {
+    const plan = getPassPlan("max_thinking", "analysis");
+    assert.equal(plan.length, 10);
+    assert.equal(plan.some((p) => p.execution === "write"), false);
+    const titles = plan.map((p) => p.title).join(" ");
+    assert.doesNotMatch(titles, /Uygulama|Implement|SSRF|Kod.*Review/i);
+    assert.match(titles, /Doğrulama|Sentez|Kanıt/i);
+  });
+
   test("max start directive embeds basiret on pass 1", () => {
     const s = createSession("auth bypass var mı", "max_thinking", "tr");
     const d = buildStartDirective(s);

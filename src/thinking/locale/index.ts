@@ -54,6 +54,7 @@ export interface PromptBundle {
   basiret: {
     code: string;
     verifyBeforeNext: string;
+    analysisVerify: string;
     readBeforeNext: string;
     creative: string;
     writeExtra: string;
@@ -324,6 +325,10 @@ const PROMPT_TR: PromptBundle = {
       "**Verify-before-next (kesin):** Shell ile test/build çalıştır; çıktıyı özetle, sonra think_next.",
       "Sayısız 'test geçti/build ok' yeterli değil — kaç test, hangi dosya, ne doğrulandı yaz.",
     ].join("\n"),
+    analysisVerify: [
+      "**Verify-before-next (analiz):** İddiaları kanıt, kaynak ve karşı argümanlarla son kez çapraz doğrula.",
+      "Shell test/build yerine — hangi iddia doğrulandı, hangi kanıt veya çelişki bulundu yaz, sonra think_next.",
+    ].join("\n"),
     readBeforeNext:
       "**Read-before-next:** Etkilenen dosyaları Read/Grep ile oku; diske bakmadan think_next çağırma.",
     creative:
@@ -425,6 +430,10 @@ const PROMPT_EN: PromptBundle = {
       "**Verify-before-next (mandatory):** Run test/build via Shell; summarize output, then think_next.",
       "Vague 'tests passed/build ok' is not enough — state count, file, what was verified.",
     ].join("\n"),
+    analysisVerify: [
+      "**Verify-before-next (analysis):** Cross-check claims against evidence, sources, and counter-arguments.",
+      "Instead of shell test/build — state which claim was verified, what evidence or conflict was found, then think_next.",
+    ].join("\n"),
     readBeforeNext:
       "**Read-before-next:** Read affected files with Read/Grep; do not call think_next without checking disk.",
     creative:
@@ -525,6 +534,10 @@ const PROMPT_DE: PromptBundle = {
       "**Verify-before-next (verbindlich):** Test/Build via Shell; Ausgabe zusammenfassen, dann think_next.",
       "Vages 'Tests ok/build ok' reicht nicht — Anzahl, Datei, was verifiziert wurde.",
     ].join("\n"),
+    analysisVerify: [
+      "**Verify-before-next (Analyse):** Behauptungen mit Evidenz, Quellen und Gegenargumenten abgleichen.",
+      "Statt Shell-Test/Build — welche Behauptung verifiziert, welche Evidenz oder welcher Widerspruch, dann think_next.",
+    ].join("\n"),
     readBeforeNext:
       "**Read-before-next:** Betroffene Dateien mit Read/Grep lesen; think_next ohne Disk-Check nicht aufrufen.",
     creative:
@@ -621,6 +634,10 @@ const PROMPT_AR: PromptBundle = {
     verifyBeforeNext: [
       "**Verify-before-next (إلزامي):** شغّل test/build؛ لخّص المخرجات، ثم think_next.",
       "'tests ok' غامض لا يكفي — اذكر العدد والملف وما تم التحقق منه.",
+    ].join("\n"),
+    analysisVerify: [
+      "**Verify-before-next (تحليل):** تحقّق من الادعاءات مقابل الأدلة والمصادر والحجج المضادة.",
+      "بدلاً من shell test/build — أي ادعاء تم التحقق منه، أي دليل أو تعارض، ثم think_next.",
     ].join("\n"),
     readBeforeNext:
       "**Read-before-next:** اقرأ الملفات المتأثرة بـ Read/Grep؛ لا think_next بدون فحص القرص.",
@@ -793,6 +810,7 @@ export function getBasiretHintForLocale(
 ): string {
   const p = PROMPT_BUNDLES[locale].basiret;
   if (taskKind === "creative") return p.creative;
+  if (taskKind === "analysis" && execution === "verify") return p.analysisVerify;
   if (execution === "verify") return `${p.code}\n${p.verifyBeforeNext}`;
   if (execution === "read") return `${p.code}\n${p.readBeforeNext}`;
   if (execution === "write") return `${p.code}\n${p.writeExtra}`;

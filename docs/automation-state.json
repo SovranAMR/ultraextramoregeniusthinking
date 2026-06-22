@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-06-22T09:02:00.000Z",
-  "runCount": 26,
+  "lastRun": "2026-06-22T09:06:00.315Z",
+  "runCount": 27,
   "roadmapPhase": "polish",
-  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": false },
+  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": true },
   "fazAProgress": {
     "a1_basiret_module": true,
     "a2_prompts_wire": true,
@@ -27,16 +27,17 @@
   "fazDProgress": {
     "d1_analysis_pass_plan": true,
     "d2_analysis_detect_triggers": true,
-    "d3_polish_done": false
+    "d3_polish_done": true
   },
-  "lastFocus": "D2: analysis EN tetikleyicileri genişletme",
+  "lastFocus": "D3: analysis verify basiret + max plan smoke",
   "lastFiles": [
-    "src/thinking/task-kind.ts",
+    "src/thinking/basiret.ts",
+    "src/thinking/locale/index.ts",
     "test/thinking-smoke.mjs"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "D3: polish fazı kapanışı"
+  "nextRisk": "roadmap tamam — yeni faz tanımı gerekir"
 }

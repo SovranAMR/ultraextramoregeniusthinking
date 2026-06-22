@@ -24,6 +24,12 @@ export const CREATIVE_BASIRET_RULE = [
   "**Basiret (görsel):** Çıktıyı Read ile aç, gör/oku — detay eksik mi, fazla mı; bulguya göre karar ver.",
 ].join("\n");
 
+/** Analiz verify — shell test/build yerine kanıt/iddia çapraz doğrulama */
+export const ANALYSIS_VERIFY_RULE = [
+  "**Verify-before-next (analiz):** İddiaları kanıt, kaynak ve karşı argümanlarla son kez çapraz doğrula.",
+  "Shell test/build yerine — hangi iddia doğrulandı, hangi kanıt veya çelişki bulundu yaz, sonra think_next.",
+].join("\n");
+
 const EVALUATION_LENSES = new Set([
   "gap_analysis",
   "gap_logic",
@@ -41,6 +47,9 @@ const EVALUATION_LENSES = new Set([
 export function getBasiretHint(taskKind: TaskKind, execution: ExecutionKind): string {
   if (taskKind === "creative") {
     return CREATIVE_BASIRET_RULE;
+  }
+  if (taskKind === "analysis" && execution === "verify") {
+    return ANALYSIS_VERIFY_RULE;
   }
   if (execution === "verify") {
     return `${CODE_BASIRET_RULE}\n${VERIFY_BEFORE_NEXT}`;
