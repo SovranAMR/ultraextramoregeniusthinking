@@ -333,7 +333,7 @@ describe("task kind & answer guard", () => {
     submitAnswer(s, firstAnswer);
 
     const improved =
-      "test/foo.html güncellendi (512 satır). 180 train feather, animasyon eklendi.";
+      "test/foo.html okundu (476 satır). Eksik animasyon katmanı, CSS gap ve z-index çakışması tespit edildi.";
     const result = handleThinkNext(s.id, improved);
     assert.notEqual(result.isError, true);
     assert.match(result.content[0].text, /Pass 2\/3/);
@@ -409,6 +409,24 @@ describe("task kind & answer guard", () => {
     assert.match(result.content[0].text, /RED — Pass 2/);
     assert.match(result.content[0].text, /çok kısa/i);
     assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 1);
+  });
+
+  test("handleThinkNext RED when read pass is copy-paste with file ref", () => {
+    const s = createSession("Test read copy", "easy_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
+    );
+
+    const copyRead =
+      "test/foo.html okundu (476 satır). 3 katman SVG yapısı, train feather ve ocellus incelendi.";
+    const result = handleThinkNext(s.id, copyRead);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /Anti-stagnation/);
+    assert.match(result.content[0].text, /içerik tekrarı/i);
 
     const loaded = loadSession(s.id);
     assert.equal(loaded.currentRound, 1);

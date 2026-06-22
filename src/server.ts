@@ -30,8 +30,36 @@ import {
 const MODE_SCHEMA = z.enum(MODE_ENUM);
 const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
 
-/** Önceki cevapla birebir aynı veya yalnızca küçük ekle/çıkar ile kopya mı? */
-function isStagnantAnswer(prev: string, next: string): boolean {
+const STAGNATION_STOP_WORDS = new Set(["için", "ile", "ve", "bir", "the", "and"]);
+
+function substantiveWords(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/\.(html|ts|tsx|js|jsx|mjs|py|css|json|md|yaml|yml)\b/gi, " ")
+      .replace(/\/[\w.-]+/g, " ")
+      .replace(/\b\d+\b/g, " ")
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STAGNATION_STOP_WORDS.has(w)),
+  );
+}
+
+function countNewSubstantiveWords(prev: string, next: string): number {
+  const prevWords = substantiveWords(prev);
+  let count = 0;
+  for (const word of substantiveWords(next)) {
+    if (!prevWords.has(word)) count++;
+  }
+  return count;
+}
+
+/** Önceki cevapla birebir aynı, küçük tweak veya read pass içerik kopyası mı? */
+function isStagnantAnswer(
+  prev: string,
+  next: string,
+  execution: string = "none",
+): boolean {
   const p = prev.trim();
   const n = next.trim();
   if (!p || !n) return false;
@@ -39,6 +67,7 @@ function isStagnantAnswer(prev: string, next: string): boolean {
   const maxTweak = 24;
   if (n.startsWith(p) && n.length - p.length <= maxTweak) return true;
   if (p.startsWith(n) && p.length - n.length <= maxTweak) return true;
+  if (execution === "read" && countNewSubstantiveWords(p, n) < 4) return true;
   return false;
 }
 
@@ -115,22 +144,6 @@ export function handleThinkNext(sessionId: string, answer: string) {
 
   const validation = validatePassAnswer(answer, nextPassNumber, execution);
   const prevAnswer = session.rounds[session.rounds.length - 1]?.answer ?? "";
-  if (prevAnswer && isStagnantAnswer(prevAnswer, answer)) {
-    return {
-      content: [
-        {
-          type: "text" as const,
-          text: [
-            `# RED — Pass ${nextPassNumber} cevabı öncekiyle aynı`,
-            ``,
-            `Anti-stagnation: önceki pass ile birebir aynı cevap gönderilemez.`,
-            `Bu pass'in odağına göre somut yeni iyileştirme yap, sonra think_next tekrar çağır.`,
-          ].join("\n"),
-        },
-      ],
-      isError: true,
-    };
-  }
 
   if (!validation.valid) {
     return {
@@ -138,6 +151,26 @@ export function handleThinkNext(sessionId: string, answer: string) {
         {
           type: "text" as const,
           text: buildMetaRejectionMessage(validation, nextPassNumber),
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  if (prevAnswer && isStagnantAnswer(prevAnswer, answer, execution)) {
+    const readCopy = execution === "read";
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: [
+            `# RED — Pass ${nextPassNumber} cevabı öncekiyle aynı`,
+            ``,
+            readCopy
+              ? `Anti-stagnation: read pass önceki pass ile içerik tekrarı — dosya referansı yeterli değil.`
+              : `Anti-stagnation: önceki pass ile birebir aynı cevap gönderilemez.`,
+            `Bu pass'in odağına göre somut yeni iyileştirme yap, sonra think_next tekrar çağır.`,
+          ].join("\n"),
         },
       ],
       isError: true,
