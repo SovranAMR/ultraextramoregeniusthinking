@@ -1,27 +1,47 @@
 import type { ExecutionKind, PassFocus } from "./pass-focus.js";
 import type { TaskKind } from "./task-kind.js";
 
-/** Kod görevlerinde pass sonrası adaptif yargı — sabit tek yön yok */
+/** Tüm görevler — düz tek tur kıyas; görselde kötüyse kodda da aynı motor şişirir */
+export const OUTCOME_BASELINE_RULE = [
+  "**Sonuç basireti (kesin — tüm görevler):**",
+  "- Sor: *Düz tek tur aynı brief ile daha temiz sonuç verir miydi?*",
+  "- Düz daha iyiyse → sil/sadeleştir (ekleme yapma).",
+  "- Eksik/hatalıysa → düzelt veya genişlet. Aynı kaliteyse → gereksiz diff yapma.",
+  "- Satır/katman sayısı artışı = iyileştirme DEĞİL.",
+].join("\n");
+
+export const OUTCOME_BASELINE_EN = [
+  "**Outcome judgment (mandatory — all tasks):**",
+  "- Ask: *Would one plain pass on the same brief be cleaner?*",
+  "- If plain wins → simplify/remove (do not add).",
+  "- If missing/wrong → fix or extend. Same quality → no pointless diff.",
+  "- More lines/layers is NOT improvement.",
+].join("\n");
+
 export const CODE_BASIRET_RULE = [
-  "**Basiret (adaptif yargı):** Pass bittikten sonra durup değerlendir.",
-  "- Eksik, hata veya edge case → genişlet veya düzelt.",
-  "- Gereksiz abstraction veya şişkin diff → sadeleştir.",
-  "- Scope creep veya fazla dosya → azalt.",
-  "Yön bu pass'in bulgusundan çıkar — önceden 'her zaman ekle' veya 'her zaman çıkar' yok.",
+  "**Basiret (kod):** Pass sonrası diff + davranış.",
+  "- Test/build geçse bile şişkin abstraction veya gereksiz dosya → sadeleştir.",
+  "- Scope creep → azalt.",
 ].join("\n");
 
 export const VERIFY_BEFORE_NEXT = [
   "**Verify-before-next (kesin):** Shell ile test/build çalıştır; çıktıyı özetle, sonra think_next.",
-  "Sayısız 'test geçti/build ok' yeterli değil — kaç test, hangi dosya, ne doğrulandı yaz.",
+  "Sadece 'test geçti/build ok' yeterli değil — kaç test, hangi dosya, ne doğrulandı yaz.",
 ].join("\n");
 
 export const READ_BEFORE_NEXT = [
   "**Read-before-next:** Etkilenen dosyaları Read/Grep ile oku; diske bakmadan think_next çağırma.",
 ].join("\n");
 
-/** Yaratıcı/görsel kenar — kod review basireti uygulanmaz */
-export const CREATIVE_BASIRET_RULE = [
-  "**Basiret (görsel):** Çıktıyı Read ile aç, gör/oku — detay eksik mi, fazla mı; bulguya göre karar ver.",
+export const CREATIVE_OUTCOME_RULE = [
+  "**Basiret (görsel):** Çıktıyı tarayıcıda aç veya Read ile incele — kod hayali yetmez.",
+  "- Eksik anatomi/kompozisyon → düzelt. Dekor/filter/katman şişmesi → sil.",
+  "- Plain tek tur daha temiz görünüyorsa → dürüstçe sadeleştir.",
+].join("\n");
+
+export const CREATIVE_VERIFY_RULE = [
+  "**Görsel doğrulama:** HTML/SVG ise browser_snapshot veya Read ile sonucu GÖR.",
+  "Syntax kontrolü tek başına yetmez. Plain kıyas notunu think_next'e yaz.",
 ].join("\n");
 
 /** Analiz verify — shell test/build yerine kanıt/iddia çapraz doğrulama */
@@ -42,28 +62,44 @@ const EVALUATION_LENSES = new Set([
   "expert_panel",
   "internal_critique",
   "actionable_conclusions",
+  "outcome_judgment",
+  "plain_baseline",
+  "apply_judgment",
+  "trim_polish",
 ]);
 
-export function getBasiretHint(taskKind: TaskKind, execution: ExecutionKind): string {
+export function getBasiretHint(
+  taskKind: TaskKind,
+  execution: ExecutionKind,
+  locale: "tr" | "en" | "de" | "ar" = "tr",
+): string {
+  const base = locale === "en" ? OUTCOME_BASELINE_EN : OUTCOME_BASELINE_RULE;
+
   if (taskKind === "creative") {
-    return CREATIVE_BASIRET_RULE;
+    if (execution === "verify") {
+      return `${base}\n${CREATIVE_OUTCOME_RULE}\n${CREATIVE_VERIFY_RULE}`;
+    }
+    return `${base}\n${CREATIVE_OUTCOME_RULE}`;
   }
+
   if (taskKind === "analysis" && execution === "verify") {
-    return ANALYSIS_VERIFY_RULE;
+    return `${base}\n${ANALYSIS_VERIFY_RULE}`;
   }
+
   if (execution === "verify") {
-    return `${CODE_BASIRET_RULE}\n${VERIFY_BEFORE_NEXT}`;
+    return `${base}\n${CODE_BASIRET_RULE}\n${VERIFY_BEFORE_NEXT}`;
   }
   if (execution === "read") {
-    return `${CODE_BASIRET_RULE}\n${READ_BEFORE_NEXT}`;
+    return `${base}\n${CODE_BASIRET_RULE}\n${READ_BEFORE_NEXT}`;
   }
   if (execution === "write") {
     return [
+      base,
       CODE_BASIRET_RULE,
-      "**Write basiret:** Diff'i değerlendir — gerekli mi, yoksa sadeleştirilebilir mi?",
+      "**Write basiret:** Diff gerekli mi? Düz mod yeter miydi? Gereksizse sil.",
     ].join("\n");
   }
-  return CODE_BASIRET_RULE;
+  return `${base}\n${CODE_BASIRET_RULE}`;
 }
 
 export function isEvaluationPass(focus: PassFocus | null): boolean {

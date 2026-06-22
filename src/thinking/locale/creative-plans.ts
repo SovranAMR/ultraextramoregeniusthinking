@@ -13,17 +13,17 @@ const TR: Record<string, CreativePassTextEntry> = {
     ],
   },
   "easy_thinking:2": {
-    title: "Detay & Derinlik",
+    title: "Sonuç Değerlendirme",
     tasks: [
-      "Read ile dosyayı aç — eksik detayları bul.",
-      "StrReplace ile görsel detayları artır (katman, renk, anatomi).",
+      "Read ile dosyayı aç — tarayıcıda gör veya SVG/CSS incele.",
+      "Eksik mi, fazla mı? Düz tek tur yeter miydi? Bulguyu not et (henüz ekleme zorunluluğu yok).",
     ],
   },
   "easy_thinking:3": {
-    title: "Cilalama & Final",
+    title: "Doğrulama & Final",
     tasks: [
-      "Son rötuşlar, gereksiz kod temizliği.",
-      "Tarayıcıda açılabilir mi kontrol et. Final özeti + dosya yolu.",
+      "Görsel sonucu doğrula (browser veya Read). Gereksiz katman varsa sil.",
+      "Final: dosya yolu + ne düzeltildi/sadeleştirildi (sadece ekleme değil).",
     ],
   },
   "medium_thinking:1": {
@@ -38,58 +38,73 @@ const TR: Record<string, CreativePassTextEntry> = {
     ],
   },
   "medium_thinking:3": {
-    title: "Detay Pass",
+    title: "Sonuç Değerlendirme",
     tasks: [
-      "StrReplace ile detay ekle: katmanlar, gradient, texture, animasyon.",
-      "Önceki pass'ten EN AZ 3 somut görsel iyileştirme.",
+      "Çıktıyı GÖR (browser_snapshot veya Read) — anatomi, kompozisyon, okunurluk.",
+      "Eksikleri ve FAZLALIKları listele. Düz mod daha temiz olur muydu?",
     ],
   },
   "medium_thinking:4": {
-    title: "İç Kontrol",
+    title: "Uygula (ekle veya sil)",
     tasks: [
-      "Read ile tekrar oku — zayıf bölgeleri güçlendir.",
-      "Write ile düzelt. Sadakat: kullanıcı ne istedi?",
+      "Pass 3 bulgusuna göre Write/StrReplace — düzelt, sadeleştir veya gereksiz katman sil.",
+      "Kör detay ekleme yasak. Kullanıcı brief'ine sadık kal.",
     ],
   },
   "medium_thinking:5": {
-    title: "Final & Doğrula",
+    title: "Görsel Doğrulama & Final",
     tasks: [
-      "Shell/node ile dosya var mı, syntax bozuk mu kontrol et.",
-      "Final teslim: dosya yolu + ne eklendi özeti.",
+      "Tarayıcıda son hali aç. Syntax + görsel kalite birlikte.",
+      "Final: dosya yolu + net değişiklik özeti (silinen/eklenen).",
     ],
   },
   "more_thinking:6": {
-    title: "Karşılaştırma & Alternatif",
+    title: "Plain Kıyas",
     tasks: [
-      "Başka yaklaşım (canvas vs SVG vs CSS) steel-man.",
-      "Mevcut seçimin zayıf noktalarını Read+Write ile düzelt.",
+      "Steel-man: düz tek tur aynı brief ne üretirdi?",
+      "Mevcut çıktı gerçekten daha iyi mi — dürüst cevap. Gerekirse Write ile sadeleştir.",
     ],
   },
   "more_thinking:7": {
-    title: "Final Sentez",
-    tasks: ["En iyi detayları birleştir.", "Final + dosya özeti."],
+    title: "Final Doğrulama",
+    tasks: [
+      "Görsel son kontrol. Plain'den iyi değilse son sadeleştirme pass'i.",
+      "Final + dosya özeti.",
+    ],
   },
   "max_thinking:6": {
-    title: "Derin Detay",
-    tasks: ["Procedural/katmanlı detay ekle.", "Renk varyasyonu, texture."],
+    title: "Sonuç Değerlendirme",
+    tasks: [
+      "Read/browser — tam çıktıyı incele: oran, ocellus/train, noise, overlap.",
+      "Fazlalık ve eksik ayrı listele.",
+    ],
   },
   "max_thinking:7": {
-    title: "Anatomi/Doğruluk",
-    tasks: ["Referans doğruluğu kontrol.", "Read+Write ile düzelt."],
+    title: "Plain Kıyas",
+    tasks: [
+      "Düz tek tur hipotezi: daha az katmanla aynı kalite mümkün mü?",
+      "Evetse sonraki pass sadeleştirme odaklı.",
+    ],
   },
   "max_thinking:8": {
-    title: "Karşı Argüman",
-    tasks: ["Alternatif teknikleri değerlendir.", "En iyi seçimi uygula."],
+    title: "Uygula (düzelt / sadeleştir)",
+    tasks: [
+      "Bulguya göre Write — ekle, düzelt VEYA filter/katman/dekor sil.",
+      "Satır sayısı artırmak hedef değil.",
+    ],
   },
   "max_thinking:9": {
-    title: "Cilalama",
-    tasks: ["Performans, erişilebilirlik, responsive.", "Son rötuşlar."],
+    title: "Son Sadeleştirme",
+    tasks: [
+      "Gereksiz gradient, filter, tekrar eden eleman temizliği.",
+      "Performans, erişilebilirlik, responsive son kontrol.",
+    ],
   },
   "max_thinking:10": {
     title: "Doğrulama & Final",
     tasks: [
-      "Smoke test çalıştır.",
-      "KULLANICIYA GİDECEK ÖZET: dosya, satır sayısı, öne çıkan detaylar.",
+      "Görsel doğrulama (browser). Plain'den iyi mi — dürüst yaz.",
+      "KULLANICIYA: dosya yolu + kalite özeti (satır sayısı övünme metriği değil).",
     ],
   },
 };
@@ -103,17 +118,17 @@ const EN: Record<string, CreativePassTextEntry> = {
     ],
   },
   "easy_thinking:2": {
-    title: "Detail & Depth",
+    title: "Outcome Review",
     tasks: [
-      "Open the file with Read — find missing details.",
-      "Increase visual detail with StrReplace (layer, color, anatomy).",
+      "Open with Read — view in browser or inspect SVG/CSS.",
+      "Missing or excess? Would a single plain pass suffice? Note findings (no forced additions).",
     ],
   },
   "easy_thinking:3": {
-    title: "Polish & Final",
+    title: "Verify & Final",
     tasks: [
-      "Final touches, remove unnecessary code.",
-      "Check if it opens in browser. Final summary + file path.",
+      "Verify visual result (browser or Read). Remove unnecessary layers.",
+      "Final: file path + what was fixed/simplified (not add-only).",
     ],
   },
   "medium_thinking:1": {
@@ -128,58 +143,73 @@ const EN: Record<string, CreativePassTextEntry> = {
     ],
   },
   "medium_thinking:3": {
-    title: "Detail Pass",
+    title: "Outcome Review",
     tasks: [
-      "Add detail with StrReplace: layers, gradient, texture, animation.",
-      "At least 3 concrete visual improvements from the previous pass.",
+      "SEE output (browser_snapshot or Read) — anatomy, composition, readability.",
+      "List gaps AND bloat. Would plain mode be cleaner?",
     ],
   },
   "medium_thinking:4": {
-    title: "Internal Review",
+    title: "Apply (add or remove)",
     tasks: [
-      "Re-read with Read — strengthen weak areas.",
-      "Fix with Write. Fidelity: what did the user ask for?",
+      "Write/StrReplace from pass 3 — fix, simplify, or remove layers.",
+      "Blind detail stacking forbidden. Stay faithful to the brief.",
     ],
   },
   "medium_thinking:5": {
-    title: "Final & Verify",
+    title: "Visual Verify & Final",
     tasks: [
-      "Check file exists and syntax is valid via Shell/node.",
-      "Final delivery: file path + summary of what was added.",
+      "Open final in browser. Syntax + visual quality together.",
+      "Final: file path + clear change summary (removed/added).",
     ],
   },
   "more_thinking:6": {
-    title: "Comparison & Alternatives",
+    title: "Plain Comparison",
     tasks: [
-      "Steel-man another approach (canvas vs SVG vs CSS).",
-      "Fix weak points of current choice with Read+Write.",
+      "Steel-man: what would one plain pass produce?",
+      "Is current output truly better — honest answer. Simplify with Write if not.",
     ],
   },
   "more_thinking:7": {
-    title: "Final Synthesis",
-    tasks: ["Merge the best details.", "Final + file summary."],
+    title: "Final Verification",
+    tasks: [
+      "Final visual check. Last simplification pass if not beating plain.",
+      "Final + file summary.",
+    ],
   },
   "max_thinking:6": {
-    title: "Deep Detail",
-    tasks: ["Add procedural/layered detail.", "Color variation, texture."],
+    title: "Outcome Review",
+    tasks: [
+      "Read/browser — full output: proportions, noise, overlap.",
+      "Separate excess from gaps.",
+    ],
   },
   "max_thinking:7": {
-    title: "Anatomy/Accuracy",
-    tasks: ["Check reference accuracy.", "Fix with Read+Write."],
+    title: "Plain Comparison",
+    tasks: [
+      "Plain single-pass hypothesis: same quality with fewer layers?",
+      "If yes, next pass focuses on simplification.",
+    ],
   },
   "max_thinking:8": {
-    title: "Counter-Argument",
-    tasks: ["Evaluate alternative techniques.", "Apply the best choice."],
+    title: "Apply (fix / simplify)",
+    tasks: [
+      "Write from findings — fix, OR remove filters/layers/decor.",
+      "Line count is not the goal.",
+    ],
   },
   "max_thinking:9": {
-    title: "Polish",
-    tasks: ["Performance, accessibility, responsive.", "Final touches."],
+    title: "Final Simplification",
+    tasks: [
+      "Remove redundant gradients, filters, duplicate elements.",
+      "Performance, a11y, responsive final check.",
+    ],
   },
   "max_thinking:10": {
     title: "Verification & Final",
     tasks: [
-      "Run smoke test.",
-      "USER-FACING SUMMARY: file, line count, standout details.",
+      "Visual verify (browser). Honestly state if better than plain.",
+      "USER: file path + quality summary (line count is not a boast metric).",
     ],
   },
 };
@@ -193,17 +223,17 @@ const DE: Record<string, CreativePassTextEntry> = {
     ],
   },
   "easy_thinking:2": {
-    title: "Detail & Tiefe",
+    title: "Ergebnis-Bewertung",
     tasks: [
-      "Datei mit Read öffnen — fehlende Details finden.",
-      "Visuelle Details mit StrReplace erhöhen (Ebene, Farbe, Anatomie).",
+      "Mit Read öffnen — im Browser ansehen oder SVG/CSS prüfen.",
+      "Fehlt etwas oder ist zu viel? Würde ein plain Pass reichen? Befunde notieren.",
     ],
   },
   "easy_thinking:3": {
-    title: "Feinschliff & Final",
+    title: "Verifizieren & Final",
     tasks: [
-      "Letzte Retuschen, unnötigen Code entfernen.",
-      "Im Browser öffenbar prüfen. Finale Zusammenfassung + Dateipfad.",
+      "Visuelles Ergebnis prüfen (Browser oder Read). Unnötige Ebenen entfernen.",
+      "Final: Dateipfad + was vereinfacht/korrigiert wurde.",
     ],
   },
   "medium_thinking:1": {
@@ -218,58 +248,67 @@ const DE: Record<string, CreativePassTextEntry> = {
     ],
   },
   "medium_thinking:3": {
-    title: "Detail-Pass",
+    title: "Ergebnis-Bewertung",
     tasks: [
-      "Detail mit StrReplace hinzufügen: Ebenen, Gradient, Textur, Animation.",
-      "Mindestens 3 konkrete visuelle Verbesserungen gegenüber vorherigem Pass.",
+      "Ausgabe SEHEN (browser_snapshot oder Read) — Anatomie, Komposition.",
+      "Lücken UND Ballast listen. Wäre plain sauberer?",
     ],
   },
   "medium_thinking:4": {
-    title: "Interne Kontrolle",
+    title: "Anwenden (hinzufügen oder entfernen)",
     tasks: [
-      "Erneut mit Read lesen — schwache Bereiche stärken.",
-      "Mit Write korrigieren. Treue: was wollte der Nutzer?",
+      "Write/StrReplace aus Pass 3 — korrigieren, vereinfachen oder Ebenen löschen.",
+      "Blindes Detail-Stapeln verboten.",
     ],
   },
   "medium_thinking:5": {
-    title: "Final & Verifizieren",
+    title: "Visuelle Verifizierung & Final",
     tasks: [
-      "Mit Shell/node prüfen: Datei vorhanden, Syntax ok.",
-      "Finale Lieferung: Dateipfad + Zusammenfassung der Ergänzungen.",
+      "Endstand im Browser öffnen. Syntax + visuelle Qualität.",
+      "Final: Dateipfad + Änderungsübersicht.",
     ],
   },
   "more_thinking:6": {
-    title: "Vergleich & Alternativen",
+    title: "Plain-Vergleich",
     tasks: [
-      "Steel-man anderer Ansatz (Canvas vs SVG vs CSS).",
-      "Schwachstellen der aktuellen Wahl mit Read+Write beheben.",
+      "Steel-man: was würde ein plain Pass liefern?",
+      "Ehrlich: ist die Ausgabe wirklich besser? Ggf. vereinfachen.",
     ],
   },
   "more_thinking:7": {
-    title: "Finale Synthese",
-    tasks: ["Beste Details zusammenführen.", "Final + Dateiübersicht."],
+    title: "Finale Verifizierung",
+    tasks: ["Visueller Endcheck.", "Final + Dateiübersicht."],
   },
   "max_thinking:6": {
-    title: "Tiefes Detail",
-    tasks: ["Prozedurale/mehrschichtige Details hinzufügen.", "Farbvariation, Textur."],
+    title: "Ergebnis-Bewertung",
+    tasks: ["Read/Browser — vollständige Ausgabe prüfen.", "Ballast und Lücken trennen."],
   },
   "max_thinking:7": {
-    title: "Anatomie/Genauigkeit",
-    tasks: ["Referenzgenauigkeit prüfen.", "Mit Read+Write korrigieren."],
+    title: "Plain-Vergleich",
+    tasks: [
+      "Plain-Ein-Pass-Hypothese: gleiche Qualität mit weniger Ebenen?",
+      "Wenn ja: nächster Pass = Vereinfachung.",
+    ],
   },
   "max_thinking:8": {
-    title: "Gegenargument",
-    tasks: ["Alternative Techniken bewerten.", "Beste Wahl anwenden."],
+    title: "Anwenden (fix / vereinfachen)",
+    tasks: [
+      "Write aus Befunden — korrigieren ODER Filter/Ebenen entfernen.",
+      "Zeilenanzahl ist kein Ziel.",
+    ],
   },
   "max_thinking:9": {
-    title: "Feinschliff",
-    tasks: ["Performance, Barrierefreiheit, Responsive.", "Letzte Retuschen."],
+    title: "Finale Vereinfachung",
+    tasks: [
+      "Redundante Gradienten, Filter, Duplikate entfernen.",
+      "Performance, A11y, Responsive.",
+    ],
   },
   "max_thinking:10": {
     title: "Verifikation & Final",
     tasks: [
-      "Smoke-Test ausführen.",
-      "NUTZER-ZUSAMMENFASSUNG: Datei, Zeilenanzahl, Highlights.",
+      "Visuelle Verifizierung (Browser). Ehrlich vs. plain.",
+      "NUTZER: Dateipfad + Qualitätsübersicht.",
     ],
   },
 };
@@ -283,17 +322,17 @@ const AR: Record<string, CreativePassTextEntry> = {
     ],
   },
   "easy_thinking:2": {
-    title: "تفاصيل وعمق",
+    title: "مراجعة النتيجة",
     tasks: [
-      "افتح الملف بـ Read — اعثر على التفاصيل الناقصة.",
-      "زِد التفاصيل البصرية بـ StrReplace (طبقة، لون، تشريح).",
+      "افتح بـ Read — اعرض في المتصفح أو افحص SVG/CSS.",
+      "ناقص أم زائد؟ هل يكفي pass واحد plain؟ دوّن الملاحظات.",
     ],
   },
   "easy_thinking:3": {
-    title: "صقل ونهائي",
+    title: "تحقق ونهائي",
     tasks: [
-      "لمسات أخيرة، أزل الكود غير الضروري.",
-      "تحقق من فتحه في المتصفح. ملخص نهائي + مسار الملف.",
+      "تحقق بصري (browser أو Read). أزل الطبقات غير الضرورية.",
+      "نهائي: مسار الملف + ما بُسّط/صُحّح.",
     ],
   },
   "medium_thinking:1": {
@@ -308,58 +347,67 @@ const AR: Record<string, CreativePassTextEntry> = {
     ],
   },
   "medium_thinking:3": {
-    title: "pass تفاصيل",
+    title: "مراجعة النتيجة",
     tasks: [
-      "أضف تفاصيل بـ StrReplace: طبقات، gradient، texture، animation.",
-      "3 تحسينات بصرية ملموسة على الأقل من pass السابق.",
+      "اعرض المخرجات (browser_snapshot أو Read) — تشريح وتركيب.",
+      "اذكر النقص والزيادة. هل plain أنظف؟",
     ],
   },
   "medium_thinking:4": {
-    title: "مراجعة داخلية",
+    title: "تطبيق (إضافة أو حذف)",
     tasks: [
-      "أعد القراءة بـ Read — قوِّ المناطق الضعيفة.",
-      "صحّح بـ Write. الالتزام: ماذا طلب المستخدم؟",
+      "Write/StrReplace حسب pass 3 — صحّح، بسّط أو احذف طبقات.",
+      "إضافة تفاصيل عمياء ممنوعة.",
     ],
   },
   "medium_thinking:5": {
-    title: "نهائي وتحقق",
+    title: "تحقق بصري ونهائي",
     tasks: [
-      "تحقق من وجود الملف وصحة syntax عبر Shell/node.",
-      "تسليم نهائي: مسار الملف + ملخص ما أُضيف.",
+      "افتح النهائي في المتصفح. syntax + جودة بصرية.",
+      "نهائي: مسار الملف + ملخص التغييرات.",
     ],
   },
   "more_thinking:6": {
-    title: "مقارنة وبدائل",
+    title: "مقارنة Plain",
     tasks: [
-      "Steel-man نهج آخر (canvas vs SVG vs CSS).",
-      "أصلح نقاط ضعف الاختيار الحالي بـ Read+Write.",
+      "Steel-man: ماذا كان plain pass واحد لينتج؟",
+      "هل المخرجات أفضل فعلاً — بصراحة. بسّط إن لزم.",
     ],
   },
   "more_thinking:7": {
-    title: "تركيب نهائي",
-    tasks: ["ادمج أفضل التفاصيل.", "نهائي + ملخص الملف."],
+    title: "تحقق نهائي",
+    tasks: ["فحص بصري أخير.", "نهائي + ملخص الملف."],
   },
   "max_thinking:6": {
-    title: "تفاصيل عميقة",
-    tasks: ["أضف تفاصيل procedural/طبقات.", "تنوع ألوان، texture."],
+    title: "مراجعة النتيجة",
+    tasks: ["Read/browser — المخرجات كاملة.", "افصل الزيادة عن النقص."],
   },
   "max_thinking:7": {
-    title: "تشريح/دقة",
-    tasks: ["تحقق من دقة المرجع.", "صحّح بـ Read+Write."],
+    title: "مقارنة Plain",
+    tasks: [
+      "فرضية plain pass واحد: نفس الجودة بطبقات أقل؟",
+      "إن نعم: pass التالي = تبسيط.",
+    ],
   },
   "max_thinking:8": {
-    title: "حجة مضادة",
-    tasks: ["قيّم تقنيات بديلة.", "طبّق أفضل اختيار."],
+    title: "تطبيق (إصلاح / تبسيط)",
+    tasks: [
+      "Write من الملاحظات — أصلح أو احذف filters/طبقات.",
+      "عدد الأسطر ليس هدفاً.",
+    ],
   },
   "max_thinking:9": {
-    title: "صقل",
-    tasks: ["أداء، إمكانية وصول، responsive.", "لمسات أخيرة."],
+    title: "تبسيط نهائي",
+    tasks: [
+      "أزل gradients/filters/عناصر مكررة.",
+      "أداء، إمكانية وصول، responsive.",
+    ],
   },
   "max_thinking:10": {
     title: "تحقق ونهائي",
     tasks: [
-      "شغّل smoke test.",
-      "ملخص للمستخدم: الملف، عدد الأسطر، أبرز التفاصيل.",
+      "تحقق بصري (browser). هل أفضل من plain — بصراحة.",
+      "للمستخدم: مسار الملف + ملخص الجودة.",
     ],
   },
 };

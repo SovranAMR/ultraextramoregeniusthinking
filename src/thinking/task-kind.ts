@@ -35,28 +35,28 @@ interface CreativePassSkeleton {
 
 const CREATIVE_EASY: CreativePassSkeleton[] = [
   { pass: 1, lens: "draft", execution: "write" },
-  { pass: 2, lens: "detail", execution: "read" },
-  { pass: 3, lens: "polish", execution: "verify" },
+  { pass: 2, lens: "outcome_judgment", execution: "read" },
+  { pass: 3, lens: "verify_final", execution: "verify" },
 ];
 
 const CREATIVE_MEDIUM: CreativePassSkeleton[] = [
   { pass: 1, lens: "draft", execution: "write" },
   { pass: 2, lens: "gap_analysis", execution: "read" },
-  { pass: 3, lens: "detail", execution: "write" },
-  { pass: 4, lens: "internal_critique", execution: "read" },
+  { pass: 3, lens: "outcome_judgment", execution: "read" },
+  { pass: 4, lens: "apply_judgment", execution: "write" },
   { pass: 5, lens: "verify_final", execution: "verify" },
 ];
 
 const CREATIVE_MORE_EXTRA: CreativePassSkeleton[] = [
-  { pass: 6, lens: "counter_argument", execution: "read" },
+  { pass: 6, lens: "plain_baseline", execution: "read" },
   { pass: 7, lens: "verify_final", execution: "verify" },
 ];
 
 const CREATIVE_MAX_EXTRA: CreativePassSkeleton[] = [
-  { pass: 6, lens: "deep_detail", execution: "write" },
-  { pass: 7, lens: "accuracy", execution: "read" },
-  { pass: 8, lens: "counter_argument", execution: "write" },
-  { pass: 9, lens: "polish", execution: "write" },
+  { pass: 6, lens: "outcome_judgment", execution: "read" },
+  { pass: 7, lens: "plain_baseline", execution: "read" },
+  { pass: 8, lens: "apply_judgment", execution: "write" },
+  { pass: 9, lens: "trim_polish", execution: "write" },
   { pass: 10, lens: "verify_final", execution: "verify" },
 ];
 

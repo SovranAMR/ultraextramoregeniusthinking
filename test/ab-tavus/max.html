@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gerçekçi tavus kuşu SVG illüstrasyonu — inline CSS ve SVG, harici bağımlılık yok">
+<title>Tavus Kuşu — SVG İllüstrasyon</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    min-height: 100dvh;
+    background: radial-gradient(ellipse at 50% 80%, #1a2e1a 0%, #0d1117 55%, #06080c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, "Times New Roman", serif;
+    overflow: hidden;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .frame {
+    width: min(96vw, 920px);
+    aspect-ratio: 4 / 5;
+    position: relative;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 12px 40px rgba(0,0,0,0.55));
+  }
+  .caption {
+    position: absolute;
+    bottom: clamp(-2.5rem, -4vw, -1.5rem);
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(200,210,180,0.45);
+    font-size: clamp(0.65rem, 2vw, 0.78rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 480px) {
+    svg { filter: drop-shadow(0 6px 20px rgba(0,0,0,0.45)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    svg { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
+  }
+</style>
+</head>
+<body>
+<main class="frame">
+<svg viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="peacock-title peacock-desc">
+  <title id="peacock-title">Tavus Kuşu (Pavo cristatus)</title>
+  <desc id="peacock-desc">Erkek tavus kuşu profilden: açık kuyruk fanında ocellus desenli tüyler, iridescent mavi-yeşil boyun, altın-yeşil göğüs, baş ibiği</desc>
+
+  <defs>
+    <!-- Gökyüzü / arka plan -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2838"/>
+      <stop offset="45%" stop-color="#243040"/>
+      <stop offset="100%" stop-color="#2a3a28"/>
+    </linearGradient>
+
+    <!-- Zemin -->
+    <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3d5a32"/>
+      <stop offset="100%" stop-color="#1e3018"/>
+    </linearGradient>
+
+    <!-- İridescent mavi-yeşil (kuyruk / boyun) -->
+    <linearGradient id="iridBlueGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a4a6e"/>
+      <stop offset="25%" stop-color="#127a8a"/>
+      <stop offset="50%" stop-color="#1a9a7a"/>
+      <stop offset="75%" stop-color="#0e6b8a"/>
+      <stop offset="100%" stop-color="#063a58"/>
+    </linearGradient>
+
+    <linearGradient id="iridBlueGreenV" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#064060"/>
+      <stop offset="40%" stop-color="#148888"/>
+      <stop offset="70%" stop-color="#22b898"/>
+      <stop offset="100%" stop-color="#0a5878"/>
+    </linearGradient>
+
+    <!-- Altın-yeşil göğüs -->
+    <linearGradient id="chestGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a7020"/>
+      <stop offset="30%" stop-color="#c4a030"/>
+      <stop offset="55%" stop-color="#d4b840"/>
+      <stop offset="80%" stop-color="#7a9030"/>
+      <stop offset="100%" stop-color="#4a6020"/>
+    </linearGradient>
+
+    <!-- Gövde koyu -->
+    <linearGradient id="bodyDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a3028"/>
+      <stop offset="50%" stop-color="#243830"/>
+      <stop offset="100%" stop-color="#142820"/>
+    </linearGradient>
+
+    <!-- Ocellus merkez -->
+    <radialGradient id="ocellusCore" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#0a1830"/>
+      <stop offset="35%" stop-color="#0c2850"/>
+      <stop offset="65%" stop-color="#106080"/>
+      <stop offset="100%" stop-color="#148898"/>
+    </radialGradient>
+
+    <!-- Ocellus dış halka -->
+    <radialGradient id="ocellusRing" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="55%" stop-color="transparent"/>
+      <stop offset="62%" stop-color="#148888"/>
+      <stop offset="72%" stop-color="#c89830"/>
+      <stop offset="82%" stop-color="#a87820"/>
+      <stop offset="92%" stop-color="#604010"/>
+      <stop offset="100%" stop-color="#302008"/>
+    </radialGradient>
+
+    <!-- Tüy gölge filtresi -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+
+    <filter id="featherBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="0.4"/>
+    </filter>
+
+    <!-- Vignette -->
+    <radialGradient id="vignette" cx="50%" cy="45%" r="65%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+    </radialGradient>
+
+    <!-- İridescent parlama -->
+    <linearGradient id="featherSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#80e8d0" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#40c0b0" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Tek tüy şablonu (ocellus'lu) -->
+    <g id="tailFeather">
+      <path d="M0,0 C-3,-40 -5,-120 -4,-200 C-2,-280 2,-360 0,-440
+               C2,-360 4,-280 4,-200 C5,-120 3,-40 0,0 Z"
+            fill="url(#iridBlueGreenV)" stroke="#063048" stroke-width="0.6"/>
+      <!-- Barb çizgileri -->
+      <path d="M0,-20 L-2,-180 M0,-20 L2,-180 M0,-60 L-3,-220 M0,-60 L3,-220
+               M0,-120 L-2,-300 M0,-120 L2,-300 M0,-200 L-1,-380 M0,-200 L1,-380"
+            fill="none" stroke="#0a5068" stroke-width="0.25" opacity="0.45"/>
+      <!-- Rachis (tüy sapı) -->
+      <path d="M0,4 L0,-430" fill="none" stroke="#042838" stroke-width="1.2" opacity="0.7"/>
+      <!-- Ocellus -->
+      <ellipse cx="0" cy="-280" rx="38" ry="42" fill="url(#ocellusRing)" opacity="0.95"/>
+      <ellipse cx="0" cy="-280" rx="22" ry="24" fill="url(#ocellusCore)"/>
+      <ellipse cx="0" cy="-280" rx="8" ry="9" fill="#081828" opacity="0.85"/>
+      <ellipse cx="0" cy="-280" rx="32" ry="36" fill="none" stroke="#b88828" stroke-width="1.8" opacity="0.7"/>
+      <ellipse cx="0" cy="-280" rx="18" ry="20" fill="none" stroke="#188888" stroke-width="1" opacity="0.55"/>
+      <ellipse cx="-4" cy="-286" rx="6" ry="5" fill="#1a8090" opacity="0.45"/>
+      <!-- İridescent parlama -->
+      <path d="M0,0 C-3,-40 -5,-120 -4,-200 C-2,-280 2,-360 0,-440
+               C2,-360 4,-280 4,-200 C5,-120 3,-40 0,0 Z"
+            fill="url(#featherSheen)" opacity="0.7"/>
+    </g>
+
+    <!-- Kısa kuyruk covert tüyü -->
+    <g id="tailCovert">
+      <path d="M0,0 C-12,-8 -18,-28 -14,-48 C-6,-38 4,-22 0,0 Z"
+            fill="url(#iridBlueGreen)" stroke="#063048" stroke-width="0.35"/>
+    </g>
+
+    <!-- Alternatif tüy (ocellus ton varyasyonu) -->
+    <g id="tailFeatherAlt">
+      <path d="M0,0 C-2,-35 -4,-110 -3,-185 C-1,-265 1,-340 0,-415
+               C1,-340 3,-265 3,-185 C4,-110 2,-35 0,0 Z"
+            fill="url(#iridBlueGreenV)" stroke="#063048" stroke-width="0.5"/>
+      <path d="M0,3 L0,-405" fill="none" stroke="#042838" stroke-width="1" opacity="0.65"/>
+      <ellipse cx="0" cy="-260" rx="34" ry="38" fill="url(#ocellusRing)" opacity="0.9"/>
+      <ellipse cx="0" cy="-260" rx="20" ry="22" fill="url(#ocellusCore)"/>
+      <ellipse cx="0" cy="-260" rx="7" ry="8" fill="#081828" opacity="0.8"/>
+      <path d="M0,0 C-2,-35 -4,-110 -3,-185 C-1,-265 1,-340 0,-415
+               C1,-340 3,-265 3,-185 C4,-110 2,-35 0,0 Z"
+            fill="url(#featherSheen)" opacity="0.55"/>
+    </g>
+
+    <!-- Scapular tüy -->
+    <g id="scapularFeather">
+      <path d="M0,0 C-6,-12 -14,-38 -10,-58 C-2,-44 4,-24 0,0 Z"
+            fill="#1a4038" stroke="#0a2018" stroke-width="0.3"/>
+    </g>
+
+    <!-- Boyun tüyü -->
+    <g id="neckFeather">
+      <path d="M0,0 C-8,-18 6,-32 0,-48 C-4,-32 8,-18 0,0 Z"
+            fill="url(#iridBlueGreen)" stroke="#063048" stroke-width="0.3"/>
+      <path d="M0,-4 C-3,-22 2,-36 0,-44" fill="none" stroke="#30b0a0" stroke-width="0.4" opacity="0.35"/>
+    </g>
+
+    <!-- İbik tüyü -->
+    <g id="crestFeather">
+      <path d="M0,0 C-2,-8 0,-22 2,-8 Z M0,-22 C-1,-30 1,-38 0,-46 C-1,-38 1,-30 0,-22"
+            fill="url(#iridBlueGreenV)" stroke="#063048" stroke-width="0.4"/>
+      <circle cx="0" cy="-38" r="1.8" fill="#48c8b0"/>
+      <circle cx="-0.5" cy="-40" r="0.6" fill="#80e8d8" opacity="0.7"/>
+    </g>
+  </defs>
+
+  <!-- Arka plan -->
+  <rect width="800" height="1000" fill="url(#skyGrad)"/>
+  <!-- Atmosferik ışık -->
+  <ellipse cx="400" cy="350" rx="320" ry="280" fill="#308898" opacity="0.06"/>
+  <ellipse cx="520" cy="280" rx="180" ry="160" fill="#c0a030" opacity="0.04"/>
+  <ellipse cx="400" cy="920" rx="420" ry="80" fill="url(#groundGrad)" opacity="0.85"/>
+  <ellipse cx="400" cy="900" rx="350" ry="30" fill="#2a4820" opacity="0.4"/>
+
+  <!-- Zemin gölgesi -->
+  <ellipse cx="400" cy="870" rx="120" ry="18" fill="#0a1008" opacity="0.45"/>
+
+  <!-- ═══ AÇIK KUYRUK (TRAIN) — pivot: rump ~400,610 ═══ -->
+  <g id="train" filter="url(#softShadow)">
+    <!-- Sol kanat tüyleri -->
+    <g transform="translate(290, 650) rotate(-72)"><use href="#tailFeather" transform="scale(0.85)"/></g>
+    <g transform="translate(270, 642) rotate(-62)"><use href="#tailFeather" transform="scale(0.88)"/></g>
+    <g transform="translate(250, 634) rotate(-52)"><use href="#tailFeather" transform="scale(0.92)"/></g>
+    <g transform="translate(230, 626) rotate(-42)"><use href="#tailFeather" transform="scale(0.95)"/></g>
+    <g transform="translate(210, 618) rotate(-32)"><use href="#tailFeather" transform="scale(0.98)"/></g>
+    <g transform="translate(192, 612) rotate(-22)"><use href="#tailFeather"/></g>
+    <g transform="translate(178, 607) rotate(-12)"><use href="#tailFeather" transform="scale(1.02)"/></g>
+    <g transform="translate(168, 604) rotate(-4)"><use href="#tailFeather" transform="scale(1.04)"/></g>
+
+    <!-- Merkez tüyler -->
+    <g transform="translate(400, 598) rotate(-90)"><use href="#tailFeather" transform="scale(1.08)"/></g>
+    <g transform="translate(385, 600) rotate(-82)"><use href="#tailFeather" transform="scale(1.06)"/></g>
+    <g transform="translate(415, 600) rotate(-98)"><use href="#tailFeather" transform="scale(1.06)"/></g>
+    <g transform="translate(370, 604) rotate(-74)"><use href="#tailFeather" transform="scale(1.04)"/></g>
+    <g transform="translate(430, 604) rotate(-106)"><use href="#tailFeather" transform="scale(1.04)"/></g>
+
+    <!-- Sağ kanat tüyleri (sol simetri) -->
+    <g transform="translate(632, 604) rotate(-176)"><use href="#tailFeather" transform="scale(1.04)"/></g>
+    <g transform="translate(622, 607) rotate(-168)"><use href="#tailFeather" transform="scale(1.02)"/></g>
+    <g transform="translate(608, 612) rotate(-158)"><use href="#tailFeather"/></g>
+    <g transform="translate(590, 618) rotate(-148)"><use href="#tailFeather" transform="scale(0.98)"/></g>
+    <g transform="translate(570, 626) rotate(-138)"><use href="#tailFeather" transform="scale(0.95)"/></g>
+    <g transform="translate(550, 634) rotate(-128)"><use href="#tailFeather" transform="scale(0.92)"/></g>
+    <g transform="translate(530, 642) rotate(-118)"><use href="#tailFeather" transform="scale(0.88)"/></g>
+    <g transform="translate(510, 650) rotate(-108)"><use href="#tailFeather" transform="scale(0.85)"/></g>
+
+    <!-- Dış kenar ince tüyler -->
+    <g transform="translate(140, 622) rotate(-28)" opacity="0.7"><use href="#tailFeather" transform="scale(0.78)"/></g>
+    <g transform="translate(660, 622) rotate(-152)" opacity="0.7"><use href="#tailFeather" transform="scale(0.78)"/></g>
+    <g transform="translate(400, 582) rotate(-90)" opacity="0.85"><use href="#tailFeather" transform="scale(1.12)"/></g>
+
+    <!-- Ara tüyler — fan dolgunluğu -->
+    <g transform="translate(155, 614) rotate(-35)" opacity="0.82"><use href="#tailFeather" transform="scale(0.82)"/></g>
+    <g transform="translate(645, 614) rotate(-145)" opacity="0.82"><use href="#tailFeather" transform="scale(0.82)"/></g>
+    <g transform="translate(185, 606) rotate(-26)" opacity="0.88"><use href="#tailFeather" transform="scale(0.90)"/></g>
+    <g transform="translate(615, 606) rotate(-154)" opacity="0.88"><use href="#tailFeather" transform="scale(0.90)"/></g>
+    <g transform="translate(345, 596) rotate(-68)" opacity="0.92"><use href="#tailFeather" transform="scale(1.0)"/></g>
+    <g transform="translate(455, 596) rotate(-112)" opacity="0.92"><use href="#tailFeather" transform="scale(1.0)"/></g>
+    <g transform="translate(360, 592) rotate(-78)" opacity="0.90"><use href="#tailFeather" transform="scale(0.96)"/></g>
+    <g transform="translate(440, 592) rotate(-102)" opacity="0.90"><use href="#tailFeather" transform="scale(0.96)"/></g>
+    <g transform="translate(315, 610) rotate(-58)" opacity="0.86"><use href="#tailFeather" transform="scale(0.88)"/></g>
+    <g transform="translate(485, 610) rotate(-122)" opacity="0.86"><use href="#tailFeather" transform="scale(0.88)"/></g>
+    <g transform="translate(400, 572) rotate(-90)" opacity="0.75"><use href="#tailFeather" transform="scale(1.15)"/></g>
+
+    <!-- Alt katman — tailFeatherAlt varyasyon -->
+    <g transform="translate(325, 618) rotate(-48)" opacity="0.55"><use href="#tailFeatherAlt" transform="scale(0.92)"/></g>
+    <g transform="translate(475, 618) rotate(-132)" opacity="0.55"><use href="#tailFeatherAlt" transform="scale(0.92)"/></g>
+    <g transform="translate(355, 612) rotate(-58)" opacity="0.50"><use href="#tailFeatherAlt" transform="scale(0.88)"/></g>
+    <g transform="translate(445, 612) rotate(-122)" opacity="0.50"><use href="#tailFeatherAlt" transform="scale(0.88)"/></g>
+    <g transform="translate(400, 608) rotate(-90)" opacity="0.48"><use href="#tailFeatherAlt" transform="scale(0.95)"/></g>
+  </g>
+
+  <!-- Kuyruk tabanı / rump covert -->
+  <g id="tail-coverts" transform="translate(400, 620)" filter="url(#softShadow)">
+    <use href="#tailCovert" transform="rotate(-55) translate(-30,0)"/>
+    <use href="#tailCovert" transform="rotate(-40) translate(-22,2)"/>
+    <use href="#tailCovert" transform="rotate(-25) translate(-14,4)"/>
+    <use href="#tailCovert" transform="rotate(-10) translate(-6,5)"/>
+    <use href="#tailCovert" transform="rotate(5) translate(2,5)"/>
+    <use href="#tailCovert" transform="rotate(20) translate(10,4)"/>
+    <use href="#tailCovert" transform="rotate(35) translate(18,2)"/>
+    <use href="#tailCovert" transform="rotate(50) translate(26,0)"/>
+    <use href="#tailCovert" transform="rotate(-70) translate(-38,-2) scale(0.9)"/>
+    <use href="#tailCovert" transform="rotate(65) translate(34,-2) scale(0.9)"/>
+  </g>
+
+  <!-- Gerçek kuyruk (rectrix) — train altından görünen kısa tüyler -->
+  <g id="rectrix" transform="translate(400, 635)" opacity="0.85">
+    <path d="M0,0 C-4,-25 -6,-55 -5,-78 C-2,-52 2,-28 0,0 Z" fill="#1a3830" stroke="#0a2018" stroke-width="0.4"/>
+    <path d="M0,0 C-2,-30 0,-62 0,-85" fill="none" stroke="#0a2018" stroke-width="0.6"/>
+    <g transform="translate(-12,2) rotate(-8)"><path d="M0,0 C-3,-22 -5,-48 -4,-68 C-1,-44 2,-24 0,0 Z" fill="#1a3830" stroke="#0a2018" stroke-width="0.35"/></g>
+    <g transform="translate(12,2) rotate(8)"><path d="M0,0 C3,-22 5,-48 4,-68 C1,-44 -2,-24 0,0 Z" fill="#1a3830" stroke="#0a2018" stroke-width="0.35"/></g>
+  </g>
+
+  <!-- ═══ GÖVDE ═══ -->
+  <g id="body" filter="url(#softShadow)">
+    <!-- Ana gövde -->
+    <ellipse cx="400" cy="680" rx="72" ry="95" fill="url(#bodyDark)" transform="rotate(-8 400 680)"/>
+    <!-- Gövde highlight -->
+    <ellipse cx="388" cy="660" rx="38" ry="55" fill="#2a4840" opacity="0.35" transform="rotate(-12 388 660)"/>
+    <!-- Göğüs altın-yeşil -->
+    <path d="M360,640 C350,670 355,720 380,740 C400,752 420,752 440,740
+             C455,720 450,670 440,640 C425,625 375,625 360,640 Z"
+          fill="url(#chestGold)" stroke="#5a4818" stroke-width="0.8"/>
+    <!-- Göğüs üst tüy scalop -->
+    <path d="M365,638 Q375,632 385,638 Q395,632 405,638 Q415,632 425,638 Q435,632 440,638"
+          fill="none" stroke="#6a5820" stroke-width="1" opacity="0.55"/>
+    <!-- Göğüs tüy çizgileri -->
+    <path d="M385,655 Q395,690 385,725" fill="none" stroke="#a08828" stroke-width="0.5" opacity="0.5"/>
+    <path d="M400,650 Q410,690 400,730" fill="none" stroke="#a08828" stroke-width="0.5" opacity="0.5"/>
+    <path d="M415,655 Q405,690 415,725" fill="none" stroke="#a08828" stroke-width="0.5" opacity="0.5"/>
+    <!-- Kanat (kapalı) -->
+    <path d="M330,660 C300,670 285,710 295,750 C310,740 330,720 340,690 Z"
+          fill="#1a3830" stroke="#0a2018" stroke-width="0.6"/>
+    <path d="M470,660 C500,670 515,710 505,750 C490,740 470,720 460,690 Z"
+          fill="#1a3830" stroke="#0a2018" stroke-width="0.6"/>
+    <!-- Kanat tüy detayı -->
+    <path d="M305,720 L295,745 M315,710 L305,738 M325,700 L318,730"
+          fill="none" stroke="#0a2820" stroke-width="0.8"/>
+    <path d="M495,720 L505,745 M485,710 L495,738 M475,700 L482,730"
+          fill="none" stroke="#0a2820" stroke-width="0.8"/>
+    <!-- Scapular tüyler -->
+    <g transform="translate(340, 648)">
+      <use href="#scapularFeather" transform="rotate(-30)"/>
+      <use href="#scapularFeather" transform="rotate(-15) translate(8,-4)"/>
+      <use href="#scapularFeather" transform="rotate(0) translate(16,-6)"/>
+    </g>
+    <g transform="translate(460, 648)">
+      <use href="#scapularFeather" transform="rotate(30) scale(-1,1)"/>
+      <use href="#scapularFeather" transform="rotate(15) translate(8,-4) scale(-1,1)"/>
+      <use href="#scapularFeather" transform="rotate(0) translate(16,-6) scale(-1,1)"/>
+    </g>
+  </g>
+
+  <!-- ═══ BOYUN TÜYLERİ (HACKLE) ═══ -->
+  <g id="neck-feathers" filter="url(#softShadow)">
+    <g transform="translate(395, 580)">
+      <use href="#neckFeather" transform="rotate(-20) translate(0,-5)"/>
+      <use href="#neckFeather" transform="rotate(-10) translate(5,-8)"/>
+      <use href="#neckFeather" transform="rotate(0) translate(10,-10)"/>
+      <use href="#neckFeather" transform="rotate(10) translate(15,-8)"/>
+      <use href="#neckFeather" transform="rotate(20) translate(20,-5)"/>
+    </g>
+    <g transform="translate(390, 560)">
+      <use href="#neckFeather" transform="rotate(-25) scale(1.1) translate(0,-6)"/>
+      <use href="#neckFeather" transform="rotate(-12) scale(1.15) translate(4,-10)"/>
+      <use href="#neckFeather" transform="rotate(2) scale(1.2) translate(8,-12)"/>
+      <use href="#neckFeather" transform="rotate(16) scale(1.15) translate(14,-10)"/>
+      <use href="#neckFeather" transform="rotate(28) scale(1.1) translate(20,-6)"/>
+    </g>
+    <g transform="translate(388, 540)">
+      <use href="#neckFeather" transform="rotate(-18) scale(1.25) translate(2,-8)"/>
+      <use href="#neckFeather" transform="rotate(0) scale(1.3) translate(10,-14)"/>
+      <use href="#neckFeather" transform="rotate(18) scale(1.25) translate(18,-8)"/>
+    </g>
+    <g transform="translate(392, 520)">
+      <use href="#neckFeather" transform="rotate(-8) scale(1.35) translate(6,-12)"/>
+      <use href="#neckFeather" transform="rotate(8) scale(1.35) translate(14,-12)"/>
+    </g>
+    <g transform="translate(396, 505)">
+      <use href="#neckFeather" transform="rotate(-4) scale(1.4) translate(8,-14)"/>
+      <use href="#neckFeather" transform="rotate(6) scale(1.38) translate(12,-13)"/>
+    </g>
+    <!-- Boyun tabanı -->
+    <ellipse cx="405" cy="595" rx="28" ry="18" fill="url(#iridBlueGreen)" opacity="0.7"/>
+  </g>
+
+  <!-- ═══ BAŞ ═══ -->
+  <g id="head" filter="url(#softShadow)">
+    <!-- Boyun bağlantı — uzun ince boyun -->
+    <path d="M388,548 C382,535 388,520 400,508 C412,498 425,496 432,502
+             C438,508 436,518 428,524 C418,530 405,538 398,545 Z"
+          fill="url(#iridBlueGreen)" stroke="#063048" stroke-width="0.5"/>
+    <!-- Kafa -->
+    <ellipse cx="438" cy="498" rx="22" ry="20" fill="url(#iridBlueGreen)" stroke="#063048" stroke-width="0.6"/>
+    <!-- Kafa highlight -->
+    <ellipse cx="432" cy="492" rx="10" ry="8" fill="#30a898" opacity="0.25"/>
+    <!-- Göz -->
+    <ellipse cx="448" cy="494" rx="5" ry="4.5" fill="#f0e8d0"/>
+    <circle cx="449" cy="494" r="2.8" fill="#1a1010"/>
+    <circle cx="450" cy="493" r="1" fill="#ffffff" opacity="0.85"/>
+    <!-- Göz çevresi mavi cilt -->
+    <path d="M442,488 C438,490 437,498 442,502 C446,504 452,502 454,496"
+          fill="none" stroke="#208888" stroke-width="2.5" opacity="0.6"/>
+    <!-- Gaga — hafif aşağı kavisli -->
+    <path d="M456,498 C468,495 476,499 474,505 C470,510 460,508 456,504 Z"
+          fill="#c89830" stroke="#806020" stroke-width="0.5"/>
+    <path d="M456,504 C464,507 472,506 474,508 C472,510 462,509 458,507"
+          fill="#a07820" opacity="0.6"/>
+    <path d="M456,502 C462,504 468,503 470,505"
+          fill="none" stroke="#604010" stroke-width="0.4"/>
+  </g>
+
+  <!-- ═══ İBİK (CREST) ═══ -->
+  <g id="crest" transform="translate(430, 478)">
+    <use href="#crestFeather" transform="rotate(-18) translate(-8,-2)"/>
+    <use href="#crestFeather" transform="rotate(-8) translate(-3,-4)"/>
+    <use href="#crestFeather" transform="rotate(2) translate(2,-5)"/>
+    <use href="#crestFeather" transform="rotate(12) translate(7,-4)"/>
+    <use href="#crestFeather" transform="rotate(22) translate(12,-2)"/>
+  </g>
+
+  <!-- ═══ BACAKLAR ═══ -->
+  <g id="legs">
+    <path d="M385,770 L382,820 L378,825 L384,826 L386,820 L390,770"
+          fill="none" stroke="#c89830" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M415,770 L418,820 L422,825 L416,826 L414,820 L410,770"
+          fill="none" stroke="#c89830" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Ayak parmakları -->
+    <path d="M378,825 L370,830 L368,828 M378,825 L375,832 M384,826 L388,832"
+          fill="none" stroke="#a07820" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M422,825 L430,830 L432,828 M422,825 L425,832 M416,826 L412,832"
+          fill="none" stroke="#a07820" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Spur -->
+    <path d="M386,800 L382,792" fill="none" stroke="#806018" stroke-width="1.2"/>
+  </g>
+
+  <!-- Ön plan ot detayı -->
+  <g opacity="0.35">
+    <path d="M120,890 Q125,860 130,890" fill="none" stroke="#4a6838" stroke-width="1.5"/>
+    <path d="M680,885 Q685,855 690,885" fill="none" stroke="#4a6838" stroke-width="1.5"/>
+    <path d="M350,895 Q352,875 354,895" fill="none" stroke="#3a5828" stroke-width="1"/>
+    <path d="M450,898 Q452,878 454,898" fill="none" stroke="#3a5828" stroke-width="1"/>
+  </g>
+
+  <!-- Vignette -->
+  <rect width="800" height="1000" fill="url(#vignette)" pointer-events="none"/>
+</svg>
+<p class="caption" aria-hidden="true">Pavo cristatus</p>
+</main>
+</body>
+</html>

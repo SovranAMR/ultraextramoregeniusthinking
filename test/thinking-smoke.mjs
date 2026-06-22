@@ -245,7 +245,7 @@ describe("thinking prompts", () => {
     assert.match(d, /\*\*Task kind:\*\* code/);
     assert.match(d, /Execution layer \(mandatory\)/);
     assert.match(d, /OUTPUT RULE \(mandatory\)/);
-    assert.match(d, /Judgment \(adaptive\)/);
+    assert.match(d, /Outcome judgment|Judgment \(adaptive\)/);
     assert.match(d, /First Draft/);
     assert.match(d, /Scan codebase with Read\/Grep/);
   });
@@ -331,7 +331,7 @@ describe("task kind & answer guard", () => {
     const plan = getCreativePassPlan("max_thinking");
     const titles = plan.map((p) => p.title).join(" ");
     assert.doesNotMatch(titles, /SSRF|Kod.*Review|Uzman Paneli/i);
-    assert.match(titles, /Detay|Doğrulama/i);
+    assert.match(titles, /Değerlendirme|Plain|Doğrulama|Sadeleştir/i);
   });
 
   test("creative session uses visual pass roadmap", () => {
@@ -822,15 +822,15 @@ describe("basiret layer", () => {
 
   test("verify pass hint includes verify-before-next", () => {
     const hint = getBasiretHint("code", "verify");
-    assert.match(hint, /Basiret \(adaptif yargı\)/);
+    assert.match(hint, /Sonuç basireti/);
     assert.match(hint, /Verify-before-next/);
     assert.match(hint, /test geçti.*yeterli değil/i);
   });
 
-  test("creative task uses visual basiret not code verify rule", () => {
+  test("creative task uses outcome basiret on verify", () => {
     const hint = getBasiretHint("creative", "verify");
-    assert.match(hint, /görsel/i);
-    assert.doesNotMatch(hint, /Verify-before-next/);
+    assert.match(hint, /Sonuç basireti|görsel/i);
+    assert.match(hint, /Plain|düz tek tur/i);
   });
 
   test("analysis task uses evidence verify basiret not shell test rule", () => {
@@ -851,8 +851,8 @@ describe("basiret layer", () => {
   test("max start directive embeds basiret on pass 1", () => {
     const s = createSession("auth bypass var mı", "max_thinking", "tr");
     const d = buildStartDirective(s);
-    assert.match(d, /Basiret \(adaptif yargı\)/);
-    assert.match(d, /her zaman ekle.*her zaman çıkar.*yok/);
+    assert.match(d, /Sonuç basireti/);
+    assert.match(d, /düz tek tur|Plain/i);
   });
 
   test("medium verify refinement includes verify-before-next", () => {

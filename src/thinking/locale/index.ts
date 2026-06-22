@@ -1,3 +1,7 @@
+import { getBasiretHint } from "../basiret.js";
+import type { ExecutionKind } from "../pass-focus.js";
+import type { TaskKind } from "../task-kind.js";
+
 export type Locale = "tr" | "en" | "de" | "ar";
 
 export type LocaleModeId =
@@ -177,6 +181,9 @@ function formatServerUseCaseBlock(locale: "tr" | "en"): string {
 const SERVER_INSTRUCTIONS_TR = [
   "ULTRA THINKING MCP — cevap kalitesini pass pass artırır.",
   "",
+  "NORTH STAR (kesin): Düz tek turdan daha iyi SONUÇ — daha fazla satır/katman/dekor değil.",
+  "Görsel kötüyse motor kodda da şişirir; sonuç basireti her görevde geçerli.",
+  "",
   "CHAT BAĞLAMI (KRİTİK):",
   "MCP sunucusu chat geçmişini OTOMATİK görmez.",
   "Agent (sen) chat geçmişini görürsün — think çağırırken conversation_context'e ÖZET geçmek ZORUNLU.",
@@ -212,7 +219,7 @@ const SERVER_INSTRUCTIONS_TR = [
   "",
   "KURALLAR:",
   "- Chain-of-thought gösterme.",
-  "- Anti-stagnation: her pass EN AZ 1 somut iyileştirme zorunlu.",
+  "- Anti-stagnation: somut kalite artışı zorunlu (sadeleştirme/silme de geçerli).",
   "- Meta log think_next'e gönderilirse MCP RED eder, pass ilerlemez.",
 ].join("\n");
 
@@ -373,7 +380,7 @@ const PROMPT_TR: PromptBundle = {
   antiStagnationRule: [
     "**Anti-stagnation (kesin):**",
     "- Önceki pass ile aynı cevabı kopyala-yapıştır YASAK.",
-    "- Bu pass'in odağına göre EN AZ 1 somut iyileştirme zorunlu.",
+    "- Somut iyileştirme = kalite artışı (düzelt, sadeleştir, sil, ekle) — satır sayısı artışı sayılmaz.",
     "- Write pass'te gerçek dosya değişikliği yoksa pass başarısız sayılır.",
   ].join("\n"),
   basiret: {
@@ -877,16 +884,10 @@ export function getPromptBundle(locale: Locale): PromptBundle {
 
 export function getBasiretHintForLocale(
   locale: Locale,
-  taskKind: "code" | "creative" | "analysis",
+  taskKind: TaskKind,
   execution: ExecutionKindKey,
 ): string {
-  const p = PROMPT_BUNDLES[locale].basiret;
-  if (taskKind === "creative") return p.creative;
-  if (taskKind === "analysis" && execution === "verify") return p.analysisVerify;
-  if (execution === "verify") return `${p.code}\n${p.verifyBeforeNext}`;
-  if (execution === "read") return `${p.code}\n${p.readBeforeNext}`;
-  if (execution === "write") return `${p.code}\n${p.writeExtra}`;
-  return p.code;
+  return getBasiretHint(taskKind, execution as ExecutionKind, locale);
 }
 
 export function mergeModeAliases(): Record<string, LocaleModeId> {
