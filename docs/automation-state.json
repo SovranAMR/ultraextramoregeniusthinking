@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-06-22T08:52:00.282Z",
-  "runCount": 24,
-  "roadmapPhase": "product",
-  "roadmapDone": { "basiret": true, "i18n": true, "product": true },
+  "lastRun": "2026-06-22T08:54:00.256Z",
+  "runCount": 25,
+  "roadmapPhase": "polish",
+  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": false },
   "fazAProgress": {
     "a1_basiret_module": true,
     "a2_prompts_wire": true,
@@ -24,14 +24,16 @@
     "c2_semver_banner": true,
     "c3_mcp_tool_schema_docs": true
   },
-  "lastFocus": "C3: MCP tool schema stabil dokümantasyon",
-  "lastFiles": [
-    "src/mcp-tool-schema.ts",
-    "src/server.ts"
-  ],
+  "fazDProgress": {
+    "d1_medium_more_eval_test": true,
+    "d2_analysis_task_kind_test": false,
+    "d3_basiret_locale_test_align": false
+  },
+  "lastFocus": "D1: medium/more code basiret eval pass smoke test",
+  "lastFiles": ["test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "Faz C tamam — polish fazına geçiş"
+  "nextRisk": "analysis task kind smoke test eksik"
 }

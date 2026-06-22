@@ -693,6 +693,22 @@ describe("basiret layer", () => {
     assert.equal(req.hasEvaluation, true);
   });
 
+  test("medium code plan has verify and evaluation passes", () => {
+    const plan = getPassPlan("medium_thinking", "code");
+    const req = planMeetsCodeBasiretRequirements(plan);
+    assert.equal(req.hasVerify, true);
+    assert.equal(req.hasEvaluation, true);
+    assert.equal(plan.length, 5);
+  });
+
+  test("more code plan has verify and evaluation passes", () => {
+    const plan = getPassPlan("more_thinking", "code");
+    const req = planMeetsCodeBasiretRequirements(plan);
+    assert.equal(req.hasVerify, true);
+    assert.equal(req.hasEvaluation, true);
+    assert.equal(plan.length, 7);
+  });
+
   test("verify pass hint includes verify-before-next", () => {
     const hint = getBasiretHint("code", "verify");
     assert.match(hint, /Basiret \(adaptif yargı\)/);
