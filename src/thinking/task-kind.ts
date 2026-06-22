@@ -9,9 +9,13 @@ const CREATIVE_RE =
 const CODE_RE =
   /\b(kod|refactor|bug|fix|api|typescript|javascript|python|fonksiyon|class|migrate|implement|dosya oluştur|yaz ve düzelt)\b/i;
 
+/** Görsel görevde yanlışlıkla code planına düşüren zayıf sinyaller (dosya oluştur, implement vb.) */
+const STRONG_CODE_RE =
+  /\b(kod|refactor|bug|fix|api|typescript|javascript|python|fonksiyon|class|migrate)\b/i;
+
 export function detectTaskKind(question: string): TaskKind {
   const q = question.toLowerCase();
-  if (CREATIVE_RE.test(q) && !CODE_RE.test(q)) return "creative";
+  if (CREATIVE_RE.test(q) && !STRONG_CODE_RE.test(q)) return "creative";
   if (CODE_RE.test(q)) return "code";
   return "analysis";
 }

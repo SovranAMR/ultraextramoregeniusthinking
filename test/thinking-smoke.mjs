@@ -14,7 +14,10 @@ import {
 } from "../dist/thinking/prompts.js";
 import { getPassFocus, formatPassRoadmap } from "../dist/thinking/pass-focus.js";
 import { detectTaskKind, getCreativePassPlan } from "../dist/thinking/task-kind.js";
-import { validatePassAnswer } from "../dist/thinking/answer-guard.js";
+import {
+  validatePassAnswer,
+  buildMetaRejectionMessage,
+} from "../dist/thinking/answer-guard.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -250,5 +253,43 @@ describe("task kind & answer guard", () => {
     );
     assert.equal(v.valid, false);
     assert.match(v.reasons.join(" "), /artifact referansı yok/i);
+  });
+
+  test("creative wins when weak code keyword also matches", () => {
+    assert.equal(
+      detectTaskKind("tavus kuşu svg çiz, dosya oluştur"),
+      "creative",
+    );
+  });
+
+  test("code wins when strong code keyword matches with creative", () => {
+    assert.equal(
+      detectTaskKind("svg dashboard html yap, typescript refactor yap"),
+      "code",
+    );
+  });
+
+  test("stagnation rule flags identical long answers", () => {
+    const prev =
+      "test/foo.html güncellendi (476 satır). 152 train feather, 3 katman eklendi.";
+    const duplicate = prev;
+    const improved =
+      "test/foo.html güncellendi (512 satır). 180 train feather, animasyon eklendi.";
+
+    const isStagnant = (prevAnswer, answer) =>
+      prevAnswer &&
+      answer.trim().length > 20 &&
+      prevAnswer.trim() === answer.trim();
+
+    assert.equal(isStagnant(prev, duplicate), true);
+    assert.equal(isStagnant(prev, improved), false);
+  });
+
+  test("meta rejection message is RED with resubmit guidance", () => {
+    const v = validatePassAnswer("Plan: dosyayı okuyacağım, eksikleri bulacağım.", 2, "read");
+    const msg = buildMetaRejectionMessage(v, 2);
+    assert.match(msg, /RED — Pass 2/);
+    assert.match(msg, /Meta log/i);
+    assert.match(msg, /think_next/i);
   });
 });
