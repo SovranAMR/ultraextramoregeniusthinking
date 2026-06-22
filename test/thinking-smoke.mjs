@@ -278,6 +278,12 @@ describe("task kind & answer guard", () => {
     assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
   });
 
+  test("rejects verify pass with file ref but only build success", () => {
+    const v = validatePassAnswer("test/foo.ts build başarılı, kod doğrulandı.", 5, "verify");
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
+  });
+
   test("rejects read pass with meaningless padding", () => {
     const padding = "x".repeat(45);
     const v = validatePassAnswer(padding, 2, "read");

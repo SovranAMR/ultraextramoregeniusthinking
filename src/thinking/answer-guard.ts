@@ -50,7 +50,10 @@ function hasWriteVerifyArtifactReference(text: string): boolean {
 function hasWriteVerifyChangeDetail(text: string): boolean {
   if (/\d+\s*satır/i.test(text)) return true;
   if (/\d+\s*(test|pass|fail|suite|paket)/i.test(text)) return true;
-  if (/\b(build|test).{0,40}(başarı|geçti|ok|success)/i.test(text)) return true;
+  if (/\d+\/\d+/.test(text)) return true;
+  if (/\b(build|test).{0,40}(başarı|geçti|ok|success)/i.test(text)) {
+    return /\d+\s*(test|pass|fail|suite)/i.test(text) || /\d+\/\d+/.test(text);
+  }
   if (/\d+\s+\w+.*(eklendi|silindi|düzeltildi|refactor|genişletildi|azaltıldı|çıkarıldı)/i.test(text))
     return true;
   if (/(eklendi|silindi|düzeltildi|refactor|guard|check).*\d+/i.test(text)) return true;

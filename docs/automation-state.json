@@ -1,9 +1,9 @@
 {
-  "lastRun": "2026-06-22T07:58:00.000Z",
-  "lastFocus": "write/verify pass somut değişiklik detayı zorunluluğu (answer-guard)",
+  "lastRun": "2026-06-22T08:00:00.000Z",
+  "lastFocus": "verify pass'te yalnızca build başarılı ile geçiş engeli (answer-guard)",
   "lastFiles": ["src/thinking/answer-guard.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "verify pass'te test sayısı olmadan sadece 'build başarılı' geçebilir",
-  "runCount": 11
+  "nextRisk": "write pass'te dosya+genel fiil ('güncellendi') hâlâ yeterli sayılabilir",
+  "runCount": 12
 }
