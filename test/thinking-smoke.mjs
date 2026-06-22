@@ -301,6 +301,23 @@ describe("task kind & answer guard", () => {
     assert.equal(loaded.currentRound, 2);
   });
 
+  test("handleThinkNext RED when meta log submitted", () => {
+    const s = createSession("Test meta log", "easy_thinking", "tr");
+    const firstAnswer =
+      "test/foo.html güncellendi (476 satır). 152 train feather, 3 katman eklendi.";
+    submitAnswer(s, firstAnswer);
+
+    const metaLog = "Plan: dosyayı okuyacağım, eksikleri bulacağım.";
+    const result = handleThinkNext(s.id, metaLog);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 2/);
+    assert.match(result.content[0].text, /iş logu\/meta/i);
+    assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 1);
+  });
+
   test("meta rejection message is RED with resubmit guidance", () => {
     const v = validatePassAnswer("Plan: dosyayı okuyacağım, eksikleri bulacağım.", 2, "read");
     const msg = buildMetaRejectionMessage(v, 2);
