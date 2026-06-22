@@ -77,7 +77,7 @@ export function getPassPlan(
   locale: Locale = "tr",
 ): PassFocus[] {
   if (taskKind === "creative") {
-    return getCreativePassPlan(mode);
+    return getCreativePassPlan(mode, locale);
   }
   return localizeSkeleton(mode, PASS_SKELETONS[mode], locale);
 }

@@ -1,5 +1,7 @@
 import type { ThinkingMode } from "./modes.js";
-import type { PassFocus } from "./pass-focus.js";
+import type { PassFocus, ExecutionKind } from "./pass-focus.js";
+import type { Locale } from "./locale/index.js";
+import { getCreativePassText } from "./locale/creative-plans.js";
 
 export type TaskKind = "creative" | "code" | "analysis";
 
@@ -20,162 +22,63 @@ export function detectTaskKind(question: string): TaskKind {
   return "analysis";
 }
 
+interface CreativePassSkeleton {
+  pass: number;
+  lens: string;
+  execution: ExecutionKind;
+}
+
+const CREATIVE_EASY: CreativePassSkeleton[] = [
+  { pass: 1, lens: "draft", execution: "write" },
+  { pass: 2, lens: "detail", execution: "read" },
+  { pass: 3, lens: "polish", execution: "verify" },
+];
+
+const CREATIVE_MEDIUM: CreativePassSkeleton[] = [
+  { pass: 1, lens: "draft", execution: "write" },
+  { pass: 2, lens: "gap_analysis", execution: "read" },
+  { pass: 3, lens: "detail", execution: "write" },
+  { pass: 4, lens: "internal_critique", execution: "read" },
+  { pass: 5, lens: "verify_final", execution: "verify" },
+];
+
+const CREATIVE_MORE_EXTRA: CreativePassSkeleton[] = [
+  { pass: 6, lens: "counter_argument", execution: "read" },
+  { pass: 7, lens: "verify_final", execution: "verify" },
+];
+
+const CREATIVE_MAX_EXTRA: CreativePassSkeleton[] = [
+  { pass: 6, lens: "deep_detail", execution: "write" },
+  { pass: 7, lens: "accuracy", execution: "read" },
+  { pass: 8, lens: "counter_argument", execution: "write" },
+  { pass: 9, lens: "polish", execution: "write" },
+  { pass: 10, lens: "verify_final", execution: "verify" },
+];
+
+function localizeCreativeSkeleton(
+  mode: ThinkingMode,
+  skeleton: CreativePassSkeleton[],
+  locale: Locale,
+): PassFocus[] {
+  return skeleton.map((s) => {
+    const text = getCreativePassText(locale, mode, s.pass);
+    return { ...s, title: text.title, tasks: text.tasks };
+  });
+}
+
 /** Yaratıcı görevlerde kod review pass'leri gereksiz — görsel odaklı plan */
-export function getCreativePassPlan(mode: ThinkingMode): PassFocus[] {
-  const plans: Record<ThinkingMode, PassFocus[]> = {
-    easy_thinking: [
-      {
-        pass: 1,
-        title: "İlk Taslak",
-        lens: "draft",
-        execution: "write",
-        tasks: [
-          "İlk versiyonu Write ile oluştur — çalışan iskelet.",
-          "Görsel/kompozisyon hedefini netleştir.",
-        ],
-      },
-      {
-        pass: 2,
-        title: "Detay & Derinlik",
-        lens: "detail",
-        execution: "read",
-        tasks: [
-          "Read ile dosyayı aç — eksik detayları bul.",
-          "StrReplace ile görsel detayları artır (katman, renk, anatomi).",
-        ],
-      },
-      {
-        pass: 3,
-        title: "Cilalama & Final",
-        lens: "polish",
-        execution: "verify",
-        tasks: [
-          "Son rötuşlar, gereksiz kod temizliği.",
-          "Tarayıcıda açılabilir mi kontrol et. Final özeti + dosya yolu.",
-        ],
-      },
-    ],
-    medium_thinking: [
-      {
-        pass: 1,
-        title: "İlk Taslak",
-        lens: "draft",
-        execution: "write",
-        tasks: ["Write ile ilk dosyayı oluştur.", "Temel kompozisyon ve yapı."],
-      },
-      {
-        pass: 2,
-        title: "Referans & Eksik",
-        lens: "gap_analysis",
-        execution: "read",
-        tasks: [
-          "Read ile mevcut çıktıyı incele.",
-          "Anatomi/kompozisyon eksiklerini listele (sessizce), koda yansıt.",
-        ],
-      },
-      {
-        pass: 3,
-        title: "Detay Pass",
-        lens: "detail",
-        execution: "write",
-        tasks: [
-          "StrReplace ile detay ekle: katmanlar, gradient, texture, animasyon.",
-          "Önceki pass'ten EN AZ 3 somut görsel iyileştirme.",
-        ],
-      },
-      {
-        pass: 4,
-        title: "İç Kontrol",
-        lens: "internal_critique",
-        execution: "read",
-        tasks: [
-          "Read ile tekrar oku — zayıf bölgeleri güçlendir.",
-          "Write ile düzelt. Sadakat: kullanıcı ne istedi?",
-        ],
-      },
-      {
-        pass: 5,
-        title: "Final & Doğrula",
-        lens: "verify_final",
-        execution: "verify",
-        tasks: [
-          "Shell/node ile dosya var mı, syntax bozuk mu kontrol et.",
-          "Final teslim: dosya yolu + ne eklendi özeti.",
-        ],
-      },
-    ],
-    more_thinking: [
-      ...([] as PassFocus[]),
-    ],
-    max_thinking: [
-      ...([] as PassFocus[]),
-    ],
-  };
-
-  // more = medium + 2, max = medium + 5 creative passes
-  const medium = plans.medium_thinking;
-  plans.more_thinking = [
-    ...medium,
-    {
-      pass: 6,
-      title: "Karşılaştırma & Alternatif",
-      lens: "counter_argument",
-      execution: "read",
-      tasks: [
-        "Başka yaklaşım (canvas vs SVG vs CSS) steel-man.",
-        "Mevcut seçimin zayıf noktalarını Read+Write ile düzelt.",
-      ],
-    },
-    {
-      pass: 7,
-      title: "Final Sentez",
-      lens: "verify_final",
-      execution: "verify",
-      tasks: ["En iyi detayları birleştir.", "Final + dosya özeti."],
-    },
-  ];
-
-  plans.max_thinking = [
-    ...medium,
-    {
-      pass: 6,
-      title: "Derin Detay",
-      lens: "deep_detail",
-      execution: "write",
-      tasks: ["Procedural/katmanlı detay ekle.", "Renk varyasyonu, texture."],
-    },
-    {
-      pass: 7,
-      title: "Anatomi/Doğruluk",
-      lens: "accuracy",
-      execution: "read",
-      tasks: ["Referans doğruluğu kontrol.", "Read+Write ile düzelt."],
-    },
-    {
-      pass: 8,
-      title: "Karşı Argüman",
-      lens: "counter_argument",
-      execution: "write",
-      tasks: ["Alternatif teknikleri değerlendir.", "En iyi seçimi uygula."],
-    },
-    {
-      pass: 9,
-      title: "Cilalama",
-      lens: "polish",
-      execution: "write",
-      tasks: ["Performans, erişilebilirlik, responsive.", "Son rötuşlar."],
-    },
-    {
-      pass: 10,
-      title: "Doğrulama & Final",
-      lens: "verify_final",
-      execution: "verify",
-      tasks: [
-        "Smoke test çalıştır.",
-        "KULLANICIYA GİDECEK ÖZET: dosya, satır sayısı, öne çıkan detaylar.",
-      ],
-    },
-  ];
-
-  return plans[mode];
+export function getCreativePassPlan(
+  mode: ThinkingMode,
+  locale: Locale = "tr",
+): PassFocus[] {
+  switch (mode) {
+    case "easy_thinking":
+      return localizeCreativeSkeleton(mode, CREATIVE_EASY, locale);
+    case "medium_thinking":
+      return localizeCreativeSkeleton(mode, CREATIVE_MEDIUM, locale);
+    case "more_thinking":
+      return localizeCreativeSkeleton(mode, [...CREATIVE_MEDIUM, ...CREATIVE_MORE_EXTRA], locale);
+    case "max_thinking":
+      return localizeCreativeSkeleton(mode, [...CREATIVE_MEDIUM, ...CREATIVE_MAX_EXTRA], locale);
+  }
 }

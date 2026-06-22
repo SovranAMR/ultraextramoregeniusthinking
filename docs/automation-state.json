@@ -1,11 +1,33 @@
 {
+  "lastRun": "2026-06-22T08:38:00.261Z",
+  "runCount": 20,
   "roadmapPhase": "i18n",
-  "productScope": "code-first",
-  "lastRun": "2026-06-22T08:36:00.295Z",
-  "lastFocus": "pass plan başlık/görev metinleri i18n (pass-plans.ts)",
-  "lastFiles": ["src/thinking/locale/pass-plans.ts", "src/thinking/pass-focus.ts", "src/thinking/prompts.ts"],
+  "roadmapDone": { "basiret": true, "i18n": false, "product": false },
+  "fazAProgress": {
+    "a1_basiret_module": true,
+    "a2_prompts_wire": true,
+    "a3_server_instructions": true,
+    "a4_code_eval_pass": true,
+    "a5_eval_test": true,
+    "a6_refinement_basiret": true
+  },
+  "fazBProgress": {
+    "b1_locale_skeleton": true,
+    "b2_parse_en_triggers": true,
+    "b3_rejection_locale": true,
+    "b4_server_instructions_en": false,
+    "b5_test_tr_en_parse": true,
+    "b6_creative_pass_i18n": true
+  },
+  "lastFocus": "creative pass plan i18n (creative-plans.ts)",
+  "lastFiles": [
+    "src/thinking/locale/creative-plans.ts",
+    "src/thinking/task-kind.ts",
+    "src/thinking/pass-focus.ts"
+  ],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "Faz B — creative pass plan i18n (task-kind.ts)",
-  "runCount": 19
+  "guardPhaseComplete": true,
+  "productScope": "code-first",
+  "nextRisk": "Faz B — server instructions EN (server.ts)"
 }
