@@ -111,6 +111,71 @@ const USE_CASE_MATRIX: UseCaseSnippet[] = [
   },
 ];
 
+const MODE_PASS_COUNTS: Record<LocaleModeId, number> = {
+  easy_thinking: 3,
+  medium_thinking: 5,
+  more_thinking: 7,
+  max_thinking: 10,
+};
+
+const MODE_SHORT: Record<LocaleModeId, string> = {
+  easy_thinking: "easy",
+  medium_thinking: "medium",
+  more_thinking: "more",
+  max_thinking: "max",
+};
+
+/** Code-first örnekler — server instructions'a eklenir (TR/EN). */
+const SERVER_USE_CASE_LINES: Record<"tr" | "en", { label: string; userMessage: string; suggestedMode: LocaleModeId }[]> = {
+  tr: [
+    {
+      label: "bug fix",
+      userMessage: "düşünme modu mcp medium de düşün: bu test neden fail?",
+      suggestedMode: "medium_thinking",
+    },
+    {
+      label: "kod review",
+      userMessage: "düşünme modu mcp max de düşün: auth bypass var mı?",
+      suggestedMode: "max_thinking",
+    },
+    {
+      label: "migration",
+      userMessage: "düşünme modu mcp max de düşün: postgres jsonb geçiş",
+      suggestedMode: "max_thinking",
+    },
+  ],
+  en: [
+    {
+      label: "bug fix",
+      userMessage: "think in medium mode: why does this test fail?",
+      suggestedMode: "medium_thinking",
+    },
+    {
+      label: "code review",
+      userMessage: "think in max mode: auth bypass review",
+      suggestedMode: "max_thinking",
+    },
+    {
+      label: "migration",
+      userMessage: "think in max mode: postgres jsonb migration",
+      suggestedMode: "max_thinking",
+    },
+  ],
+};
+
+function formatServerUseCaseBlock(locale: "tr" | "en"): string {
+  const header =
+    locale === "tr"
+      ? "ÖRNEK KOD GÖREVLERİ (code-first — mod ipucu):"
+      : "CODE TASK EXAMPLES (code-first — mode hints):";
+  const lines = SERVER_USE_CASE_LINES[locale].map(({ label, userMessage, suggestedMode }) => {
+    const mode = MODE_SHORT[suggestedMode];
+    const passes = MODE_PASS_COUNTS[suggestedMode];
+    return `• ${label}: "${userMessage}" → ${mode} (${passes} pass)`;
+  });
+  return ["", header, ...lines].join("\n");
+}
+
 const SERVER_INSTRUCTIONS_TR = [
   "ULTRA THINKING MCP — cevap kalitesini pass pass artırır.",
   "",
@@ -790,7 +855,10 @@ export function getRejectionBundle(locale: Locale): RejectionBundle {
 }
 
 export function getServerInstructions(locale: Locale = "tr"): string {
-  return LOCALE_BUNDLES[locale].serverInstructions;
+  const instrLocale = serverInstructionsLocale(locale);
+  const base =
+    instrLocale === "tr" ? SERVER_INSTRUCTIONS_TR : SERVER_INSTRUCTIONS_EN;
+  return base + formatServerUseCaseBlock(instrLocale);
 }
 
 /** Server instructions bundle: TR or EN (de/ar → EN copy). */
