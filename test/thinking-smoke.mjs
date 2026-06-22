@@ -266,6 +266,18 @@ describe("task kind & answer guard", () => {
     assert.match(v.reasons.join(" "), /artifact referansı yok/i);
   });
 
+  test("rejects write pass with file ref but no change detail", () => {
+    const v = validatePassAnswer("src/server.ts güncellendi.", 4, "write");
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
+  });
+
+  test("rejects verify pass with file ref but no change detail", () => {
+    const v = validatePassAnswer("test/foo.ts doğrulandı, dosya kontrol edildi.", 5, "verify");
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
+  });
+
   test("rejects read pass with meaningless padding", () => {
     const padding = "x".repeat(45);
     const v = validatePassAnswer(padding, 2, "read");
@@ -361,6 +373,27 @@ describe("task kind & answer guard", () => {
     assert.match(result.content[0].text, /RED — Pass 3/);
     assert.match(result.content[0].text, /artifact referansı yok/i);
     assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 2);
+  });
+
+  test("handleThinkNext RED when write pass lacks change detail", () => {
+    const s = createSession("Test write detail", "easy_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+
+    const vagueWrite = "src/server.ts güncellendi.";
+    const result = handleThinkNext(s.id, vagueWrite);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /somut değişiklik detayı yok/i);
 
     const loaded = loadSession(s.id);
     assert.equal(loaded.currentRound, 2);

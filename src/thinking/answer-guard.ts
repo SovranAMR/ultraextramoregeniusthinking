@@ -39,6 +39,26 @@ function hasReadArtifactReference(text: string): boolean {
   );
 }
 
+function hasWriteVerifyArtifactReference(text: string): boolean {
+  return (
+    /\.(html|ts|tsx|js|jsx|mjs|py|css|json|md)\b/i.test(text) ||
+    /dosya|file|oluşturuldu|güncellendi|satır/i.test(text)
+  );
+}
+
+/** Dosya adı var ama ne değiştiği yok — düşük kaliteli write/verify özeti */
+function hasWriteVerifyChangeDetail(text: string): boolean {
+  if (/\d+\s*satır/i.test(text)) return true;
+  if (/\d+\s*(test|pass|fail|suite|paket)/i.test(text)) return true;
+  if (/\b(build|test).{0,40}(başarı|geçti|ok|success)/i.test(text)) return true;
+  if (/\d+\s+\w+.*(eklendi|silindi|düzeltildi|refactor|genişletildi|azaltıldı|çıkarıldı)/i.test(text))
+    return true;
+  if (/(eklendi|silindi|düzeltildi|refactor|guard|check).*\d+/i.test(text)) return true;
+  if (/\([^)]{8,}\)/.test(text)) return true;
+  if (/[`'"]?\w+[\`'"]?\s*[:→].{5,}/i.test(text)) return true;
+  return false;
+}
+
 /** Agent'ın think_next'e gönderdiği meta log mu, gerçek teslim özeti mi? */
 export function validatePassAnswer(
   answer: string,
@@ -75,15 +95,16 @@ export function validatePassAnswer(
     reasons.push("Cevap anlamsız tekrar/padding — somut okuma özeti gerekli.");
   }
 
-  // Write/verify pass'lerde dosya yolu veya somut çıktı beklenir
+  // Write/verify pass'lerde dosya yolu + somut değişiklik detayı beklenir
   let artifactMissing = false;
+  let changeDetailMissing = false;
   if (execution === "write" || execution === "verify") {
-    const hasArtifact =
-      /\.(html|ts|tsx|js|py|css|json|md)\b/i.test(trimmed) ||
-      /dosya|file|oluşturuldu|güncellendi|satır/i.test(trimmed);
-    if (!hasArtifact) {
+    if (!hasWriteVerifyArtifactReference(trimmed)) {
       artifactMissing = true;
       reasons.push("Write/verify pass'te dosya/artifact referansı yok.");
+    } else if (!hasWriteVerifyChangeDetail(trimmed)) {
+      changeDetailMissing = true;
+      reasons.push("Write/verify pass'te dosya var ama somut değişiklik detayı yok.");
     }
   }
 
@@ -102,6 +123,7 @@ export function validatePassAnswer(
       reasons.length === 0 ||
       (!isMeta &&
         !artifactMissing &&
+        !changeDetailMissing &&
         !tooShort &&
         !padding &&
         !readContextMissing &&
