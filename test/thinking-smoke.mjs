@@ -1,6 +1,12 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { resolveMode, THINKING_MODES, parseThinkingRequest } from "../dist/thinking/modes.js";
+import {
+  resolveMode,
+  THINKING_MODES,
+  parseThinkingRequest,
+  detectLocale,
+  getUseCaseSnippets,
+} from "../dist/thinking/modes.js";
 import {
   createSession,
   submitAnswer,
@@ -87,7 +93,46 @@ describe("natural language mode parsing", () => {
   test("max da düşünerek", () => {
     const p = parseThinkingRequest("max da düşünerek tavus kuşu çiz");
     assert.equal(p.mode, "max_thinking");
+    assert.equal(p.locale, "tr");
     assert.match(p.question, /tavus kuşu/);
+  });
+});
+
+describe("i18n mode parsing", () => {
+  test("en: max mode think", () => {
+    const p = parseThinkingRequest("max mode think: why does this test fail");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(p.locale, "en");
+    assert.match(p.question, /why does this test fail/);
+  });
+
+  test("de: max modus denken", () => {
+    const p = parseThinkingRequest("max modus denken: postgres jsonb migration");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(p.locale, "de");
+    assert.match(p.question, /postgres jsonb migration/);
+  });
+
+  test("ar: فكر في وضع max", () => {
+    const p = parseThinkingRequest("فكر في وضع max: auth bypass var mı");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(p.locale, "ar");
+    assert.match(p.question, /auth bypass/);
+  });
+
+  test("detectLocale heuristics", () => {
+    assert.equal(detectLocale("max mode think"), "en");
+    assert.equal(detectLocale("max modus denken"), "de");
+    assert.equal(detectLocale("فكر في وضع max"), "ar");
+    assert.equal(detectLocale("max de düşün"), "tr");
+  });
+
+  test("use-case snippets per locale", () => {
+    for (const locale of ["tr", "en", "de", "ar"]) {
+      const snippets = getUseCaseSnippets(locale);
+      assert.ok(snippets.length >= 7, `${locale} should have use-case snippets`);
+      assert.ok(snippets.some((s) => s.domain === "bug_fix"));
+    }
   });
 });
 

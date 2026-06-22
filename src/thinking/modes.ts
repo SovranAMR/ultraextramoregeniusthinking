@@ -59,6 +59,17 @@ export const THINKING_MODES: Record<ThinkingMode, ModeConfig> = {
   },
 };
 
+import {
+  type SupportedLocale,
+  detectLocale,
+  resolveModeAlias,
+  getAllModePatterns,
+  getAllStripPatterns,
+  getUseCaseSnippets,
+} from "./locale/index.js";
+
+export type { SupportedLocale };
+
 const MODE_ALIASES: Record<string, ThinkingMode> = {
   easy: "easy_thinking",
   easy_thinking: "easy_thinking",
@@ -74,29 +85,8 @@ const MODE_ALIASES: Record<string, ThinkingMode> = {
   maksimum: "max_thinking",
 };
 
-/** Kullanıcı mesajından mod tetikleyicisini yakala */
-const NL_MODE_PATTERNS: RegExp[] = [
-  /düşünme\s+modu\s+mcp\s+(easy|medium|more|max|kolay|orta|ileri|maksimum)/i,
-  /mcp\s+(easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün/i,
-  /(?:^|\s)(easy|medium|more|max)\s*(?:de\s+)?düşün/i,
-  /(?:^|\s)(easy|medium|more|max)\s+thinking/i,
-  /(?:^|\s)(easy|medium|more|max)\s+modda\s+düşün/i,
-  /(?:^|\s)(kolay|orta|ileri|maksimum)\s+modda\s+düşün/i,
-  /(?:^|\s)(easy|medium|more|max)\s+da\s+düşünerek/i,
-  /(?:^|\s)(kolay|orta|ileri|maksimum)\s+da\s+düşünerek/i,
-];
-
-const STRIP_PATTERNS: RegExp[] = [
-  /düşünme\s+modu\s+mcp\s+(?:easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /mcp\s+(?:easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s+thinking[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s+modda\s+düşün[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s+modda\s+düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s+da\s+düşünerek[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s+da\s+düşünerek[:\s]*/gi,
-];
+const NL_MODE_PATTERNS = getAllModePatterns();
+const STRIP_PATTERNS = getAllStripPatterns();
 
 export function resolveMode(mode?: string): ModeConfig {
   const key = (mode ?? "easy_thinking").toLowerCase().trim();
@@ -122,6 +112,7 @@ export interface ParsedThinkingRequest {
   question: string;
   detectedFromText: boolean;
   matchedTrigger?: string;
+  locale: SupportedLocale;
 }
 
 /** Kullanıcı sadece mod tetikledi, somut soru yazmadı */
@@ -130,9 +121,9 @@ export function isModeOnlyTrigger(text: string): boolean {
   if (!parsed.detectedFromText) return false;
   const q = parsed.question.trim().toLowerCase();
   if (!q || q.length < 5) return true;
-  return NL_MODE_PATTERNS.some((p) => {
-    const m = q.match(p);
-    return m !== null && q.replace(p, "").trim().length < 10;
+  return NL_MODE_PATTERNS.some(({ pattern }) => {
+    const m = q.match(pattern);
+    return m !== null && q.replace(pattern, "").trim().length < 10;
   });
 }
 
@@ -153,13 +144,15 @@ export function parseThinkingRequest(text: string): ParsedThinkingRequest {
   const trimmed = text.trim();
   let matchedMode: ThinkingMode | null = null;
   let matchedTrigger: string | undefined;
+  let matchedLocale: SupportedLocale = detectLocale(trimmed);
 
-  for (const pattern of NL_MODE_PATTERNS) {
+  for (const { locale, pattern } of NL_MODE_PATTERNS) {
     const match = trimmed.match(pattern);
     if (match?.[1]) {
       const alias = match[1].toLowerCase();
-      matchedMode = MODE_ALIASES[alias] ?? null;
+      matchedMode = resolveModeAlias(alias, locale) ?? MODE_ALIASES[alias] ?? null;
       matchedTrigger = match[0].trim();
+      matchedLocale = locale;
       if (matchedMode) break;
     }
   }
@@ -179,8 +172,11 @@ export function parseThinkingRequest(text: string): ParsedThinkingRequest {
     question,
     detectedFromText: matchedMode !== null,
     matchedTrigger,
+    locale: matchedLocale,
   };
 }
+
+export { detectLocale, getUseCaseSnippets };
 
 export function formatUserExamples(): string {
   return [
