@@ -6,7 +6,7 @@ export type LocaleModeId =
   | "more_thinking"
   | "max_thinking";
 
-export const SUPPORTED_LOCALES: Locale[] = ["tr", "en", "de", "ar"];
+const SUPPORTED_LOCALES: Locale[] = ["tr", "en", "de", "ar"];
 
 export interface UseCaseSnippet {
   id: string;
@@ -65,15 +65,13 @@ export interface PromptBundle {
   modeLabel: string;
 }
 
-export interface LocaleBundle {
+interface LocaleBundle {
   code: Locale;
   modeAliases: Record<string, LocaleModeId>;
   nlModePatterns: RegExp[];
   stripPatterns: RegExp[];
   useCaseSnippets: UseCaseSnippet[];
-  detectHints: RegExp[];
   rejection: RejectionBundle;
-  serverInstructions: string;
 }
 
 const USE_CASE_MATRIX: UseCaseSnippet[] = [
@@ -736,7 +734,7 @@ const REJECTION_AR: RejectionBundle = {
   stagnationResubmit: "تحسين ملموس جديد لهذا pass، ثم استدعِ think_next مرة أخرى.",
 };
 
-export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
+const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
   tr: {
     code: "tr",
     modeAliases: {
@@ -764,9 +762,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
       /fail|toparla|geçiş|bypass|500|webhook|monolith/i.test(s.trigger.source),
     ),
-    detectHints: [/düşün/i, /modu mcp/i, /kolay|orta|ileri|maksimum/i],
     rejection: REJECTION_TR,
-    serverInstructions: SERVER_INSTRUCTIONS_TR,
   },
   en: {
     code: "en",
@@ -786,9 +782,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
       /why|refactor|migration|bypass|root cause|webhook|monolith vs/i.test(s.trigger.source),
     ),
-    detectHints: [/\bthink\b/i, /\bmode\b/i, /\beasy thinking\b/i],
     rejection: REJECTION_EN,
-    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
   de: {
     code: "de",
@@ -810,9 +804,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
       /schlägt|modul refaktor|migration|bypass|ursache|webhook|monolith oder/i.test(s.trigger.source),
     ),
-    detectHints: [/\bdenken\b/i, /\bmodus\b/i, /\beinfach\b/i, /\bmittel\b/i],
     rejection: REJECTION_DE,
-    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
   ar: {
     code: "ar",
@@ -833,9 +825,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     useCaseSnippets: USE_CASE_MATRIX.filter((s) =>
       /يفشل|هيكلة|مراجعة|webhook|الوحدة/i.test(s.trigger.source),
     ),
-    detectHints: [/[\u0600-\u06FF]/, /فكر/],
     rejection: REJECTION_AR,
-    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
 };
 
@@ -844,10 +834,6 @@ export function detectLocale(text: string): Locale {
   if (/\b(denken|modus|einfach|mittel|mehr|maximal)\b/i.test(text)) return "de";
   if (/\b(think|thinking)\b/i.test(text) && !/düşün/i.test(text)) return "en";
   return "tr";
-}
-
-export function getLocaleBundle(locale: Locale): LocaleBundle {
-  return LOCALE_BUNDLES[locale];
 }
 
 export function getRejectionBundle(locale: Locale): RejectionBundle {
