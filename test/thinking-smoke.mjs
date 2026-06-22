@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { resolveMode, THINKING_MODES, parseThinkingRequest } from "../dist/thinking/modes.js";
+import { resolveMode, THINKING_MODES, parseThinkingRequest, detectLocale, suggestModeFromUseCase } from "../dist/thinking/modes.js";
 import {
   createSession,
   submitAnswer,
@@ -88,6 +88,39 @@ describe("natural language mode parsing", () => {
     const p = parseThinkingRequest("max da düşünerek tavus kuşu çiz");
     assert.equal(p.mode, "max_thinking");
     assert.match(p.question, /tavus kuşu/);
+  });
+});
+
+describe("locale mode parsing", () => {
+  test("tr: düşünme modu mcp max de düşün", () => {
+    const p = parseThinkingRequest("düşünme modu mcp max de düşün: auth bypass var mı");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(detectLocale("düşünme modu mcp max de düşün"), "tr");
+  });
+
+  test("en: think in max mode", () => {
+    const p = parseThinkingRequest("think in max mode: why does this test fail");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(detectLocale("think in max mode"), "en");
+    assert.match(p.question, /why does this test fail/);
+  });
+
+  test("de: im maximal modus denken", () => {
+    const p = parseThinkingRequest("im maximal modus denken: postgres jsonb migration");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(detectLocale("im maximal modus denken"), "de");
+  });
+
+  test("ar: فكر max", () => {
+    const p = parseThinkingRequest("فكر max: مراجعة auth");
+    assert.equal(p.mode, "max_thinking");
+    assert.equal(detectLocale("فكر max"), "ar");
+  });
+
+  test("use-case matrix suggests medium for bug fix (tr)", () => {
+    const p = parseThinkingRequest("bu test neden fail oluyor");
+    assert.equal(p.mode, "medium_thinking");
+    assert.equal(suggestModeFromUseCase("bu test neden fail", "tr"), "medium_thinking");
   });
 });
 

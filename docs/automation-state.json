@@ -1,11 +1,11 @@
 {
   "roadmapPhase": "i18n",
   "productScope": "code-first",
-  "lastRun": "2026-06-22T08:22:00.287Z",
-  "lastFocus": "easy code planına verify pass — tüm modlarda basiret gereksinimi tamam",
-  "lastFiles": ["src/thinking/pass-focus.ts", "test/thinking-smoke.mjs"],
+  "lastRun": "2026-06-22T08:28:00.282Z",
+  "lastFocus": "locale bundle — TR/EN/DE/AR mod tetikleyicileri + use-case matrisi",
+  "lastFiles": ["src/thinking/locale/index.ts", "src/thinking/modes.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "Faz B — tr/en locale bundle ve mod tetikleyicileri",
-  "runCount": 15
+  "nextRisk": "Faz B — rejection mesajları ve session locale (de/ar) genişletme",
+  "runCount": 16
 }

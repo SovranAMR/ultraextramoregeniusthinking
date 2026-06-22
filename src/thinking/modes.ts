@@ -1,8 +1,19 @@
+import {
+  allNlModePatterns,
+  allStripPatterns,
+  detectLocale,
+  mergeModeAliases,
+  suggestModeFromUseCase,
+} from "./locale/index.js";
+
 export type ThinkingMode =
   | "easy_thinking"
   | "medium_thinking"
   | "more_thinking"
   | "max_thinking";
+
+export { detectLocale, suggestModeFromUseCase } from "./locale/index.js";
+export type { Locale } from "./locale/index.js";
 
 export interface ModeConfig {
   mode: ThinkingMode;
@@ -59,43 +70,19 @@ export const THINKING_MODES: Record<ThinkingMode, ModeConfig> = {
   },
 };
 
-const MODE_ALIASES: Record<string, ThinkingMode> = {
-  easy: "easy_thinking",
-  easy_thinking: "easy_thinking",
-  kolay: "easy_thinking",
-  medium: "medium_thinking",
-  medium_thinking: "medium_thinking",
-  orta: "medium_thinking",
-  more: "more_thinking",
-  more_thinking: "more_thinking",
-  ileri: "more_thinking",
-  max: "max_thinking",
-  max_thinking: "max_thinking",
-  maksimum: "max_thinking",
-};
+const MODE_ALIASES: Record<string, ThinkingMode> = mergeModeAliases();
 
-/** Kullanıcı mesajından mod tetikleyicisini yakala */
+/** Kullanıcı mesajından mod tetikleyicisini yakala — TR/EN/DE/AR locale bundle */
 const NL_MODE_PATTERNS: RegExp[] = [
-  /düşünme\s+modu\s+mcp\s+(easy|medium|more|max|kolay|orta|ileri|maksimum)/i,
-  /mcp\s+(easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün/i,
-  /(?:^|\s)(easy|medium|more|max)\s*(?:de\s+)?düşün/i,
+  ...allNlModePatterns(),
   /(?:^|\s)(easy|medium|more|max)\s+thinking/i,
   /(?:^|\s)(easy|medium|more|max)\s+modda\s+düşün/i,
-  /(?:^|\s)(kolay|orta|ileri|maksimum)\s+modda\s+düşün/i,
-  /(?:^|\s)(easy|medium|more|max)\s+da\s+düşünerek/i,
-  /(?:^|\s)(kolay|orta|ileri|maksimum)\s+da\s+düşünerek/i,
 ];
 
 const STRIP_PATTERNS: RegExp[] = [
-  /düşünme\s+modu\s+mcp\s+(?:easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /mcp\s+(?:easy|medium|more|max|kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s*(?:de\s+)?düşün[:\s]*/gi,
+  ...allStripPatterns(),
   /(?:^|\s)(?:easy|medium|more|max)\s+thinking[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s*(?:de\s+)?düşün[:\s]*/gi,
   /(?:^|\s)(?:easy|medium|more|max)\s+modda\s+düşün[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s+modda\s+düşün[:\s]*/gi,
-  /(?:^|\s)(?:easy|medium|more|max)\s+da\s+düşünerek[:\s]*/gi,
-  /(?:^|\s)(?:kolay|orta|ileri|maksimum)\s+da\s+düşünerek[:\s]*/gi,
 ];
 
 export function resolveMode(mode?: string): ModeConfig {
@@ -174,8 +161,12 @@ export function parseThinkingRequest(text: string): ParsedThinkingRequest {
     question = trimmed;
   }
 
+  const useCaseMode = matchedMode
+    ? null
+    : suggestModeFromUseCase(trimmed, detectLocale(trimmed));
+
   return {
-    mode: matchedMode ?? "easy_thinking",
+    mode: matchedMode ?? useCaseMode ?? "easy_thinking",
     question,
     detectedFromText: matchedMode !== null,
     matchedTrigger,
