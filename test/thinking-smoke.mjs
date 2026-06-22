@@ -3,9 +3,16 @@ import assert from "node:assert/strict";
 import { resolveMode, THINKING_MODES, parseThinkingRequest, detectLocale, suggestModeFromUseCase } from "../dist/thinking/modes.js";
 import {
   createSession,
-  submitAnswer,
   loadSession,
+  submitAnswer,
+  resolveSessionInstructionsLocale,
 } from "../dist/thinking/session.js";
+import {
+  buildServerInstructions,
+  getServerInstructions,
+  resolveServerLocale,
+  serverInstructionsLocale,
+} from "../dist/thinking/locale/index.js";
 import {
   buildStartDirective,
   buildRefinementDirective,
@@ -705,6 +712,32 @@ describe("task kind & answer guard", () => {
     assert.equal(s.language, "de");
     const loaded = loadSession(s.id);
     assert.equal(loaded.language, "de");
+  });
+});
+
+describe("server instructions locale", () => {
+  test("EN instructions from question detect", () => {
+    const locale = resolveServerLocale({ question: "think in max mode: fix auth bypass" });
+    assert.equal(locale, "en");
+    const text = buildServerInstructions({ question: "think in max mode: fix auth bypass" });
+    assert.match(text, /improves answer quality pass by pass/);
+    assert.doesNotMatch(text, /cevap kalitesini pass pass/);
+  });
+
+  test("TR instructions from session language", () => {
+    const s = createSession("bu test neden fail", "medium_thinking", "tr");
+    const locale = resolveSessionInstructionsLocale(s);
+    assert.equal(locale, "tr");
+    const text = buildServerInstructions({ sessionLanguage: s.language });
+    assert.match(text, /cevap kalitesini pass pass artırır/);
+  });
+
+  test("EN instructions from session language", () => {
+    const s = createSession("why does this test fail", "medium_thinking", "en");
+    const locale = resolveSessionInstructionsLocale(s);
+    assert.equal(locale, "en");
+    const text = getServerInstructions(serverInstructionsLocale(locale));
+    assert.match(text, /improves answer quality/);
   });
 });
 

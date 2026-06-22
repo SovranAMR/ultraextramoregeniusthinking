@@ -1,39 +1,28 @@
 {
-  "lastRun": "2026-06-22T09:44:00.269Z",
-  "runCount": 36,
-  "roadmapPhase": "polish",
-  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": true },
-  "fazAProgress": {
-    "a1_basiret_module": true,
-    "a2_prompts_wire": true,
-    "a3_server_instructions": true,
-    "a4_code_eval_pass": true,
-    "a5_eval_test": true,
-    "a6_refinement_basiret": true
+  "lastRun": "2026-06-22T09:48:00.302Z",
+  "runCount": 37,
+  "roadmapPhase": "ship",
+  "roadmapDone": {
+    "basiret": true,
+    "i18n": true,
+    "product": true,
+    "polish": true,
+    "ship": false
   },
-  "fazBProgress": {
-    "b1_locale_skeleton": true,
-    "b2_parse_en_triggers": true,
-    "b3_rejection_locale": true,
-    "b4_server_instructions_en": true,
-    "b5_test_tr_en_parse": true,
-    "b6_creative_pass_i18n": true
+  "fazEProgress": {
+    "e1_de_ar_parse": true,
+    "e2_server_locale": true,
+    "e3_code_session_smoke": false,
+    "e4_cli_mcp_config_test": false,
+    "e5_npm_files_field": false,
+    "e6_use_case_snippets": false,
+    "e7_locale_dead_code": false,
+    "e8_version_170": false
   },
-  "fazCProgress": {
-    "c1_ultra_thinking_root_env": true,
-    "c2_semver_banner": true,
-    "c3_mcp_tool_schema_docs": true
-  },
-  "fazDProgress": {
-    "d1_analysis_pass_plan": true,
-    "d2_analysis_detect_triggers": true,
-    "d3_polish_done": true
-  },
-  "lastFocus": "none — roadmap tamam",
-  "lastFiles": [],
+  "lastFocus": "E2: EN server instructions locale seçimi",
+  "lastFiles": ["src/thinking/locale/index.ts", "src/thinking/session.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
-  "productScope": "code-first",
-  "nextRisk": "roadmap tamam — yeni faz tanımı gerekir"
+  "productScope": "code-first"
 }

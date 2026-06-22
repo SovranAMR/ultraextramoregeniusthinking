@@ -6,7 +6,7 @@ import type { ThinkingMode } from "./modes.js";
 import { resolveMode } from "./modes.js";
 import type { TaskKind } from "./task-kind.js";
 import { detectTaskKind } from "./task-kind.js";
-import type { Locale } from "./locale/index.js";
+import { resolveServerLocale, type Locale } from "./locale/index.js";
 
 export interface ThinkingRound {
   round: number;
@@ -112,4 +112,15 @@ export function submitAnswer(session: ThinkingSession, answer: string): Thinking
 
 export function getSessionDir(): string {
   return resolveSessionDir();
+}
+
+/** MCP server instructions locale: session.language öncelikli, yoksa question detect. */
+export function resolveSessionInstructionsLocale(
+  session?: Pick<ThinkingSession, "language" | "question">,
+  question?: string,
+): Locale {
+  return resolveServerLocale({
+    sessionLanguage: session?.language,
+    question: question ?? session?.question,
+  });
 }

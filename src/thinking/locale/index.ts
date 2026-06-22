@@ -793,10 +793,28 @@ export function getServerInstructions(locale: Locale = "tr"): string {
   return LOCALE_BUNDLES[locale].serverInstructions;
 }
 
-export function resolveServerLocale(): Locale {
+/** Server instructions bundle: TR or EN (de/ar → EN copy). */
+export function serverInstructionsLocale(locale: Locale): "tr" | "en" {
+  return locale === "tr" ? "tr" : "en";
+}
+
+export function resolveServerLocale(opts?: {
+  sessionLanguage?: Locale;
+  question?: string;
+}): Locale {
   const env = process.env.ULTRA_THINKING_LOCALE?.toLowerCase();
   if (env && SUPPORTED_LOCALES.includes(env as Locale)) return env as Locale;
+  if (opts?.sessionLanguage) return opts.sessionLanguage;
+  if (opts?.question?.trim()) return detectLocale(opts.question);
   return "tr";
+}
+
+export function buildServerInstructions(opts?: {
+  sessionLanguage?: Locale;
+  question?: string;
+}): string {
+  const locale = resolveServerLocale(opts);
+  return getServerInstructions(serverInstructionsLocale(locale));
 }
 
 export function getPromptBundle(locale: Locale): PromptBundle {
