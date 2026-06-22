@@ -34,7 +34,9 @@ export function validatePassAnswer(
   const trimmed = answer.trim();
   const reasons: string[] = [];
 
+  let tooShort = false;
   if (trimmed.length < 40 && !(passNumber === 1 && execution === "none")) {
+    tooShort = true;
     reasons.push("Cevap çok kısa — somut değişiklik veya teslim özeti yok.");
   }
 
@@ -72,7 +74,7 @@ export function validatePassAnswer(
   return {
     valid:
       reasons.length === 0 ||
-      (!isMeta && !artifactMissing && reasons.length <= 1),
+      (!isMeta && !artifactMissing && !tooShort && reasons.length <= 1),
     isMeta,
     reasons,
   };

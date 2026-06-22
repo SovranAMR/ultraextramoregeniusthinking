@@ -365,6 +365,24 @@ describe("task kind & answer guard", () => {
     assert.equal(loaded.currentRound, 4);
   });
 
+  test("handleThinkNext RED when read pass answer too short", () => {
+    const s = createSession("Test read short", "easy_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
+    );
+
+    const shortAnswer = "Kod okundu, eksik bulundu.";
+    const result = handleThinkNext(s.id, shortAnswer);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 2/);
+    assert.match(result.content[0].text, /çok kısa/i);
+    assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 1);
+  });
+
   test("handleThinkNext RED when meta log submitted", () => {
     const s = createSession("Test meta log", "easy_thinking", "tr");
     const firstAnswer =
