@@ -15,6 +15,8 @@ export interface PlanStep {
   title: string;
   purpose: string;
   status: PlanStepStatus;
+  /** F3: adım tamamlanınca karar özeti; F2 bağlamında önceki adımlar için okunur */
+  summary?: string;
 }
 
 export interface Plan {

@@ -35,7 +35,12 @@ import {
   buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
-import { createPlan, loadPlan, getPlanDir } from "../dist/thinking/plan.js";
+import { createPlan, loadPlan, getPlanDir, savePlan } from "../dist/thinking/plan.js";
+import {
+  createStepSession,
+  buildPriorStepContext,
+  buildStepQuestion,
+} from "../dist/thinking/step-session.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -889,6 +894,71 @@ describe("orchestration plan (F1)", () => {
 
   test("loadPlan returns null for unknown id", () => {
     assert.equal(loadPlan("00000000-0000-0000-0000-000000000000"), null);
+  });
+});
+
+describe("orchestration step session (F2)", () => {
+  test("createStepSession links plan id, step no, mode and marks in_progress", () => {
+    const plan = createPlan("Checkout flow yeniden tasarımı", [
+      { title: "Mevcut akışı haritala", purpose: "Sepet, ödeme ve onay adımlarını belgele." },
+      { title: "Hedef API tasarımı", purpose: "Yeni endpoint sınırları ve hata sözleşmesini netleştir." },
+    ]);
+    const result = createStepSession(plan.id, 2, "max");
+    assert.ok("session" in result);
+    assert.equal(result.session.planId, plan.id);
+    assert.equal(result.session.planStep, 2);
+    assert.equal(result.session.mode, "max_thinking");
+    assert.equal(result.session.totalPasses, 10);
+    assert.match(result.session.question, /Adım 2\/2/);
+    assert.match(result.session.question, /Hedef API tasarımı/);
+    const reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.steps[1].status, "in_progress");
+  });
+
+  test("prior step summaries flow into conversationContext", () => {
+    const plan = createPlan("Auth modülü migration", [
+      { title: "Mevcut akışı haritala", purpose: "Giriş ve token yenilemeyi belgele." },
+      { title: "Hedef API tasarımı", purpose: "Geriye uyumluluk kurallarını netleştir." },
+      { title: "Kademeli geçiş", purpose: "Feature flag adımlarını sırala." },
+    ]);
+    plan.steps[0].status = "completed";
+    plan.steps[0].summary =
+      "Seçilen: JWT + refresh token. Reddedilen: session cookie-only. Etkilenen: src/auth/token.ts";
+    plan.steps[1].status = "completed";
+    plan.steps[1].summary = "Seçilen: v2 REST facade. Reddedilen: GraphQL katmanı.";
+    savePlan(plan);
+
+    const ctx = buildPriorStepContext(plan, 3);
+    assert.match(ctx, /Önceki adım kararları/);
+    assert.match(ctx, /JWT \+ refresh token/);
+    assert.match(ctx, /v2 REST facade/);
+    assert.doesNotMatch(ctx, /Kademeli geçiş/);
+
+    const result = createStepSession(plan.id, 3, "more");
+    assert.ok("session" in result);
+    assert.match(result.session.conversationContext, /Adım 1:/);
+    assert.match(result.session.conversationContext, /Adım 2:/);
+    assert.match(result.session.conversationContext, /GraphQL katmanı/);
+  });
+
+  test("createStepSession returns error for unknown plan or step", () => {
+    assert.deepEqual(createStepSession("00000000-0000-0000-0000-000000000000", 1, "easy"), {
+      error: "plan_not_found",
+    });
+    const plan = createPlan("Tek adımlı iş", [
+      { title: "Tek parça", purpose: "Kapsamı netleştir." },
+    ]);
+    assert.deepEqual(createStepSession(plan.id, 9, "easy"), { error: "step_not_found" });
+  });
+
+  test("buildStepQuestion is category-neutral", () => {
+    const plan = createPlan("Servis katmanı refaktörü", [
+      { title: "Bağımlılık analizi", purpose: "Modül sınırlarını çıkar." },
+    ]);
+    const q = buildStepQuestion(plan, plan.steps[0]);
+    assert.match(q, /Servis katmanı refaktörü/);
+    assert.match(q, /Bağımlılık analizi/);
+    assert.doesNotMatch(q, /oyun|minecraft|tavus/i);
   });
 });
 

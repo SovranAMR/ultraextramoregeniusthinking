@@ -27,6 +27,9 @@ export interface ThinkingSession {
   createdAt: string;
   updatedAt: string;
   completed: boolean;
+  /** Orkestrasyon: plan adım oturumu */
+  planId?: string;
+  planStep?: number;
 }
 
 function resolveSessionDir(): string {
