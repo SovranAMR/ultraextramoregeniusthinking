@@ -35,6 +35,7 @@ import {
   buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
+import { createPlan, loadPlan, getPlanDir } from "../dist/thinking/plan.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -864,6 +865,30 @@ describe("basiret layer", () => {
     const r5 = buildRefinementDirective(current);
     assert.match(r5, /Verify-before-next/);
     assert.match(r5, /Pass 5\/5/);
+  });
+});
+
+describe("orchestration plan (F1)", () => {
+  test("createPlan writes id, title, steps with purpose to disk", () => {
+    const plan = createPlan("Auth modülü migration", [
+      { title: "Mevcut akışı haritala", purpose: "Giriş, token yenileme ve oturum kapanışını belgele." },
+      { title: "Hedef API tasarımı", purpose: "Yeni modül sınırları ve geriye uyumluluk kurallarını netleştir." },
+      { title: "Kademeli geçiş planı", purpose: "Feature flag ve rollback adımlarını sırala." },
+    ]);
+    assert.ok(plan.id);
+    assert.equal(plan.title, "Auth modülü migration");
+    assert.equal(plan.steps.length, 3);
+    assert.equal(plan.steps[0].step, 1);
+    assert.equal(plan.steps[0].status, "pending");
+    assert.match(plan.steps[1].purpose, /geriye uyumluluk/i);
+    const reloaded = loadPlan(plan.id);
+    assert.equal(reloaded?.title, plan.title);
+    assert.equal(reloaded?.steps.length, 3);
+    assert.notEqual(getPlanDir(), join(process.env.HOME ?? "", ".ultra-thinking", "sessions"));
+  });
+
+  test("loadPlan returns null for unknown id", () => {
+    assert.equal(loadPlan("00000000-0000-0000-0000-000000000000"), null);
   });
 });
 
