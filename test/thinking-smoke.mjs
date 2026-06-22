@@ -35,7 +35,14 @@ import {
   buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
-import { createPlan, loadPlan, getPlanDir, savePlan } from "../dist/thinking/plan.js";
+import {
+  createPlan,
+  loadPlan,
+  getPlanDir,
+  savePlan,
+  getPlanProgress,
+  formatPlanProgress,
+} from "../dist/thinking/plan.js";
 import {
   createStepSession,
   buildPriorStepContext,
@@ -1048,6 +1055,82 @@ describe("orchestration step completion (F3)", () => {
     assert.match(summary, /Seçilen:/);
     assert.match(summary, /Facade pattern/);
     assert.match(summary, /src\/service\/registry\.ts/);
+  });
+});
+
+describe("orchestration plan progress (F4)", () => {
+  test("getPlanProgress reports completed count and next pending step", () => {
+    const plan = createPlan("Auth modülü migration", [
+      { title: "Mevcut akışı haritala", purpose: "Giriş ve token yenilemeyi belgele." },
+      { title: "Hedef API tasarımı", purpose: "Geriye uyumluluk kurallarını netleştir." },
+      { title: "Kademeli geçiş", purpose: "Feature flag adımlarını sırala." },
+    ]);
+    plan.steps[0].status = "completed";
+    plan.steps[0].summary = "Seçilen: JWT. Reddedilen: cookie-only.";
+    savePlan(plan);
+
+    const progress = getPlanProgress(plan);
+    assert.equal(progress.completedCount, 1);
+    assert.equal(progress.totalSteps, 3);
+    assert.equal(progress.completedSteps[0].title, "Mevcut akışı haritala");
+    assert.equal(progress.nextStep?.step, 2);
+    assert.match(progress.nextStep?.title ?? "", /Hedef API/);
+    assert.equal(progress.allComplete, false);
+  });
+
+  test("formatPlanProgress shows completed steps and what is next", () => {
+    const plan = createPlan("Checkout flow yeniden tasarımı", [
+      { title: "Mevcut akışı haritala", purpose: "Sepet ve ödeme adımlarını belgele." },
+      { title: "Hedef API tasarımı", purpose: "Endpoint sınırları ve hata sözleşmesini netleştir." },
+    ]);
+    plan.steps[0].status = "completed";
+    savePlan(plan);
+
+    const text = formatPlanProgress(plan);
+    assert.match(text, /Plan ilerlemesi \(1\/2\)/);
+    assert.match(text, /✓ Adım 1: Mevcut akışı haritala/);
+    assert.match(text, /Sırada: Adım 2 — Hedef API tasarımı/);
+    assert.match(text, /Endpoint sınırları/);
+  });
+
+  test("handleThinkNext step completion includes plan progress with next step", () => {
+    const plan = createPlan("Servis katmanı refaktörü", [
+      { title: "Bağımlılık analizi", purpose: "Modül sınırlarını çıkar." },
+      { title: "Facade tasarımı", purpose: "Public API ve geriye uyumluluğu netleştir." },
+    ]);
+    const first = createStepSession(plan.id, 1, "easy");
+    assert.ok("session" in first);
+    let session = first.session;
+
+    for (let i = 1; i <= session.totalPasses; i++) {
+      const answer =
+        i === session.totalPasses
+          ? "Seçilen: dependency graph. Reddedilen: monolith merge. src/service/registry.ts: modül sınırları çıkarıldı."
+          : `Pass ${i}: src/service/registry.ts okundu (80 satır), bağımlılık grafiği listelendi.`;
+      if (i < session.totalPasses) {
+        session = submitAnswer(session, answer);
+      } else {
+        const completion = handleThinkNext(session.id, answer);
+        assert.notEqual(completion.isError, true);
+        assert.match(completion.content[0].text, /Plan ilerlemesi \(1\/2\)/);
+        assert.match(completion.content[0].text, /Sırada: Adım 2 — Facade tasarımı/);
+      }
+    }
+  });
+
+  test("getPlanProgress marks allComplete when every step is done", () => {
+    const plan = createPlan("Tek adımlı iş", [
+      { title: "Kapsam netleştir", purpose: "Girdi ve çıktıyı tanımla." },
+    ]);
+    plan.steps[0].status = "completed";
+    savePlan(plan);
+
+    const progress = getPlanProgress(plan);
+    assert.equal(progress.allComplete, true);
+    assert.equal(progress.nextStep, null);
+    const text = formatPlanProgress(plan);
+    assert.match(text, /Plan tamamlandı \(1\/1\)/);
+    assert.match(text, /Tüm adımlar tamamlandı/);
   });
 });
 

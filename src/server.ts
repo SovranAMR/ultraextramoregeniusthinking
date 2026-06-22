@@ -27,6 +27,7 @@ import {
 } from "./thinking/answer-guard.js";
 import { buildServerInstructions, detectLocale } from "./thinking/locale/index.js";
 import { completePlanStep } from "./thinking/step-session.js";
+import { formatPlanProgress } from "./thinking/plan.js";
 import { MCP_STDIO_BANNER, PKG_VERSION } from "./version.js";
 
 const STAGNATION_STOP_WORDS = new Set(["için", "ile", "ve", "bir", "the", "and"]);
@@ -137,6 +138,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
       const done = completePlanStep(updated);
       if (done) {
         text += `\n\n---\nPlan adım ${done.step.step} tamamlandı — karar özeti plana kaydedildi.`;
+        text += `\n\n${formatPlanProgress(done.plan)}`;
       }
     }
     return {

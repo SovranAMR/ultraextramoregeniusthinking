@@ -79,3 +79,88 @@ export function savePlan(plan: Plan): void {
   plan.updatedAt = new Date().toISOString();
   writeFileSync(planPath(plan.id), JSON.stringify(plan, null, 2), "utf8");
 }
+
+export interface PlanProgressSnapshot {
+  totalSteps: number;
+  completedCount: number;
+  completedSteps: Array<{ step: number; title: string }>;
+  inProgressStep: { step: number; title: string } | null;
+  nextStep: { step: number; title: string; purpose: string } | null;
+  allComplete: boolean;
+}
+
+/** F4: hangi adım bitti, sırada ne — yapısal ilerleme özeti */
+export function getPlanProgress(plan: Plan): PlanProgressSnapshot {
+  const completed = plan.steps.filter((s) => s.status === "completed");
+  const inProgress = plan.steps.find((s) => s.status === "in_progress");
+  const nextPending = plan.steps.find((s) => s.status === "pending");
+  const allComplete = plan.steps.length > 0 && completed.length === plan.steps.length;
+
+  let nextStep: PlanProgressSnapshot["nextStep"] = null;
+  if (!allComplete) {
+    if (inProgress) {
+      nextStep = {
+        step: inProgress.step,
+        title: inProgress.title,
+        purpose: inProgress.purpose,
+      };
+    } else if (nextPending) {
+      nextStep = {
+        step: nextPending.step,
+        title: nextPending.title,
+        purpose: nextPending.purpose,
+      };
+    }
+  }
+
+  return {
+    totalSteps: plan.steps.length,
+    completedCount: completed.length,
+    completedSteps: completed.map((s) => ({ step: s.step, title: s.title })),
+    inProgressStep: inProgress
+      ? { step: inProgress.step, title: inProgress.title }
+      : null,
+    nextStep,
+    allComplete,
+  };
+}
+
+/** F4: insan okunur plan ilerlemesi — tamamlanan, devam eden, sıradaki adım */
+export function formatPlanProgress(plan: Plan): string {
+  const progress = getPlanProgress(plan);
+  const lines: string[] = [];
+
+  if (progress.allComplete) {
+    lines.push(`Plan tamamlandı (${progress.completedCount}/${progress.totalSteps})`);
+  } else {
+    lines.push(`Plan ilerlemesi (${progress.completedCount}/${progress.totalSteps})`);
+  }
+
+  for (const step of plan.steps) {
+    if (step.status === "completed") {
+      lines.push(`✓ Adım ${step.step}: ${step.title}`);
+    } else if (step.status === "in_progress") {
+      lines.push(`▶ Adım ${step.step}: ${step.title} (devam ediyor)`);
+    } else {
+      lines.push(`○ Adım ${step.step}: ${step.title}`);
+    }
+  }
+
+  if (progress.allComplete) {
+    lines.push("", "Tüm adımlar tamamlandı.");
+  } else if (progress.inProgressStep) {
+    lines.push(
+      "",
+      `Devam eden: Adım ${progress.inProgressStep.step} — ${progress.inProgressStep.title}`,
+    );
+    const afterCurrent = plan.steps.find((s) => s.status === "pending");
+    if (afterCurrent) {
+      lines.push(`Sonra: Adım ${afterCurrent.step} — ${afterCurrent.title}`);
+    }
+  } else if (progress.nextStep) {
+    lines.push("", `Sırada: Adım ${progress.nextStep.step} — ${progress.nextStep.title}`);
+    lines.push(`Amaç: ${progress.nextStep.purpose}`);
+  }
+
+  return lines.join("\n");
+}

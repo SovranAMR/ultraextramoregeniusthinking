@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T10:42:00.000Z",
-  "runCount": 45,
+  "lastRun": "2026-06-22T10:44:00.000Z",
+  "runCount": 46,
   "roadmapPhase": "orchestration",
   "roadmapDone": {
     "basiret": true,
@@ -14,14 +14,14 @@
     "f1_plan_concept": true,
     "f2_step_session": true,
     "f3_step_completion_summary": true,
-    "f4_plan_progress": false,
+    "f4_plan_progress": true,
     "f5_natural_language": false,
     "f6_small_jobs_unchanged": false,
     "f7_integration_test": false,
     "f8_version_bump": false
   },
-  "lastFocus": "F4: plan ilerlemesi — hangi adım bitti, sırada ne",
-  "lastFiles": ["src/thinking/step-session.ts", "src/server.ts", "test/thinking-smoke.mjs"],
+  "lastFocus": "F5: doğal dil — plan çıkar, her adımı max düşün (TR+EN tetikleyiciler)",
+  "lastFiles": ["src/thinking/plan.ts", "src/server.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
