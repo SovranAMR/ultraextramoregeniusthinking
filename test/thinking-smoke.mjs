@@ -35,6 +35,7 @@ import {
   buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
+import { PKG_VERSION } from "../dist/version.js";
 import {
   createPlan,
   loadPlan,
@@ -1339,6 +1340,19 @@ describe("orchestration integration (F7)", () => {
     assert.equal(getPlanProgress(reloaded).allComplete, true);
     assert.equal(getPlanProgress(reloaded).nextStep, null);
     assert.match(formatPlanProgress(reloaded), /Tüm adımlar tamamlandı/);
+  });
+});
+
+describe("version (F8)", () => {
+  test("orchestration release is 1.8.0", () => {
+    assert.equal(PKG_VERSION, "1.8.0");
+  });
+
+  test("think / think_next unchanged after orchestration layer", () => {
+    const session = createSession("Kısa analiz sorusu", "easy_thinking", "tr");
+    assert.equal(session.currentRound, 0);
+    assert.equal(session.planId, undefined);
+    assert.equal(session.planStep, undefined);
   });
 });
 

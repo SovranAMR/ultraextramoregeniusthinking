@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T10:48:00.282Z",
-  "runCount": 49,
+  "lastRun": "2026-06-22T10:50:00.296Z",
+  "runCount": 50,
   "roadmapPhase": "orchestration",
   "roadmapDone": {
     "basiret": true,
@@ -8,7 +8,7 @@
     "product": true,
     "polish": true,
     "ship": true,
-    "orchestration": false
+    "orchestration": true
   },
   "fazFProgress": {
     "f1_plan_concept": true,
@@ -18,10 +18,10 @@
     "f5_natural_language": true,
     "f6_small_jobs_unchanged": true,
     "f7_integration_test": true,
-    "f8_version_bump": false
+    "f8_version_bump": true
   },
-  "lastFocus": "F7: 3 adımlı plan entegrasyon testi — adım oturumu, özet, bağlam taşınması",
-  "lastFiles": ["test/thinking-smoke.mjs", "docs/automation-state.json"],
+  "lastFocus": "F8: sürüm 1.8.0 — orkestrasyon katmanı tamamlandı, think/think_next geriye uyumlu",
+  "lastFiles": ["package.json", "test/thinking-smoke.mjs", "docs/automation-state.json"],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,

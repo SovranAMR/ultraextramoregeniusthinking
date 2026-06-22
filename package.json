@@ -1,6 +1,6 @@
 {
   "name": "ultra-extra-more-genius-thinking",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "MCP server: iteratif ultra-deep thinking — dadik modelleri bile çok tur düşündürerek kaliteyi artırır.",
   "type": "module",
   "main": "./dist/server.js",
