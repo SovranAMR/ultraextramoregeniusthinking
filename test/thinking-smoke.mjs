@@ -172,6 +172,34 @@ describe("thinking session", () => {
     current = submitAnswer(current, "Pass 10 final");
     assert.equal(current.completed, true);
   });
+
+  test("medium bug-fix code session end-to-end", () => {
+    const s = createSession("bu test neden fail oluyor src/auth.ts", "medium_thinking", "tr");
+    assert.equal(s.taskKind, "code");
+    assert.equal(s.totalPasses, 5);
+
+    const answers = [
+      "test/auth.test.ts için ilk taslak: null guard eksikliği ve async timeout ihtimali planlandı.",
+      "src/auth.ts okundu (87 satır). login() null check eksik, token refresh race condition tespit edildi.",
+      "src/auth.ts review: refreshToken() async await eksik, 401 fallback yolu hatalı, düzeltme listesi çıkarıldı.",
+      "src/auth.ts: null guard ve async try-catch eklendi, refreshToken race condition düzeltildi.",
+      "npm test geçti, src/auth.ts doğrulandı: null guard ve async fix 3/3 test green.",
+    ];
+
+    let current = s;
+    for (let i = 0; i < answers.length; i++) {
+      current = submitAnswer(current, answers[i]);
+      assert.equal(current.currentRound, i + 1);
+      assert.equal(current.completed, i === answers.length - 1);
+    }
+
+    assert.equal(current.rounds.length, 5);
+    const completion = buildCompletionDirective(current);
+    assert.match(completion, /TAMAMLANDI/);
+    assert.match(completion, /null guard ve async fix 3\/3 test green/);
+    assert.doesNotMatch(completion, /Düşünme Evrimi/);
+    assert.doesNotMatch(completion, /Pass 1:|Pass 2:|Pass 3:|Pass 4:/);
+  });
 });
 
 describe("thinking prompts", () => {
