@@ -24,6 +24,20 @@ export const CREATIVE_BASIRET_RULE = [
   "**Basiret (görsel):** Çıktıyı Read ile aç, gör/oku — detay eksik mi, fazla mı; bulguya göre karar ver.",
 ].join("\n");
 
+/** Analiz görevlerinde write/shell verify basireti uygulanmaz */
+export const ANALYSIS_BASIRET_RULE = [
+  "**Basiret (analiz):** Pass bittikten sonra durup değerlendir.",
+  "- Argüman boşluğu, zayıf kanıt veya mantık hatası → derinleştir veya düzelt.",
+  "- Gereksiz tekrar veya şişkin açıklama → sadeleştir.",
+  "- Scope creep veya konu dışı sapma → azalt.",
+  "Yön bu pass'in bulgusundan çıkar — geliştir / sadeleştir / azalt.",
+].join("\n");
+
+export const ANALYSIS_VERIFY_BEFORE_NEXT = [
+  "**Verify-before-next (analiz):** Argüman tutarlılığı, eksik kanıt ve mantık hatasını kontrol et; sonra think_next.",
+  "Somut: hangi iddia doğrulandı, hangi zayıflık kaldı, sonraki pass yönü.",
+].join("\n");
+
 const EVALUATION_LENSES = new Set([
   "gap_analysis",
   "gap_logic",
@@ -41,6 +55,12 @@ const EVALUATION_LENSES = new Set([
 export function getBasiretHint(taskKind: TaskKind, execution: ExecutionKind): string {
   if (taskKind === "creative") {
     return CREATIVE_BASIRET_RULE;
+  }
+  if (taskKind === "analysis") {
+    if (execution === "verify") {
+      return `${ANALYSIS_BASIRET_RULE}\n${ANALYSIS_VERIFY_BEFORE_NEXT}`;
+    }
+    return ANALYSIS_BASIRET_RULE;
   }
   if (execution === "verify") {
     return `${CODE_BASIRET_RULE}\n${VERIFY_BEFORE_NEXT}`;
@@ -71,3 +91,6 @@ export function planMeetsCodeBasiretRequirements(plan: PassFocus[]): {
     hasEvaluation: plan.some((p) => isEvaluationPass(p)),
   };
 }
+
+/** Analiz planları da verify + değerlendirme pass'i içermeli */
+export const planMeetsAnalysisBasiretRequirements = planMeetsCodeBasiretRequirements;

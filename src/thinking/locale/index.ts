@@ -57,6 +57,8 @@ export interface PromptBundle {
     readBeforeNext: string;
     creative: string;
     writeExtra: string;
+    analysis: string;
+    analysisVerifyBeforeNext: string;
   };
   firstDraftTitle: string;
   refinementTitle: string;
@@ -129,6 +131,11 @@ const SERVER_INSTRUCTIONS_TR = [
   "• Write pass → Write/StrReplace/Delete ile uygula, mock yasak",
   "• Verify pass → Shell ile test/build, dosya özetini finalde ver",
   "",
+  "GÖREV TİPLERİ (otomatik algılanır):",
+  "• code — read/write/verify döngüsü",
+  "• creative/görsel — görsel odaklı plan, kod review pass'leri yok",
+  "• analysis — read/verify ağırlıklı, write pass yok",
+  "",
   "MODLAR:",
   "• easy=3: taslak → read/eksik → write/final",
   "• medium=5: taslak → read → kod review → write/uygula → verify/final",
@@ -170,6 +177,11 @@ const SERVER_INSTRUCTIONS_EN = [
   "• Read pass → read real files with Read/Grep/SemanticSearch",
   "• Write pass → apply with Write/StrReplace/Delete, no mocks",
   "• Verify pass → test/build via Shell, file summary in final answer",
+  "",
+  "TASK KINDS (auto-detected):",
+  "• code — read/write/verify cycle",
+  "• creative/visual — visual-focused plan, no code review passes",
+  "• analysis — read/verify heavy, no write passes",
   "",
   "MODES:",
   "• easy=3: draft → read/gaps → write/final",
@@ -330,6 +342,17 @@ const PROMPT_TR: PromptBundle = {
       "**Basiret (görsel):** Çıktıyı Read ile aç, gör/oku — detay eksik mi, fazla mı; bulguya göre karar ver.",
     writeExtra:
       "**Write basiret:** Diff'i değerlendir — gerekli mi, yoksa sadeleştirilebilir mi?",
+    analysis: [
+      "**Basiret (analiz):** Pass bittikten sonra durup değerlendir.",
+      "- Argüman boşluğu, zayıf kanıt veya mantık hatası → derinleştir veya düzelt.",
+      "- Gereksiz tekrar veya şişkin açıklama → sadeleştir.",
+      "- Scope creep veya konu dışı sapma → azalt.",
+      "Yön bu pass'in bulgusundan çıkar — geliştir / sadeleştir / azalt.",
+    ].join("\n"),
+    analysisVerifyBeforeNext: [
+      "**Verify-before-next (analiz):** Argüman tutarlılığı, eksik kanıt ve mantık hatasını kontrol et; sonra think_next.",
+      "Somut: hangi iddia doğrulandı, hangi zayıflık kaldı, sonraki pass yönü.",
+    ].join("\n"),
   },
   firstDraftTitle: "İlk Taslak",
   refinementTitle: "İyileştirme",
@@ -431,6 +454,17 @@ const PROMPT_EN: PromptBundle = {
       "**Judgment (visual):** Open output with Read, inspect — missing or excess detail; decide from findings.",
     writeExtra:
       "**Write judgment:** Evaluate the diff — necessary, or can it be simplified?",
+    analysis: [
+      "**Judgment (analysis):** After the pass, pause and evaluate.",
+      "- Argument gap, weak evidence, or logic flaw → deepen or fix.",
+      "- Redundant repetition or bloated explanation → simplify.",
+      "- Scope creep or off-topic drift → reduce.",
+      "Direction from this pass — expand / simplify / reduce.",
+    ].join("\n"),
+    analysisVerifyBeforeNext: [
+      "**Verify-before-next (analysis):** Check argument consistency, missing evidence, logic flaws; then think_next.",
+      "Be concrete: which claim was verified, which weakness remains, next pass direction.",
+    ].join("\n"),
   },
   firstDraftTitle: "First Draft",
   refinementTitle: "Refinement",
@@ -531,6 +565,17 @@ const PROMPT_DE: PromptBundle = {
       "**Urteilsvermögen (visuell):** Ausgabe mit Read öffnen, prüfen — fehlende oder überflüssige Details; aus Befunden entscheiden.",
     writeExtra:
       "**Write-Urteil:** Diff bewerten — nötig oder vereinfachbar?",
+    analysis: [
+      "**Urteilsvermögen (Analyse):** Nach dem Pass pausieren und bewerten.",
+      "- Argumentlücke, schwache Evidenz oder Logikfehler → vertiefen oder korrigieren.",
+      "- Redundante Wiederholung oder aufgeblähte Erklärung → vereinfachen.",
+      "- Scope creep oder Themenabweichung → reduzieren.",
+      "Richtung aus diesem Pass — erweitern / vereinfachen / reduzieren.",
+    ].join("\n"),
+    analysisVerifyBeforeNext: [
+      "**Verify-before-next (Analyse):** Argumentkonsistenz, fehlende Evidenz, Logikfehler prüfen; dann think_next.",
+      "Konkret: welche Behauptung verifiziert, welche Schwäche bleibt, Richtung nächster Pass.",
+    ].join("\n"),
   },
   firstDraftTitle: "Erster Entwurf",
   refinementTitle: "Verfeinerung",
@@ -627,6 +672,17 @@ const PROMPT_AR: PromptBundle = {
     creative:
       "**Basiret (مرئي):** افتح المخرجات بـ Read — تفاصيل ناقصة أو زائدة؛ قرر من النتائج.",
     writeExtra: "**Write basiret:** قيّم diff — ضروري أم يمكن تبسيطه؟",
+    analysis: [
+      "**Basiret (تحليل):** بعد pass توقّف وقيّم.",
+      "- فجوة حجة أو دليل ضعيف أو خطأ منطقي → عمّق أو صحّح.",
+      "- تكرار زائد أو شرح منتفخ → بسّط.",
+      "- scope creep أو انحراف عن الموضوع → قلّل.",
+      "الاتجاه من هذا pass — توسيع / تبسيط / تقليل.",
+    ].join("\n"),
+    analysisVerifyBeforeNext: [
+      "**Verify-before-next (تحليل):** تحقق من اتساق الحجة والأدلة الناقصة وأخطاء المنطق؛ ثم think_next.",
+      "ملموس: أي ادعاء تم التحقق منه، أي ضعف بقي، اتجاه pass التالي.",
+    ].join("\n"),
   },
   firstDraftTitle: "مسودة أولى",
   refinementTitle: "تحسين",
@@ -793,6 +849,10 @@ export function getBasiretHintForLocale(
 ): string {
   const p = PROMPT_BUNDLES[locale].basiret;
   if (taskKind === "creative") return p.creative;
+  if (taskKind === "analysis") {
+    if (execution === "verify") return `${p.analysis}\n${p.analysisVerifyBeforeNext}`;
+    return p.analysis;
+  }
   if (execution === "verify") return `${p.code}\n${p.verifyBeforeNext}`;
   if (execution === "read") return `${p.code}\n${p.readBeforeNext}`;
   if (execution === "write") return `${p.code}\n${p.writeExtra}`;

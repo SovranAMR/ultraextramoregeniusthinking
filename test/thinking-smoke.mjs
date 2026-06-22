@@ -17,6 +17,7 @@ import { detectTaskKind, getCreativePassPlan } from "../dist/thinking/task-kind.
 import {
   getBasiretHint,
   planMeetsCodeBasiretRequirements,
+  planMeetsAnalysisBasiretRequirements,
 } from "../dist/thinking/basiret.js";
 import {
   validatePassAnswer,
@@ -750,6 +751,28 @@ describe("basiret layer", () => {
     const hint = getBasiretHint("creative", "verify");
     assert.match(hint, /görsel/i);
     assert.doesNotMatch(hint, /Verify-before-next/);
+  });
+
+  test("analysis task uses analysis basiret not shell verify rule", () => {
+    const hint = getBasiretHint("analysis", "verify");
+    assert.match(hint, /Basiret \(analiz\)/);
+    assert.match(hint, /Verify-before-next \(analiz\)/);
+    assert.doesNotMatch(hint, /Shell ile test\/build/);
+  });
+
+  test("analysis medium plan has verify and evaluation passes", () => {
+    const plan = getPassPlan("medium_thinking", "analysis");
+    const req = planMeetsAnalysisBasiretRequirements(plan);
+    assert.equal(req.hasVerify, true);
+    assert.equal(req.hasEvaluation, true);
+  });
+
+  test("analysis start directive embeds analysis basiret", () => {
+    const s = createSession("REST vs GraphQL trade-offs", "medium_thinking", "en");
+    assert.equal(s.taskKind, "analysis");
+    const d = buildStartDirective(s);
+    assert.match(d, /Judgment \(analysis\)/);
+    assert.match(d, /Task kind.*analysis/i);
   });
 
   test("max start directive embeds basiret on pass 1", () => {
