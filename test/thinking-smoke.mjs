@@ -295,6 +295,20 @@ describe("task kind & answer guard", () => {
     assert.equal(loaded.currentRound, 1);
   });
 
+  test("handleThinkNext RED when answer is trivial tweak of previous", () => {
+    const s = createSession("Test trivial tweak", "easy_thinking", "tr");
+    const firstAnswer =
+      "test/foo.html güncellendi (476 satır). 152 train feather, 3 katman eklendi.";
+    submitAnswer(s, firstAnswer);
+
+    const result = handleThinkNext(s.id, `${firstAnswer} ok`);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /Anti-stagnation/);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 1);
+  });
+
   test("handleThinkNext advances pass when answer improved", () => {
     const s = createSession("Test stagnation ok", "easy_thinking", "tr");
     const firstAnswer =

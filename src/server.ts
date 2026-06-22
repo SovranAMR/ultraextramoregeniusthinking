@@ -30,6 +30,18 @@ import {
 const MODE_SCHEMA = z.enum(MODE_ENUM);
 const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
 
+/** Önceki cevapla birebir aynı veya yalnızca küçük ekle/çıkar ile kopya mı? */
+function isStagnantAnswer(prev: string, next: string): boolean {
+  const p = prev.trim();
+  const n = next.trim();
+  if (!p || !n) return false;
+  if (p === n) return true;
+  const maxTweak = 24;
+  if (n.startsWith(p) && n.length - p.length <= maxTweak) return true;
+  if (p.startsWith(n) && p.length - n.length <= maxTweak) return true;
+  return false;
+}
+
 const SERVER_INSTRUCTIONS = [
   "ULTRA THINKING MCP — cevap kalitesini pass pass artırır.",
   "",
@@ -103,11 +115,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
 
   const validation = validatePassAnswer(answer, nextPassNumber, execution);
   const prevAnswer = session.rounds[session.rounds.length - 1]?.answer ?? "";
-  if (
-    prevAnswer &&
-    answer.trim().length > 20 &&
-    prevAnswer.trim() === answer.trim()
-  ) {
+  if (prevAnswer && isStagnantAnswer(prevAnswer, answer)) {
     return {
       content: [
         {
