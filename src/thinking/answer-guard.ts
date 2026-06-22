@@ -25,6 +25,20 @@ const META_PHRASES = [
   /pass \d+ tamamlandı/i,
 ];
 
+function isMeaninglessPadding(text: string): boolean {
+  const compact = text.replace(/\s/g, "");
+  if (compact.length < 40) return false;
+  return new Set(compact.toLowerCase()).size <= 5;
+}
+
+function hasReadArtifactReference(text: string): boolean {
+  return (
+    /\.(html|ts|tsx|js|jsx|mjs|py|css|json|md|yaml|yml)\b/i.test(text) ||
+    /\/[\w.-]+/i.test(text) ||
+    /\b\d+\s*satır\b/i.test(text)
+  );
+}
+
 /** Agent'ın think_next'e gönderdiği meta log mu, gerçek teslim özeti mi? */
 export function validatePassAnswer(
   answer: string,
@@ -55,6 +69,12 @@ export function validatePassAnswer(
     reasons.push("Birden fazla meta ifade — iş logu gibi görünüyor.");
   }
 
+  let padding = false;
+  if (isMeaninglessPadding(trimmed)) {
+    padding = true;
+    reasons.push("Cevap anlamsız tekrar/padding — somut okuma özeti gerekli.");
+  }
+
   // Write/verify pass'lerde dosya yolu veya somut çıktı beklenir
   let artifactMissing = false;
   if (execution === "write" || execution === "verify") {
@@ -67,6 +87,12 @@ export function validatePassAnswer(
     }
   }
 
+  let readContextMissing = false;
+  if (execution === "read" && !hasReadArtifactReference(trimmed)) {
+    readContextMissing = true;
+    reasons.push("Read pass'te dosya/kaynak referansı yok.");
+  }
+
   const isMeta =
     reasons.some((r) => r.includes("Meta log")) ||
     (reasons.length >= 2 && trimmed.length < 200);
@@ -74,7 +100,12 @@ export function validatePassAnswer(
   return {
     valid:
       reasons.length === 0 ||
-      (!isMeta && !artifactMissing && !tooShort && reasons.length <= 1),
+      (!isMeta &&
+        !artifactMissing &&
+        !tooShort &&
+        !padding &&
+        !readContextMissing &&
+        reasons.length <= 1),
     isMeta,
     reasons,
   };
