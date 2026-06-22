@@ -1,10 +1,13 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { resolveMode, THINKING_MODES, parseThinkingRequest, detectLocale, suggestModeFromUseCase } from "../dist/thinking/modes.js";
 import {
   createSession,
   submitAnswer,
   loadSession,
+  getSessionDir,
 } from "../dist/thinking/session.js";
 import {
   buildStartDirective,
@@ -139,6 +142,16 @@ describe("thinking session", () => {
     const loaded = loadSession(s.id);
     assert.ok(loaded);
     assert.equal(loaded.question, "Test sorusu?");
+  });
+
+  test("loadSession backfills language for legacy sessions", () => {
+    const s = createSession("please think about why the auth handler fails", "easy_thinking", "en");
+    const path = join(getSessionDir(), `${s.id}.json`);
+    const raw = JSON.parse(readFileSync(path, "utf8"));
+    delete raw.language;
+    writeFileSync(path, JSON.stringify(raw));
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.language, "en");
   });
 
   test("easy_thinking completes after 3 passes", () => {

@@ -6,7 +6,7 @@ import type { ThinkingMode } from "./modes.js";
 import { resolveMode } from "./modes.js";
 import type { TaskKind } from "./task-kind.js";
 import { detectTaskKind } from "./task-kind.js";
-import type { Locale } from "./locale/index.js";
+import { detectLocale, type Locale } from "./locale/index.js";
 
 export interface ThinkingRound {
   round: number;
@@ -82,6 +82,9 @@ export function loadSession(id: string): ThinkingSession | null {
     }
     if (!raw.taskKind) {
       raw.taskKind = detectTaskKind(raw.question);
+    }
+    if (!raw.language) {
+      raw.language = detectLocale(raw.question);
     }
     return raw;
   } catch {
