@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T09:50:00.324Z",
-  "runCount": 38,
+  "lastRun": "2026-06-22T09:54:00.294Z",
+  "runCount": 39,
   "roadmapPhase": "ship",
   "roadmapDone": {
     "basiret": true,
@@ -13,13 +13,13 @@
     "e1_de_ar_parse": true,
     "e2_server_locale": true,
     "e3_code_session_smoke": true,
-    "e4_cli_mcp_config_test": false,
+    "e4_cli_mcp_config_test": true,
     "e5_npm_files_field": false,
     "e6_use_case_snippets": false,
     "e7_locale_dead_code": false,
     "e8_version_170": false
   },
-  "lastFocus": "E3: code session smoke",
+  "lastFocus": "E4: CLI mcp-config test",
   "lastFiles": ["test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,

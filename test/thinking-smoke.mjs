@@ -1,5 +1,9 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join, resolve, dirname, isAbsolute } from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveMode, THINKING_MODES, parseThinkingRequest, detectLocale, suggestModeFromUseCase } from "../dist/thinking/modes.js";
 import {
   createSession,
@@ -844,5 +848,27 @@ describe("basiret layer", () => {
     const r5 = buildRefinementDirective(current);
     assert.match(r5, /Verify-before-next/);
     assert.match(r5, /Pass 5\/5/);
+  });
+});
+
+describe("CLI mcp-config", () => {
+  test("mcp-config prints absolute SERVER_PATH and ULTRA_THINKING_ROOT", () => {
+    const pkgRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+    const cliPath = join(pkgRoot, "dist", "cli", "index.js");
+    const out = execFileSync(process.execPath, [cliPath, "mcp-config"], {
+      cwd: pkgRoot,
+      encoding: "utf8",
+    });
+    const config = JSON.parse(out.trim());
+    const server = config.mcpServers["ultra-thinking"];
+    assert.equal(server.command, "node");
+    assert.equal(server.args.length, 1);
+    const serverPath = server.args[0];
+    assert.ok(isAbsolute(serverPath), "SERVER_PATH must be absolute");
+    assert.equal(serverPath, join(pkgRoot, "dist", "server.js"));
+    assert.ok(existsSync(serverPath), "SERVER_PATH must exist on disk");
+    assert.ok(server.env, "env block required");
+    assert.ok("ULTRA_THINKING_ROOT" in server.env);
+    assert.equal(server.env.ULTRA_THINKING_ROOT, join(pkgRoot, ".ultra-thinking"));
   });
 });
