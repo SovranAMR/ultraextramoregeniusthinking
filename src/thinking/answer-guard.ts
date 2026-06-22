@@ -42,7 +42,8 @@ function hasReadArtifactReference(text: string): boolean {
 function hasWriteVerifyArtifactReference(text: string): boolean {
   return (
     /\.(html|ts|tsx|js|jsx|mjs|py|css|json|md)\b/i.test(text) ||
-    /dosya|file|oluşturuldu|güncellendi|satır/i.test(text)
+    /\/[\w.-]+/i.test(text) ||
+    /\b\d+\s*satır\b/i.test(text)
   );
 }
 
@@ -57,8 +58,10 @@ function hasWriteVerifyChangeDetail(text: string): boolean {
   if (/\d+\s+\w+.*(eklendi|silindi|düzeltildi|refactor|genişletildi|azaltıldı|çıkarıldı)/i.test(text))
     return true;
   if (/(eklendi|silindi|düzeltildi|refactor|guard|check).*\d+/i.test(text)) return true;
-  if (/\([^)]{8,}\)/.test(text)) return true;
-  if (/[`'"]?\w+[\`'"]?\s*[:→].{5,}/i.test(text)) return true;
+  if (/\([^)]*(?:\d|eklendi|silindi|satır|test|guard|refactor|düzeltildi)[^)]*\)/i.test(text))
+    return true;
+  if (/[`'"]?[\w./-]+\.(html|ts|tsx|js|jsx|mjs|py|css|json|md)\b[\`'"]?\s*[:→].{5,}/i.test(text))
+    return true;
   return false;
 }
 

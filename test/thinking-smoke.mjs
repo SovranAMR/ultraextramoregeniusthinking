@@ -272,6 +272,25 @@ describe("task kind & answer guard", () => {
     assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
   });
 
+  test("rejects write pass with generic verb and vague colon clause", () => {
+    const v = validatePassAnswer(
+      "src/server.ts güncellendi: birkaç küçük düzeltme yapıldı.",
+      4,
+      "write",
+    );
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /somut değişiklik detayı yok/i);
+  });
+
+  test("accepts write pass with file path colon and concrete detail", () => {
+    const v = validatePassAnswer(
+      "src/server.ts: null guard ve async error handling eklendi.",
+      4,
+      "write",
+    );
+    assert.equal(v.valid, true);
+  });
+
   test("rejects verify pass with file ref but no change detail", () => {
     const v = validatePassAnswer("test/foo.ts doğrulandı, dosya kontrol edildi.", 5, "verify");
     assert.equal(v.valid, false);
@@ -397,6 +416,28 @@ describe("task kind & answer guard", () => {
 
     const vagueWrite = "src/server.ts güncellendi.";
     const result = handleThinkNext(s.id, vagueWrite);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /somut değişiklik detayı yok/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 2);
+  });
+
+  test("handleThinkNext RED when write pass uses generic verb colon padding", () => {
+    const s = createSession("Test write colon padding", "easy_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
+    );
+    handleThinkNext(
+      s.id,
+      "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+
+    const colonPadding =
+      "src/server.ts güncellendi: birkaç küçük düzeltme yapıldı ve kaydedildi.";
+    const result = handleThinkNext(s.id, colonPadding);
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /RED — Pass 3/);
     assert.match(result.content[0].text, /somut değişiklik detayı yok/i);
