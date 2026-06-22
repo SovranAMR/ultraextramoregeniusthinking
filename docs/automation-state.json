@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-06-22T08:38:00.261Z",
-  "runCount": 20,
-  "roadmapPhase": "i18n",
-  "roadmapDone": { "basiret": true, "i18n": false, "product": false },
+  "lastRun": "2026-06-22T08:40:00.274Z",
+  "runCount": 21,
+  "roadmapPhase": "product",
+  "roadmapDone": { "basiret": true, "i18n": true, "product": false },
   "fazAProgress": {
     "a1_basiret_module": true,
     "a2_prompts_wire": true,
@@ -15,19 +15,23 @@
     "b1_locale_skeleton": true,
     "b2_parse_en_triggers": true,
     "b3_rejection_locale": true,
-    "b4_server_instructions_en": false,
+    "b4_server_instructions_en": true,
     "b5_test_tr_en_parse": true,
     "b6_creative_pass_i18n": true
   },
-  "lastFocus": "creative pass plan i18n (creative-plans.ts)",
+  "fazCProgress": {
+    "c1_ultra_thinking_root_env": false,
+    "c2_semver_banner": false,
+    "c3_mcp_tool_schema_docs": false
+  },
+  "lastFocus": "B4: server instructions EN locale bundle",
   "lastFiles": [
-    "src/thinking/locale/creative-plans.ts",
-    "src/thinking/task-kind.ts",
-    "src/thinking/pass-focus.ts"
+    "src/thinking/locale/index.ts",
+    "src/server.ts"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "Faz B — server instructions EN (server.ts)"
+  "nextRisk": "Faz C — ULTRA_THINKING_ROOT env + mcp-config örneği"
 }

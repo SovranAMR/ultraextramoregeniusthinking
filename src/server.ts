@@ -27,7 +27,7 @@ import {
   buildMetaRejectionMessage,
   buildStagnationRejectionMessage,
 } from "./thinking/answer-guard.js";
-import { detectLocale } from "./thinking/locale/index.js";
+import { detectLocale, getServerInstructions, resolveServerLocale } from "./thinking/locale/index.js";
 
 const MODE_SCHEMA = z.enum(MODE_ENUM);
 const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
@@ -73,47 +73,7 @@ function isStagnantAnswer(
   return false;
 }
 
-const SERVER_INSTRUCTIONS = [
-  "ULTRA THINKING MCP — cevap kalitesini pass pass artırır.",
-  "",
-  "CHAT BAĞLAMI (KRİTİK):",
-  "MCP sunucusu chat geçmişini OTOMATİK görmez.",
-  "Agent (sen) chat geçmişini görürsün — think çağırırken conversation_context'e ÖZET geçmek ZORUNLU.",
-  "Kullanıcı sadece 'max de düşün' dediyse soruyu tekrar sorma; bağlamı kendin aktar.",
-  "",
-  "KULLANICI DOĞAL DİL İLE MOD SEÇER:",
-  '• "düşünme modu mcp easy/medium/more/max de düşün" (+ isteğe bağlı soru)',
-  "",
-  "Kullanıcı mod + düşün dediğinde HEMEN think çağır.",
-  "Modu mesajdan çıkar. Hangi mod diye sorma.",
-  "",
-  "EXECUTION (agent workspace — MCP'de write/read tool YOK):",
-  "• Read pass → Read/Grep/SemanticSearch ile gerçek dosyaları oku",
-  "• Write pass → Write/StrReplace/Delete ile uygula, mock yasak",
-  "• Verify pass → Shell ile test/build, dosya özetini finalde ver",
-  "",
-  "MODLAR:",
-  "• easy=3: taslak → read/eksik → write/final",
-  "• medium=5: taslak → read → kod review → write/uygula → verify/final",
-  "• more=7: medium + karşı argüman → write/yapı → verify/sentez",
-  "• max=10: + derin review, uzman paneli, çoklu write/verify",
-  "",
-  "AKIŞ:",
-  "1. think(user_message, conversation_context) → Pass 1",
-  "2. Pass işini bitir (Read/Write/Shell) → think_next(session_id, somut_özet)",
-  "3. Bitene kadar tekrarla → kullanıcıya SADECE final cevap",
-  "",
-  "think_next KURALLARI (kesin):",
-  "- answer = iş logu DEĞİL: 'Plan:', 'Read:', 'Kod review:' ile başlama.",
-  "- answer = bu pass'te ne yapıldı + hangi dosya + ne değişti.",
-  "- Her pass arasında gerçek iş yap; birden fazla think_next'i aynı turda çağırma.",
-  "- ultra-thinking aktifken ctx_forge / başka implementation MCP ÇAĞIRMA.",
-  "",
-  "KURALLAR:",
-  "- Chain-of-thought gösterme.",
-  "- Anti-stagnation: her pass EN AZ 1 somut iyileştirme zorunlu.",
-  "- Meta log think_next'e gönderilirse MCP RED eder, pass ilerlemez.",
-].join("\n");
+const SERVER_INSTRUCTIONS = getServerInstructions(resolveServerLocale());
 
 export function handleThinkNext(sessionId: string, answer: string) {
   const session = loadSession(sessionId);

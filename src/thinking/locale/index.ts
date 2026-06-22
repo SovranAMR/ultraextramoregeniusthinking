@@ -72,6 +72,7 @@ export interface LocaleBundle {
   useCaseSnippets: UseCaseSnippet[];
   detectHints: RegExp[];
   rejection: RejectionBundle;
+  serverInstructions: string;
 }
 
 const USE_CASE_MATRIX: UseCaseSnippet[] = [
@@ -108,6 +109,90 @@ const USE_CASE_MATRIX: UseCaseSnippet[] = [
     suggestedMode: "more_thinking",
   },
 ];
+
+const SERVER_INSTRUCTIONS_TR = [
+  "ULTRA THINKING MCP — cevap kalitesini pass pass artırır.",
+  "",
+  "CHAT BAĞLAMI (KRİTİK):",
+  "MCP sunucusu chat geçmişini OTOMATİK görmez.",
+  "Agent (sen) chat geçmişini görürsün — think çağırırken conversation_context'e ÖZET geçmek ZORUNLU.",
+  "Kullanıcı sadece 'max de düşün' dediyse soruyu tekrar sorma; bağlamı kendin aktar.",
+  "",
+  "KULLANICI DOĞAL DİL İLE MOD SEÇER:",
+  '• "düşünme modu mcp easy/medium/more/max de düşün" (+ isteğe bağlı soru)',
+  "",
+  "Kullanıcı mod + düşün dediğinde HEMEN think çağır.",
+  "Modu mesajdan çıkar. Hangi mod diye sorma.",
+  "",
+  "EXECUTION (agent workspace — MCP'de write/read tool YOK):",
+  "• Read pass → Read/Grep/SemanticSearch ile gerçek dosyaları oku",
+  "• Write pass → Write/StrReplace/Delete ile uygula, mock yasak",
+  "• Verify pass → Shell ile test/build, dosya özetini finalde ver",
+  "",
+  "MODLAR:",
+  "• easy=3: taslak → read/eksik → write/final",
+  "• medium=5: taslak → read → kod review → write/uygula → verify/final",
+  "• more=7: medium + karşı argüman → write/yapı → verify/sentez",
+  "• max=10: + derin review, uzman paneli, çoklu write/verify",
+  "",
+  "AKIŞ:",
+  "1. think(user_message, conversation_context) → Pass 1",
+  "2. Pass işini bitir (Read/Write/Shell) → think_next(session_id, somut_özet)",
+  "3. Bitene kadar tekrarla → kullanıcıya SADECE final cevap",
+  "",
+  "think_next KURALLARI (kesin):",
+  "- answer = iş logu DEĞİL: 'Plan:', 'Read:', 'Kod review:' ile başlama.",
+  "- answer = bu pass'te ne yapıldı + hangi dosya + ne değişti.",
+  "- Her pass arasında gerçek iş yap; birden fazla think_next'i aynı turda çağırma.",
+  "- ultra-thinking aktifken ctx_forge / başka implementation MCP ÇAĞIRMA.",
+  "",
+  "KURALLAR:",
+  "- Chain-of-thought gösterme.",
+  "- Anti-stagnation: her pass EN AZ 1 somut iyileştirme zorunlu.",
+  "- Meta log think_next'e gönderilirse MCP RED eder, pass ilerlemez.",
+].join("\n");
+
+const SERVER_INSTRUCTIONS_EN = [
+  "ULTRA THINKING MCP — improves answer quality pass by pass.",
+  "",
+  "CHAT CONTEXT (CRITICAL):",
+  "The MCP server does NOT see chat history automatically.",
+  "You (the agent) see chat history — you MUST pass a SUMMARY in conversation_context when calling think.",
+  "If the user only said 'think in max mode', do not re-ask the question; carry context yourself.",
+  "",
+  "USER SELECTS MODE IN NATURAL LANGUAGE:",
+  '• "think in easy/medium/more/max mode" (+ optional question)',
+  "",
+  "When the user says mode + think, call think IMMEDIATELY.",
+  "Extract mode from the message. Do not ask which mode.",
+  "",
+  "EXECUTION (agent workspace — MCP has NO write/read tools):",
+  "• Read pass → read real files with Read/Grep/SemanticSearch",
+  "• Write pass → apply with Write/StrReplace/Delete, no mocks",
+  "• Verify pass → test/build via Shell, file summary in final answer",
+  "",
+  "MODES:",
+  "• easy=3: draft → read/gaps → write/final",
+  "• medium=5: draft → read → code review → write/apply → verify/final",
+  "• more=7: medium + counter-argument → write/structure → verify/synthesis",
+  "• max=10: + deep review, expert panel, multiple write/verify",
+  "",
+  "FLOW:",
+  "1. think(user_message, conversation_context) → Pass 1",
+  "2. Finish pass work (Read/Write/Shell) → think_next(session_id, concrete_summary)",
+  "3. Repeat until done → present ONLY the final answer to the user",
+  "",
+  "think_next RULES (mandatory):",
+  "- answer is NOT a work log: do NOT start with 'Plan:', 'Read:', 'Code review:'.",
+  "- answer = what was done this pass + which file + what changed.",
+  "- Real work between passes; do not call multiple think_next in one turn.",
+  "- Do NOT call ctx_forge or other implementation MCPs while ultra-thinking is active.",
+  "",
+  "RULES:",
+  "- Do not show chain-of-thought.",
+  "- Anti-stagnation: each pass requires AT LEAST 1 concrete improvement.",
+  "- Meta log sent to think_next is RED-rejected; pass does not advance.",
+].join("\n");
 
 const REJECTION_TR: RejectionBundle = {
   metaTitle: (pass) => `# RED — Pass ${pass} cevabı kabul edilmedi`,
@@ -599,6 +684,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     ),
     detectHints: [/düşün/i, /modu mcp/i, /kolay|orta|ileri|maksimum/i],
     rejection: REJECTION_TR,
+    serverInstructions: SERVER_INSTRUCTIONS_TR,
   },
   en: {
     code: "en",
@@ -620,6 +706,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     ),
     detectHints: [/\bthink\b/i, /\bmode\b/i, /\beasy thinking\b/i],
     rejection: REJECTION_EN,
+    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
   de: {
     code: "de",
@@ -643,6 +730,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     ),
     detectHints: [/\bdenken\b/i, /\bmodus\b/i, /\beinfach\b/i, /\bmittel\b/i],
     rejection: REJECTION_DE,
+    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
   ar: {
     code: "ar",
@@ -665,6 +753,7 @@ export const LOCALE_BUNDLES: Record<Locale, LocaleBundle> = {
     ),
     detectHints: [/[\u0600-\u06FF]/, /فكر/],
     rejection: REJECTION_AR,
+    serverInstructions: SERVER_INSTRUCTIONS_EN,
   },
 };
 
@@ -681,6 +770,16 @@ export function getLocaleBundle(locale: Locale): LocaleBundle {
 
 export function getRejectionBundle(locale: Locale): RejectionBundle {
   return LOCALE_BUNDLES[locale].rejection;
+}
+
+export function getServerInstructions(locale: Locale = "tr"): string {
+  return LOCALE_BUNDLES[locale].serverInstructions;
+}
+
+export function resolveServerLocale(): Locale {
+  const env = process.env.ULTRA_THINKING_LOCALE?.toLowerCase();
+  if (env && SUPPORTED_LOCALES.includes(env as Locale)) return env as Locale;
+  return "tr";
 }
 
 export function getPromptBundle(locale: Locale): PromptBundle {
