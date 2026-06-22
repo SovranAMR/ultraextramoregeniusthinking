@@ -1,32 +1,30 @@
 {
-  "lastRun": "2026-06-22T10:10:00.558Z",
+  "lastRun": null,
   "runCount": 42,
-  "roadmapPhase": "idle",
+  "roadmapPhase": "orchestration",
   "roadmapDone": {
     "basiret": true,
     "i18n": true,
     "product": true,
     "polish": true,
-    "ship": true
+    "ship": true,
+    "orchestration": false
   },
-  "fazEProgress": {
-    "e1_de_ar_parse": true,
-    "e2_server_locale": true,
-    "e3_code_session_smoke": true,
-    "e4_cli_mcp_config_test": true,
-    "e5_npm_files_field": true,
-    "e6_use_case_snippets": true,
-    "e7_locale_dead_code": true,
-    "e8_version_170": true
+  "fazFProgress": {
+    "f1_plan_concept": false,
+    "f2_step_session": false,
+    "f3_step_completion_summary": false,
+    "f4_plan_progress": false,
+    "f5_natural_language": false,
+    "f6_small_jobs_unchanged": false,
+    "f7_integration_test": false,
+    "f8_version_bump": false
   },
-  "lastFocus": "E8: semver 1.7.0 bump",
-  "lastFiles": [
-    "package.json",
-    "package-lock.json",
-    "src/version.ts"
-  ],
+  "lastFocus": "F1: plan kavramı — büyük iş parçalama",
+  "lastFiles": [],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
-  "productScope": "code-first"
+  "productScope": "code-first",
+  "productVision": "Büyük iş → plan → her adım derin düşünme → adımlar arası hafıza"
 }
