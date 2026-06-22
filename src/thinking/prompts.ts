@@ -1,14 +1,11 @@
 import type { ThinkingSession } from "./session.js";
 import { THINKING_MODES } from "./modes.js";
+import { getPassFocus, formatPassRoadmap } from "./pass-focus.js";
 import {
-  getPassFocus,
-  formatPassRoadmap,
-  getExecutionHint,
-  ANTI_STAGNATION_RULE,
-  EXECUTION_LAYER_RULE,
-} from "./pass-focus.js";
-import { SUBMIT_ANSWER_RULE } from "./answer-guard.js";
-import { getBasiretHint } from "./basiret.js";
+  getPromptBundle,
+  getBasiretHintForLocale,
+  type ExecutionKindKey,
+} from "./locale/index.js";
 
 export const QUALITY_CHECKLIST_TR = [
   "Önceki cevaptaki eksikleri bul ve kapat.",
@@ -22,84 +19,81 @@ export const QUALITY_CHECKLIST_TR = [
   "Cevabı bir üst kalite seviyesine çıkar.",
 ];
 
-const OUTPUT_RULE_TR = [
-  "**ÇIKTI KURALI (kesin):**",
-  "- Sadece iyileştirilmiş cevabı döndür.",
-  "- İç review sürecini dökme — sonucu ve dosya değişikliklerini göster.",
-  "- 'Pass 3'te şunu düzelttim' gibi meta yasak.",
-].join("\n");
-
 function modeLabel(session: ThinkingSession): string {
   return THINKING_MODES[session.mode]?.buttonLabel ?? session.mode;
 }
 
-function contextBlock(session: ThinkingSession): string[] {
+function contextBlock(session: ThinkingSession, chatHeader: string): string[] {
   if (!session.conversationContext?.trim()) return [];
-  return [``, `## Chat bağlamı`, session.conversationContext.trim()];
+  return [``, chatHeader, session.conversationContext.trim()];
 }
 
 function passFocusBlock(
-  mode: ThinkingSession["mode"],
+  session: ThinkingSession,
   passNumber: number,
-  taskKind: ThinkingSession["taskKind"],
 ): string[] {
-  const focus = getPassFocus(mode, passNumber, taskKind);
+  const p = getPromptBundle(session.language);
+  const focus = getPassFocus(session.mode, passNumber, session.taskKind);
   if (!focus) return [];
 
+  const execution = focus.execution as ExecutionKindKey;
+
   return [
-    `## Bu pass'in odağı: ${focus.title}`,
+    p.passFocusHeader(focus.title),
     ``,
-    getExecutionHint(focus.execution),
+    p.executionHints[execution],
     ``,
     ...focus.tasks.map((t) => `- ${t}`),
     ``,
-    getBasiretHint(taskKind, focus.execution),
+    getBasiretHintForLocale(session.language, session.taskKind, execution),
     ``,
-    ANTI_STAGNATION_RULE,
+    p.antiStagnationRule,
   ];
 }
 
+function taskKindNote(session: ThinkingSession): string {
+  const p = getPromptBundle(session.language);
+  if (session.taskKind === "creative") return p.taskKind.creative;
+  if (session.taskKind === "analysis") return p.taskKind.analysis;
+  return p.taskKind.code;
+}
+
 export function buildStartDirective(session: ThinkingSession): string {
+  const p = getPromptBundle(session.language);
   const total = session.totalPasses;
   const cfg = THINKING_MODES[session.mode];
   const focus = getPassFocus(session.mode, 1, session.taskKind);
 
-  const taskKindNote =
-    session.taskKind === "creative"
-      ? "**Görev tipi:** yaratıcı/görsel — kod review pass'leri atlandı, görsel detay odaklı plan."
-      : session.taskKind === "analysis"
-        ? "**Görev tipi:** analiz — read/verify ağırlıklı."
-        : "**Görev tipi:** kod — read/write/verify döngüsü.";
-
   return [
-    `# ${modeLabel(session)} — Pass 1/${total}: ${focus?.title ?? "İlk Taslak"}`,
+    `# ${modeLabel(session)} — Pass 1/${total}: ${focus?.title ?? p.firstDraftTitle}`,
     ``,
-    `**Konu:** ${session.question}`,
-    `**Mod:** ${cfg.description}`,
-    taskKindNote,
-    ...contextBlock(session),
+    `${p.topicLabel} ${session.question}`,
+    `${p.modeLabel} ${cfg.description}`,
+    taskKindNote(session),
+    ...contextBlock(session, p.chatContextHeader),
     ``,
-    EXECUTION_LAYER_RULE,
+    p.executionLayerRule,
     ``,
-    `## Pass yol haritası`,
+    p.passRoadmapHeader,
     formatPassRoadmap(session.mode, session.taskKind),
     ``,
-    ...passFocusBlock(session.mode, 1, session.taskKind),
+    ...passFocusBlock(session, 1),
     ``,
-    SUBMIT_ANSWER_RULE,
+    p.submitAnswerRule,
     ``,
-    OUTPUT_RULE_TR,
+    p.outputRule,
     ``,
-    `## Akış`,
-    `1. Bu pass'i tamamla (gerekirse agent Read/Write kullan)`,
-    `2. Somut özet → \`think_next\` (session_id: "${session.id}") — meta log YASAK`,
-    `3. ${total} pass bitene kadar devam — pass'leri toplu/paralel gönderme`,
+    p.flowHeader,
+    p.flowStep1,
+    p.flowStep2(session.id),
+    p.flowStep3(total),
     ``,
-    `Şimdi Pass 1'i uygula.`,
+    p.applyPassNow,
   ].join("\n");
 }
 
 export function buildRefinementDirective(session: ThinkingSession): string {
+  const p = getPromptBundle(session.language);
   const submittedPass = session.currentRound;
   const nextPass = session.currentRound + 1;
   const total = session.totalPasses;
@@ -108,43 +102,40 @@ export function buildRefinementDirective(session: ThinkingSession): string {
   const focus = getPassFocus(session.mode, nextPass, session.taskKind);
 
   return [
-    `# ${modeLabel(session)} — Pass ${nextPass}/${total}: ${focus?.title ?? "İyileştirme"}`,
+    `# ${modeLabel(session)} — Pass ${nextPass}/${total}: ${focus?.title ?? p.refinementTitle}`,
     ``,
-    `**Konu:** ${session.question}`,
-    ...contextBlock(session),
+    `${p.topicLabel} ${session.question}`,
+    ...contextBlock(session, p.chatContextHeader),
     ``,
-    `## Pass ${submittedPass} özeti`,
+    p.passSummaryHeader(submittedPass),
     lastAnswer,
     ``,
     `---`,
     ``,
-    ...passFocusBlock(session.mode, nextPass, session.taskKind),
+    ...passFocusBlock(session, nextPass),
     ``,
-    SUBMIT_ANSWER_RULE,
+    p.submitAnswerRule,
     ``,
-    OUTPUT_RULE_TR,
+    p.outputRule,
     ``,
-    `## Sonraki adım`,
-    remaining > 0
-      ? `Önce Pass ${nextPass} işini yap (Read/Write/Shell), sonra \`think_next\`. Kalan: **${remaining}**. Paralel think_next YASAK.`
-      : `Son pass — işi bitir → \`think_next\` çağır.`,
+    p.nextStepHeader,
+    remaining > 0 ? p.nextStepContinue(nextPass, remaining) : p.nextStepFinal,
   ].join("\n");
 }
 
 export function buildCompletionDirective(session: ThinkingSession): string {
+  const p = getPromptBundle(session.language);
   const finalAnswer = session.rounds[session.rounds.length - 1]?.answer ?? "";
 
   return [
-    `# ${modeLabel(session)} — TAMAMLANDI`,
+    `# ${modeLabel(session)} — ${p.completionTitle}`,
     ``,
-    `${session.totalPasses} pass tamamlandı. Kullanıcıya **sadece** final cevabı sun.`,
+    p.completionIntro(session.totalPasses),
     ``,
-    `## Kurallar`,
-    `- Pass geçmişi, review süreci, MCP meta gösterme.`,
-    `- Kod göreviyse: değişen/oluşan dosyaları final cevapta listele.`,
-    `- Sadece temiz final cevap.`,
+    p.completionRulesHeader,
+    ...p.completionRules,
     ``,
-    `## KULLANICIYA SUNULACAK CEVAP`,
+    p.finalAnswerHeader,
     ``,
     finalAnswer,
   ].join("\n");

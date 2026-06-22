@@ -1,4 +1,4 @@
-import { getRejectionBundle, type Locale } from "./locale/index.js";
+import { getRejectionBundle, getPromptBundle, type Locale } from "./locale/index.js";
 
 export interface AnswerValidation {
   valid: boolean;
@@ -141,15 +141,7 @@ export function validatePassAnswer(
   };
 }
 
-export const SUBMIT_ANSWER_RULE = [
-  "**think_next answer formatı (kesin):**",
-  "- İş logu YASAK: 'Plan:', 'Read:', 'Kod review:', 'İlk prensipler:' ile BAŞLAMA.",
-  "- Bu pass'te NE YAPILDI + NE DEĞİŞTİ + hangi dosya — somut özet.",
-  "- Örnek: 'test/foo.html oluşturuldu (320 satır). 3 katman SVG train, 58 ocellus eklendi.'",
-  "- Önce pass işini bitir (Read/Write/Shell), SONRA think_next çağır.",
-  "- Aynı anda birden fazla think_next YASAK — her pass arasında gerçek iş yap.",
-  "- ultra-thinking aktifken başka MCP (forge, inspect) ÇAĞIRMA.",
-].join("\n");
+export const SUBMIT_ANSWER_RULE = getPromptBundle("tr").submitAnswerRule;
 
 export function buildMetaRejectionMessage(
   validation: AnswerValidation,
@@ -157,6 +149,7 @@ export function buildMetaRejectionMessage(
   locale: Locale = "tr",
 ): string {
   const r = getRejectionBundle(locale);
+  const submitRule = getPromptBundle(locale).submitAnswerRule;
   return [
     r.metaTitle(passNumber),
     ``,
@@ -165,7 +158,7 @@ export function buildMetaRejectionMessage(
     r.problemsLabel,
     ...validation.reasons.map((reason) => `- ${reason}`),
     ``,
-    SUBMIT_ANSWER_RULE,
+    submitRule,
     ``,
     r.nowDo,
   ].join("\n");

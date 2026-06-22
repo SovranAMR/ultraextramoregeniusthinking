@@ -198,6 +198,25 @@ describe("thinking prompts", () => {
     assert.match(c, /Cevap 3/);
     assert.doesNotMatch(c, /Düşünme Evrimi/);
   });
+
+  test("en start directive uses English prompt bundle", () => {
+    const s = createSession("add webhook retry to api handler", "medium_thinking", "en");
+    const d = buildStartDirective(s);
+    assert.match(d, /Pass roadmap/);
+    assert.match(d, /\*\*Task kind:\*\* code/);
+    assert.match(d, /Execution layer \(mandatory\)/);
+    assert.match(d, /OUTPUT RULE \(mandatory\)/);
+    assert.match(d, /Judgment \(adaptive\)/);
+  });
+
+  test("de refinement uses German next-step copy", () => {
+    const s = createSession("warum schlägt dieser test fehl", "easy_thinking", "de");
+    let current = submitAnswer(s, "Erster Entwurf: src/foo.ts gelesen.");
+    const r2 = buildRefinementDirective(current);
+    assert.match(r2, /Nächster Schritt/);
+    assert.match(r2, /Paralleles think_next VERBOTEN/);
+    assert.match(r2, /AUSGABEREGEL \(verbindlich\)/);
+  });
 });
 
 describe("pass focus per mode", () => {
