@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T08:40:00.274Z",
-  "runCount": 21,
+  "lastRun": "2026-06-22T08:42:00.338Z",
+  "runCount": 22,
   "roadmapPhase": "product",
   "roadmapDone": { "basiret": true, "i18n": true, "product": false },
   "fazAProgress": {
@@ -20,18 +20,19 @@
     "b6_creative_pass_i18n": true
   },
   "fazCProgress": {
-    "c1_ultra_thinking_root_env": false,
+    "c1_ultra_thinking_root_env": true,
     "c2_semver_banner": false,
     "c3_mcp_tool_schema_docs": false
   },
-  "lastFocus": "B4: server instructions EN locale bundle",
+  "lastFocus": "C1: ULTRA_THINKING_ROOT env + mcp-config örneği",
   "lastFiles": [
-    "src/thinking/locale/index.ts",
-    "src/server.ts"
+    "src/thinking/session.ts",
+    "src/cli/index.ts",
+    "cursor-mcp.example.json"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "Faz C — ULTRA_THINKING_ROOT env + mcp-config örneği"
+  "nextRisk": "Faz C — semver banner tutarlılığı"
 }

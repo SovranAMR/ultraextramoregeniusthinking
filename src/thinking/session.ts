@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 import type { ThinkingMode } from "./modes.js";
 import { resolveMode } from "./modes.js";
@@ -29,14 +29,18 @@ export interface ThinkingSession {
   completed: boolean;
 }
 
-const SESSION_DIR = join(homedir(), ".ultra-thinking", "sessions");
+function resolveSessionDir(): string {
+  const root = process.env.ULTRA_THINKING_ROOT?.trim();
+  if (root) return join(resolve(root), "sessions");
+  return join(homedir(), ".ultra-thinking", "sessions");
+}
 
 function ensureSessionDir(): void {
-  mkdirSync(SESSION_DIR, { recursive: true });
+  mkdirSync(resolveSessionDir(), { recursive: true });
 }
 
 function sessionPath(id: string): string {
-  return join(SESSION_DIR, `${id}.json`);
+  return join(resolveSessionDir(), `${id}.json`);
 }
 
 export function createSession(
@@ -107,5 +111,5 @@ export function submitAnswer(session: ThinkingSession, answer: string): Thinking
 }
 
 export function getSessionDir(): string {
-  return SESSION_DIR;
+  return resolveSessionDir();
 }

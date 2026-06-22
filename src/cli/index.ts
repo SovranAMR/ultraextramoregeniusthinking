@@ -31,12 +31,20 @@ Kurulum (Cursor / VSCode / Antigravity):
 `);
 }
 
-function buildMcpConfig(): { mcpServers: Record<string, { command: string; args: string[] }> } {
+function buildMcpConfig(): {
+  mcpServers: Record<
+    string,
+    { command: string; args: string[]; env?: Record<string, string> }
+  >;
+} {
   return {
     mcpServers: {
       "ultra-thinking": {
         command: "node",
         args: [SERVER_PATH],
+        env: {
+          ULTRA_THINKING_ROOT: join(process.cwd(), ".ultra-thinking"),
+        },
       },
     },
   };

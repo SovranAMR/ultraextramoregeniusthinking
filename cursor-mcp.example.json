@@ -2,7 +2,10 @@
   "mcpServers": {
     "ultra-thinking": {
       "command": "node",
-      "args": ["/ABSOLUTE/PATH/to/ultraextramoregeniusthinking/dist/server.js"]
+      "args": ["/ABSOLUTE/PATH/to/ultraextramoregeniusthinking/dist/server.js"],
+      "env": {
+        "ULTRA_THINKING_ROOT": "/ABSOLUTE/PATH/to/.ultra-thinking"
+      }
     }
   }
 }
