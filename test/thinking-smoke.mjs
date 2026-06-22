@@ -35,6 +35,12 @@ import {
   buildStagnationRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
 import { handleThinkNext } from "../dist/server.js";
+import {
+  createPlan,
+  loadPlan,
+  getPlanDir,
+} from "../dist/thinking/plan.js";
+import { getSessionDir } from "../dist/thinking/session.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -864,6 +870,71 @@ describe("basiret layer", () => {
     const r5 = buildRefinementDirective(current);
     assert.match(r5, /Verify-before-next/);
     assert.match(r5, /Pass 5\/5/);
+  });
+});
+
+describe("work plan (orchestration F1)", () => {
+  test("createPlan persists title, steps with purpose, and id", () => {
+    const plan = createPlan(
+      "Auth module migration",
+      [
+        { title: "Inventory current auth", purpose: "Map endpoints, tokens, and session storage." },
+        { title: "Design target schema", purpose: "Define migration path and rollback strategy." },
+        { title: "Implement and verify", purpose: "Apply changes and run integration tests." },
+      ],
+      "en",
+    );
+
+    assert.ok(plan.id);
+    assert.equal(plan.title, "Auth module migration");
+    assert.equal(plan.steps.length, 3);
+    assert.equal(plan.steps[0].stepNumber, 1);
+    assert.equal(plan.steps[0].title, "Inventory current auth");
+    assert.match(plan.steps[0].purpose, /Map endpoints/);
+    assert.equal(plan.steps[0].status, "pending");
+    assert.equal(plan.language, "en");
+    assert.ok(plan.createdAt);
+  });
+
+  test("loadPlan round-trips from disk", () => {
+    const created = createPlan(
+      "Checkout flow refactor",
+      [
+        { title: "Analyze current flow", purpose: "Document steps and failure points." },
+        { title: "Prototype new flow", purpose: "Validate UX and API contracts." },
+      ],
+      "tr",
+    );
+
+    const loaded = loadPlan(created.id);
+    assert.ok(loaded);
+    assert.equal(loaded.id, created.id);
+    assert.equal(loaded.title, "Checkout flow refactor");
+    assert.equal(loaded.steps.length, 2);
+    assert.equal(loaded.steps[1].purpose, "Validate UX and API contracts.");
+  });
+
+  test("plans stored separately from thinking sessions", () => {
+    const planDir = getPlanDir();
+    const sessionDir = getSessionDir();
+    assert.notEqual(planDir, sessionDir);
+    assert.match(planDir, /plans$/);
+    assert.match(sessionDir, /sessions$/);
+  });
+
+  test("createPlan rejects empty title or steps", () => {
+    assert.throws(
+      () => createPlan("", [{ title: "Step", purpose: "Do work." }]),
+      /başlığı gerekli/i,
+    );
+    assert.throws(
+      () => createPlan("Title", []),
+      /en az bir adım/i,
+    );
+    assert.throws(
+      () => createPlan("Title", [{ title: "  ", purpose: "Purpose." }]),
+      /başlık gerekli/i,
+    );
   });
 });
 
