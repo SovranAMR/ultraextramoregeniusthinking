@@ -54,11 +54,13 @@ export function validatePassAnswer(
   }
 
   // Write/verify pass'lerde dosya yolu veya somut çıktı beklenir
+  let artifactMissing = false;
   if (execution === "write" || execution === "verify") {
     const hasArtifact =
       /\.(html|ts|tsx|js|py|css|json|md)\b/i.test(trimmed) ||
       /dosya|file|oluşturuldu|güncellendi|satır/i.test(trimmed);
-    if (!hasArtifact && passNumber > 1) {
+    if (!hasArtifact) {
+      artifactMissing = true;
       reasons.push("Write/verify pass'te dosya/artifact referansı yok.");
     }
   }
@@ -68,7 +70,9 @@ export function validatePassAnswer(
     (reasons.length >= 2 && trimmed.length < 200);
 
   return {
-    valid: reasons.length === 0 || (!isMeta && reasons.length <= 1),
+    valid:
+      reasons.length === 0 ||
+      (!isMeta && !artifactMissing && reasons.length <= 1),
     isMeta,
     reasons,
   };

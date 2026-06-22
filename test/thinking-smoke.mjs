@@ -241,4 +241,14 @@ describe("task kind & answer guard", () => {
     assert.equal(v.isMeta, false);
     assert.equal(v.valid, true);
   });
+
+  test("rejects write pass without artifact reference", () => {
+    const v = validatePassAnswer(
+      "Kod iyileştirildi, mantık hatası düzeltildi ve yapı netleştirildi.",
+      1,
+      "write",
+    );
+    assert.equal(v.valid, false);
+    assert.match(v.reasons.join(" "), /artifact referansı yok/i);
+  });
 });
