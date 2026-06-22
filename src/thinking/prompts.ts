@@ -8,6 +8,7 @@ import {
   EXECUTION_LAYER_RULE,
 } from "./pass-focus.js";
 import { SUBMIT_ANSWER_RULE } from "./answer-guard.js";
+import { getBasiretHint } from "./basiret.js";
 
 export const QUALITY_CHECKLIST_TR = [
   "Önceki cevaptaki eksikleri bul ve kapat.",
@@ -51,6 +52,8 @@ function passFocusBlock(
     getExecutionHint(focus.execution),
     ``,
     ...focus.tasks.map((t) => `- ${t}`),
+    ``,
+    getBasiretHint(taskKind, focus.execution),
     ``,
     ANTI_STAGNATION_RULE,
   ];

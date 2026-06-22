@@ -12,8 +12,12 @@ import {
   buildCompletionDirective,
   QUALITY_CHECKLIST_TR,
 } from "../dist/thinking/prompts.js";
-import { getPassFocus, formatPassRoadmap } from "../dist/thinking/pass-focus.js";
+import { getPassFocus, formatPassRoadmap, getPassPlan } from "../dist/thinking/pass-focus.js";
 import { detectTaskKind, getCreativePassPlan } from "../dist/thinking/task-kind.js";
+import {
+  getBasiretHint,
+  planMeetsCodeBasiretRequirements,
+} from "../dist/thinking/basiret.js";
 import {
   validatePassAnswer,
   buildMetaRejectionMessage,
@@ -553,5 +557,45 @@ describe("task kind & answer guard", () => {
     assert.match(msg, /RED — Pass 2/);
     assert.match(msg, /Meta log/i);
     assert.match(msg, /think_next/i);
+  });
+});
+
+describe("basiret layer", () => {
+  test("max code plan has verify and evaluation passes", () => {
+    const plan = getPassPlan("max_thinking", "code");
+    const req = planMeetsCodeBasiretRequirements(plan);
+    assert.equal(req.hasVerify, true);
+    assert.equal(req.hasEvaluation, true);
+  });
+
+  test("verify pass hint includes verify-before-next", () => {
+    const hint = getBasiretHint("code", "verify");
+    assert.match(hint, /Basiret \(adaptif yargı\)/);
+    assert.match(hint, /Verify-before-next/);
+    assert.match(hint, /test geçti.*yeterli değil/i);
+  });
+
+  test("creative task uses visual basiret not code verify rule", () => {
+    const hint = getBasiretHint("creative", "verify");
+    assert.match(hint, /görsel/i);
+    assert.doesNotMatch(hint, /Verify-before-next/);
+  });
+
+  test("max start directive embeds basiret on pass 1", () => {
+    const s = createSession("auth bypass var mı", "max_thinking", "tr");
+    const d = buildStartDirective(s);
+    assert.match(d, /Basiret \(adaptif yargı\)/);
+    assert.match(d, /her zaman ekle.*her zaman çıkar.*yok/);
+  });
+
+  test("medium verify refinement includes verify-before-next", () => {
+    const s = createSession("bug fix", "medium_thinking", "tr");
+    let current = s;
+    for (let i = 0; i < 4; i++) {
+      current = submitAnswer(current, `Pass ${i + 1} özeti: src/foo.ts okundu (42 satır). null guard eksik bulundu.`);
+    }
+    const r5 = buildRefinementDirective(current);
+    assert.match(r5, /Verify-before-next/);
+    assert.match(r5, /Pass 5\/5/);
   });
 });

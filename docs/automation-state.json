@@ -1,9 +1,11 @@
 {
-  "lastRun": "2026-06-22T08:02:00.000Z",
-  "lastFocus": "write pass'te dosya+genel fiil+colon padding reddi (answer-guard)",
-  "lastFiles": ["src/thinking/answer-guard.ts", "test/thinking-smoke.mjs"],
+  "roadmapPhase": "basiret",
+  "productScope": "code-first",
+  "lastRun": "2026-06-22T08:20:00.270Z",
+  "lastFocus": "basiret.ts adaptif yargı katmanı + prompts entegrasyonu",
+  "lastFiles": ["src/thinking/basiret.ts", "src/thinking/prompts.ts", "test/thinking-smoke.mjs"],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "verify pass'te sayısız 'test geçti/build ok' ifadesi hâlâ yeterli görülebilir",
-  "runCount": 13
+  "nextRisk": "easy code planında verify pass yok — Faz A tamamlanması için pass-focus güncellemesi gerekebilir",
+  "runCount": 14
 }
