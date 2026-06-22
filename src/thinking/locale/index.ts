@@ -1,4 +1,5 @@
 import { getBasiretHint } from "../basiret.js";
+import { formatOrchestrationNlHints } from "../orchestration-nl.js";
 import type { ExecutionKind } from "../pass-focus.js";
 import type { TaskKind } from "../task-kind.js";
 
@@ -851,7 +852,12 @@ export function getServerInstructions(locale: Locale = "tr"): string {
   const instrLocale = serverInstructionsLocale(locale);
   const base =
     instrLocale === "tr" ? SERVER_INSTRUCTIONS_TR : SERVER_INSTRUCTIONS_EN;
-  return base + formatServerUseCaseBlock(instrLocale);
+  return [
+    base,
+    formatServerUseCaseBlock(instrLocale),
+    "",
+    formatOrchestrationNlHints(instrLocale),
+  ].join("\n");
 }
 
 /** Server instructions bundle: TR or EN (de/ar → EN copy). */

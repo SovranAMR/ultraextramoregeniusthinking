@@ -50,6 +50,11 @@ import {
   buildStepSummary,
   completePlanStep,
 } from "../dist/thinking/step-session.js";
+import {
+  parseOrchestrationRequest,
+  isOrchestrationTrigger,
+  formatOrchestrationNlHints,
+} from "../dist/thinking/orchestration-nl.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -1055,6 +1060,94 @@ describe("orchestration step completion (F3)", () => {
     assert.match(summary, /Seçilen:/);
     assert.match(summary, /Facade pattern/);
     assert.match(summary, /src\/service\/registry\.ts/);
+  });
+});
+
+describe("orchestration natural language (F5)", () => {
+  test("TR: plan çıkar, her adımı max düşün", () => {
+    const p = parseOrchestrationRequest(
+      "plan çıkar, her adımı max düşün: servis katmanı refaktörü",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(p.stepMode, "max_thinking");
+    assert.match(p.taskDescription, /servis katmanı refaktörü/i);
+    assert.match(p.matchedTrigger ?? "", /plan çıkar/i);
+  });
+
+  test("TR: önce plan, her adımı derin düşün", () => {
+    const p = parseOrchestrationRequest(
+      "önce plan, her adımı derin düşün: checkout akışı yeniden tasarımı",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(p.stepMode, "max_thinking");
+    assert.match(p.taskDescription, /checkout akışı/i);
+  });
+
+  test("EN: create a plan, think each step in max mode", () => {
+    const p = parseOrchestrationRequest(
+      "create a plan, think each step in max mode: auth module migration",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(p.stepMode, "max_thinking");
+    assert.match(p.taskDescription, /auth module migration/i);
+  });
+
+  test("EN: plan first, deep think each step", () => {
+    const p = parseOrchestrationRequest(
+      "plan first, deep think each step: payment integration rollout",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(p.stepMode, "max_thinking");
+    assert.match(p.taskDescription, /payment integration/i);
+  });
+
+  test("TR: adım 2 medium düşün", () => {
+    const p = parseOrchestrationRequest("adım 2 medium düşün: API tasarımı");
+    assert.equal(p.intent, "run_step");
+    assert.equal(p.stepNumber, 2);
+    assert.equal(p.stepMode, "medium_thinking");
+  });
+
+  test("EN: think step 3 in max mode", () => {
+    const p = parseOrchestrationRequest("think step 3 in max mode: rollout checklist");
+    assert.equal(p.intent, "run_step");
+    assert.equal(p.stepNumber, 3);
+    assert.equal(p.stepMode, "max_thinking");
+  });
+
+  test("TR: plan ilerlemesi", () => {
+    const p = parseOrchestrationRequest("plan ilerlemesi");
+    assert.equal(p.intent, "plan_progress");
+  });
+
+  test("EN: what's next in the plan", () => {
+    const p = parseOrchestrationRequest("what's next in the plan");
+    assert.equal(p.intent, "plan_progress");
+  });
+
+  test("small job does not trigger orchestration", () => {
+    assert.equal(isOrchestrationTrigger("bu test neden fail oluyor"), false);
+    assert.equal(parseOrchestrationRequest("fix null guard in src/auth.ts").intent, "none");
+    assert.equal(parseOrchestrationRequest("refactor this function").intent, "none");
+  });
+
+  test("category-neutral — no sector-specific product names required", () => {
+    const p = parseOrchestrationRequest(
+      "faz faz götür, her adımı more düşün: veri katmanı migration",
+    );
+    assert.equal(p.intent, "create_plan");
+    assert.equal(p.stepMode, "more_thinking");
+    assert.doesNotMatch(p.taskDescription, /oyun|minecraft|tavus/i);
+  });
+
+  test("server instructions include orchestration NL hints", () => {
+    const tr = getServerInstructions("tr");
+    assert.match(tr, /ORKESTRASYON/);
+    assert.match(tr, /plan çıkar, her adımı max düşün/);
+    const en = getServerInstructions("en");
+    assert.match(en, /ORCHESTRATION/);
+    assert.match(en, /think each step in max mode/);
+    assert.match(formatOrchestrationNlHints("en"), /plan progress/);
   });
 });
 
