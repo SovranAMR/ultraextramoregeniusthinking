@@ -2,7 +2,7 @@ import type { ThinkingMode } from "../modes.js";
 import type { Locale } from "./index.js";
 import { passKey } from "./pass-plans.js";
 
-export type CreativePassTextEntry = { title: string; tasks: string[] };
+type CreativePassTextEntry = { title: string; tasks: string[] };
 
 const TR: Record<string, CreativePassTextEntry> = {
   "easy_thinking:1": {
@@ -364,7 +364,7 @@ const AR: Record<string, CreativePassTextEntry> = {
   },
 };
 
-export const CREATIVE_PASS_TEXTS: Record<Locale, Record<string, CreativePassTextEntry>> = {
+const CREATIVE_PASS_TEXTS: Record<Locale, Record<string, CreativePassTextEntry>> = {
   tr: TR,
   en: EN,
   de: DE,

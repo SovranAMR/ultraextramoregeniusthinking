@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T10:00:00.319Z",
-  "runCount": 40,
+  "lastRun": "2026-06-22T10:04:00.305Z",
+  "runCount": 41,
   "roadmapPhase": "ship",
   "roadmapDone": {
     "basiret": true,
@@ -16,11 +16,16 @@
     "e4_cli_mcp_config_test": true,
     "e5_npm_files_field": true,
     "e6_use_case_snippets": true,
-    "e7_locale_dead_code": false,
+    "e7_locale_dead_code": true,
     "e8_version_170": false
   },
-  "lastFocus": "E6: use-case snippets server instructions",
-  "lastFiles": ["src/thinking/locale/index.ts", "src/server.ts", "test/thinking-smoke.mjs"],
+  "lastFocus": "E7: locale dead export/key audit",
+  "lastFiles": [
+    "src/thinking/locale/index.ts",
+    "src/thinking/locale/pass-plans.ts",
+    "src/thinking/locale/creative-plans.ts",
+    "src/thinking/locale/analysis-plans.ts"
+  ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,

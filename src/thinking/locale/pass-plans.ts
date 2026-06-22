@@ -1,7 +1,7 @@
 import type { ThinkingMode } from "../modes.js";
 import type { Locale } from "./index.js";
 
-export type PassTextEntry = { title: string; tasks: string[] };
+type PassTextEntry = { title: string; tasks: string[] };
 
 export function passKey(mode: ThinkingMode, pass: number): string {
   return `${mode}:${pass}`;
@@ -559,7 +559,7 @@ const AR: Record<string, PassTextEntry> = {
   },
 };
 
-export const PASS_TEXTS: Record<Locale, Record<string, PassTextEntry>> = {
+const PASS_TEXTS: Record<Locale, Record<string, PassTextEntry>> = {
   tr: TR,
   en: EN,
   de: DE,
