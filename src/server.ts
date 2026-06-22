@@ -124,7 +124,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
     };
   }
 
-  if (validation.isMeta && !validation.valid) {
+  if (!validation.valid) {
     return {
       content: [
         {

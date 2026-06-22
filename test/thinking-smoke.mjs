@@ -301,6 +301,30 @@ describe("task kind & answer guard", () => {
     assert.equal(loaded.currentRound, 2);
   });
 
+  test("handleThinkNext RED when write pass lacks artifact reference", () => {
+    const s = createSession("Test write artifact", "easy_thinking", "tr");
+    submitAnswer(
+      s,
+      "test/foo.html için ilk taslak: 3 katman SVG yapısı, train feather ve ocellus planlandı.",
+    );
+
+    handleThinkNext(
+      s.id,
+      "test/foo.html okundu (476 satır). Eksik animasyon katmanı ve CSS gap tespit edildi.",
+    );
+
+    const noArtifact =
+      "Kod iyileştirildi, mantık hatası düzeltildi ve yapı netleştirildi.";
+    const result = handleThinkNext(s.id, noArtifact);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 3/);
+    assert.match(result.content[0].text, /artifact referansı yok/i);
+    assert.match(result.content[0].text, /think_next/i);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 2);
+  });
+
   test("handleThinkNext RED when meta log submitted", () => {
     const s = createSession("Test meta log", "easy_thinking", "tr");
     const firstAnswer =
