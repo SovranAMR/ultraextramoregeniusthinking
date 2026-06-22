@@ -303,6 +303,25 @@ describe("task kind & answer guard", () => {
     assert.match(d, /İlk Taslak/);
   });
 
+  test("analysis medium plan has no write passes", () => {
+    const plan = getPassPlan("medium_thinking", "analysis");
+    assert.equal(plan.length, 5);
+    assert.equal(
+      plan.some((p) => p.execution === "write"),
+      false,
+    );
+    assert.match(plan[2].title, /Kanıt|Mantık/i);
+    assert.match(plan[3].title, /Sentez/i);
+  });
+
+  test("analysis session uses read-heavy roadmap", () => {
+    const s = createSession("bu mimari kararın artı eksileri neler", "medium_thinking", "tr");
+    assert.equal(s.taskKind, "analysis");
+    const d = buildStartDirective(s);
+    assert.match(d, /analiz/i);
+    assert.doesNotMatch(d, /Uygulama/i);
+  });
+
   test("rejects meta log think_next answer", () => {
     const v = validatePassAnswer("Plan: dosyayı okuyacağım, eksikleri bulacağım.", 4, "read");
     assert.equal(v.isMeta, true);

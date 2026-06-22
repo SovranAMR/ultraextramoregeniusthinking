@@ -29,9 +29,13 @@ const EVALUATION_LENSES = new Set([
   "gap_logic",
   "code_logic_review",
   "deep_code_review",
+  "deep_evidence_review",
+  "evidence_review",
+  "synthesis",
   "counter_argument",
   "expert_panel",
   "internal_critique",
+  "actionable_conclusions",
 ]);
 
 export function getBasiretHint(taskKind: TaskKind, execution: ExecutionKind): string {

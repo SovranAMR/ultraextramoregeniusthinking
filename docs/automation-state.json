@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-06-22T08:52:00.282Z",
-  "runCount": 24,
-  "roadmapPhase": "product",
-  "roadmapDone": { "basiret": true, "i18n": true, "product": true },
+  "lastRun": "2026-06-22T08:56:00.353Z",
+  "runCount": 25,
+  "roadmapPhase": "polish",
+  "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": false },
   "fazAProgress": {
     "a1_basiret_module": true,
     "a2_prompts_wire": true,
@@ -24,14 +24,20 @@
     "c2_semver_banner": true,
     "c3_mcp_tool_schema_docs": true
   },
-  "lastFocus": "C3: MCP tool schema stabil dokümantasyon",
+  "fazDProgress": {
+    "d1_analysis_pass_plan": true,
+    "d2_analysis_detect_triggers": false,
+    "d3_polish_done": false
+  },
+  "lastFocus": "D1: analysis read/verify pass planı",
   "lastFiles": [
-    "src/mcp-tool-schema.ts",
-    "src/server.ts"
+    "src/thinking/task-kind.ts",
+    "src/thinking/locale/analysis-plans.ts",
+    "src/thinking/pass-focus.ts"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "Faz C tamam — polish fazına geçiş"
+  "nextRisk": "D2: analysis EN tetikleyicileri genişletme"
 }

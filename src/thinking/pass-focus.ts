@@ -1,5 +1,5 @@
 import type { ThinkingMode } from "./modes.js";
-import { getCreativePassPlan, type TaskKind } from "./task-kind.js";
+import { getCreativePassPlan, getAnalysisPassPlan, type TaskKind } from "./task-kind.js";
 import type { Locale } from "./locale/index.js";
 import { getPassText } from "./locale/pass-plans.js";
 
@@ -78,6 +78,9 @@ export function getPassPlan(
 ): PassFocus[] {
   if (taskKind === "creative") {
     return getCreativePassPlan(mode, locale);
+  }
+  if (taskKind === "analysis") {
+    return getAnalysisPassPlan(mode, locale);
   }
   return localizeSkeleton(mode, PASS_SKELETONS[mode], locale);
 }
