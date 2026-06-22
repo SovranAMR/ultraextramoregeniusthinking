@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -71,7 +72,7 @@ const SERVER_INSTRUCTIONS = [
   "- Meta log think_next'e gönderilirse MCP RED eder, pass ilerlemez.",
 ].join("\n");
 
-function handleThinkNext(sessionId: string, answer: string) {
+export function handleThinkNext(sessionId: string, answer: string) {
   const session = loadSession(sessionId);
   if (!session) {
     return {
@@ -271,7 +272,9 @@ async function main(): Promise<void> {
   console.error("ultra-thinking MCP v1.6.0 — stdio");
 }
 
-main().catch((err) => {
-  console.error("Fatal:", err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("Fatal:", err);
+    process.exit(1);
+  });
+}

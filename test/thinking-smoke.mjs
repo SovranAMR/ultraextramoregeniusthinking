@@ -18,6 +18,7 @@ import {
   validatePassAnswer,
   buildMetaRejectionMessage,
 } from "../dist/thinking/answer-guard.js";
+import { handleThinkNext } from "../dist/server.js";
 
 describe("thinking modes", () => {
   test("easy_thinking = 3 passes", () => {
@@ -269,20 +270,35 @@ describe("task kind & answer guard", () => {
     );
   });
 
-  test("stagnation rule flags identical long answers", () => {
-    const prev =
+  test("handleThinkNext RED when answer identical to previous pass", () => {
+    const s = createSession("Test stagnation", "easy_thinking", "tr");
+    const firstAnswer =
       "test/foo.html güncellendi (476 satır). 152 train feather, 3 katman eklendi.";
-    const duplicate = prev;
+    submitAnswer(s, firstAnswer);
+
+    const result = handleThinkNext(s.id, firstAnswer);
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /RED — Pass 2 cevabı öncekiyle aynı/);
+    assert.match(result.content[0].text, /Anti-stagnation/);
+
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 1);
+  });
+
+  test("handleThinkNext advances pass when answer improved", () => {
+    const s = createSession("Test stagnation ok", "easy_thinking", "tr");
+    const firstAnswer =
+      "test/foo.html güncellendi (476 satır). 152 train feather, 3 katman eklendi.";
+    submitAnswer(s, firstAnswer);
+
     const improved =
       "test/foo.html güncellendi (512 satır). 180 train feather, animasyon eklendi.";
+    const result = handleThinkNext(s.id, improved);
+    assert.notEqual(result.isError, true);
+    assert.match(result.content[0].text, /Pass 2\/3/);
 
-    const isStagnant = (prevAnswer, answer) =>
-      prevAnswer &&
-      answer.trim().length > 20 &&
-      prevAnswer.trim() === answer.trim();
-
-    assert.equal(isStagnant(prev, duplicate), true);
-    assert.equal(isStagnant(prev, improved), false);
+    const loaded = loadSession(s.id);
+    assert.equal(loaded.currentRound, 2);
   });
 
   test("meta rejection message is RED with resubmit guidance", () => {
