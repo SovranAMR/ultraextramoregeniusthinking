@@ -3,13 +3,14 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { THINKING_MODES } from "../thinking/modes.js";
+import { VERSION } from "../version.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = resolve(__dirname, "..", "..");
 const SERVER_PATH = join(PKG_ROOT, "dist", "server.js");
 
 function printHelp(): void {
-  console.log(`ultra-thinking — Ultra Extra More Genius Thinking MCP
+  console.log(`ultra-thinking v${VERSION} — Ultra Extra More Genius Thinking MCP
 
 Kullanım:
   ultra-thinking mcp-config [--print|--write] [--force]

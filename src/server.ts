@@ -28,6 +28,7 @@ import {
   buildStagnationRejectionMessage,
 } from "./thinking/answer-guard.js";
 import { detectLocale, getServerInstructions, resolveServerLocale } from "./thinking/locale/index.js";
+import { VERSION } from "./version.js";
 
 const MODE_SCHEMA = z.enum(MODE_ENUM);
 const SHORT_MODE_SCHEMA = z.enum(SHORT_MODE_ENUM);
@@ -160,7 +161,7 @@ async function main(): Promise<void> {
   const server = new McpServer(
     {
       name: "ultra-extra-more-genius-thinking",
-      version: "1.6.0",
+      version: VERSION,
     },
     { instructions: SERVER_INSTRUCTIONS },
   );
@@ -268,7 +269,7 @@ async function main(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("ultra-thinking MCP v1.6.0 — stdio");
+  console.error(`ultra-thinking MCP v${VERSION} — stdio`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
