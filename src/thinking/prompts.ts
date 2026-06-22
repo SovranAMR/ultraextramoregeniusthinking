@@ -33,7 +33,7 @@ function passFocusBlock(
   passNumber: number,
 ): string[] {
   const p = getPromptBundle(session.language);
-  const focus = getPassFocus(session.mode, passNumber, session.taskKind);
+  const focus = getPassFocus(session.mode, passNumber, session.taskKind, session.language);
   if (!focus) return [];
 
   const execution = focus.execution as ExecutionKindKey;
@@ -62,7 +62,7 @@ export function buildStartDirective(session: ThinkingSession): string {
   const p = getPromptBundle(session.language);
   const total = session.totalPasses;
   const cfg = THINKING_MODES[session.mode];
-  const focus = getPassFocus(session.mode, 1, session.taskKind);
+  const focus = getPassFocus(session.mode, 1, session.taskKind, session.language);
 
   return [
     `# ${modeLabel(session)} — Pass 1/${total}: ${focus?.title ?? p.firstDraftTitle}`,
@@ -75,7 +75,7 @@ export function buildStartDirective(session: ThinkingSession): string {
     p.executionLayerRule,
     ``,
     p.passRoadmapHeader,
-    formatPassRoadmap(session.mode, session.taskKind),
+    formatPassRoadmap(session.mode, session.taskKind, session.language),
     ``,
     ...passFocusBlock(session, 1),
     ``,
@@ -99,7 +99,7 @@ export function buildRefinementDirective(session: ThinkingSession): string {
   const total = session.totalPasses;
   const lastAnswer = session.rounds[session.rounds.length - 1]?.answer ?? "";
   const remaining = total - submittedPass;
-  const focus = getPassFocus(session.mode, nextPass, session.taskKind);
+  const focus = getPassFocus(session.mode, nextPass, session.taskKind, session.language);
 
   return [
     `# ${modeLabel(session)} — Pass ${nextPass}/${total}: ${focus?.title ?? p.refinementTitle}`,

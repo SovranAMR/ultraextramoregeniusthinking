@@ -1,11 +1,11 @@
 {
   "roadmapPhase": "i18n",
   "productScope": "code-first",
-  "lastRun": "2026-06-22T08:32:00.338Z",
-  "lastFocus": "pass direktifleri TR/EN/DE/AR locale bundle (prompts.ts)",
-  "lastFiles": ["src/thinking/locale/index.ts", "src/thinking/prompts.ts", "src/thinking/answer-guard.ts"],
+  "lastRun": "2026-06-22T08:36:00.295Z",
+  "lastFocus": "pass plan başlık/görev metinleri i18n (pass-plans.ts)",
+  "lastFiles": ["src/thinking/locale/pass-plans.ts", "src/thinking/pass-focus.ts", "src/thinking/prompts.ts"],
   "testsPass": true,
   "escalate": false,
-  "nextRisk": "Faz B — pass plan başlık/görev metinleri i18n (pass-focus.ts)",
-  "runCount": 18
+  "nextRisk": "Faz B — creative pass plan i18n (task-kind.ts)",
+  "runCount": 19
 }

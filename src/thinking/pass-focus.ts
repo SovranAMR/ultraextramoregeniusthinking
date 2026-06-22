@@ -1,5 +1,7 @@
 import type { ThinkingMode } from "./modes.js";
 import { getCreativePassPlan, type TaskKind } from "./task-kind.js";
+import type { Locale } from "./locale/index.js";
+import { getPassText } from "./locale/pass-plans.js";
 
 export type ExecutionKind = "none" | "read" | "write" | "verify";
 
@@ -11,272 +13,91 @@ export interface PassFocus {
   tasks: string[];
 }
 
-/** Agent workspace araçları — MCP'de write/read tool YOK, direktif agent'a gider */
-export const EXECUTION_HINTS: Record<ExecutionKind, string> = {
-  none: "Bu pass'te dosya değişikliği gerekmez — düşünme/cevap odaklı kal.",
-  read: [
-    "**Execution (agent):** Read / Grep / SemanticSearch ile gerçek dosyaları oku.",
-    "Kodu veya config'i hayal etme — diskten oku, sonra think_next çağır.",
-  ].join("\n"),
-  write: [
-    "**Execution (agent):** Write / StrReplace / Delete ile değişiklikleri uygula.",
-    "Mock, placeholder, TODO yasak — gerçek kod/dosya. Sonra think_next çağır.",
-  ].join("\n"),
-  verify: [
-    "**Execution (agent):** Shell ile test/build çalıştır (npm test, tsc, vb.).",
-    "Kırık bırakma. Değişen dosyaları final cevapta özetle.",
-  ].join("\n"),
+interface PassSkeleton {
+  pass: number;
+  lens: string;
+  execution: ExecutionKind;
+}
+
+const EASY_SKELETON: PassSkeleton[] = [
+  { pass: 1, lens: "draft", execution: "none" },
+  { pass: 2, lens: "gap_logic", execution: "read" },
+  { pass: 3, lens: "verify_final", execution: "verify" },
+];
+
+const MEDIUM_SKELETON: PassSkeleton[] = [
+  { pass: 1, lens: "draft", execution: "none" },
+  { pass: 2, lens: "gap_analysis", execution: "read" },
+  { pass: 3, lens: "code_logic_review", execution: "read" },
+  { pass: 4, lens: "implement", execution: "write" },
+  { pass: 5, lens: "verify_final", execution: "verify" },
+];
+
+const MORE_SKELETON: PassSkeleton[] = [
+  ...MEDIUM_SKELETON.slice(0, 4),
+  { pass: 5, lens: "counter_argument", execution: "read" },
+  { pass: 6, lens: "structure_ripple", execution: "write" },
+  { pass: 7, lens: "verify_final", execution: "verify" },
+];
+
+const MAX_SKELETON: PassSkeleton[] = [
+  { pass: 1, lens: "draft", execution: "none" },
+  { pass: 2, lens: "gap_analysis", execution: "read" },
+  { pass: 3, lens: "first_principles", execution: "read" },
+  { pass: 4, lens: "code_logic_review", execution: "read" },
+  { pass: 5, lens: "deep_code_review", execution: "read" },
+  { pass: 6, lens: "implement", execution: "write" },
+  { pass: 7, lens: "counter_argument", execution: "write" },
+  { pass: 8, lens: "expert_panel", execution: "read" },
+  { pass: 9, lens: "structure_actionable", execution: "write" },
+  { pass: 10, lens: "verify_final", execution: "verify" },
+];
+
+const PASS_SKELETONS: Record<ThinkingMode, PassSkeleton[]> = {
+  easy_thinking: EASY_SKELETON,
+  medium_thinking: MEDIUM_SKELETON,
+  more_thinking: MORE_SKELETON,
+  max_thinking: MAX_SKELETON,
 };
 
-const EASY_PASSES: PassFocus[] = [
-  {
-    pass: 1,
-    title: "İlk Taslak",
-    lens: "draft",
-    execution: "none",
-    tasks: [
-      "Soruya doğrudan, net, uygulanabilir ilk cevap ver.",
-      "Kod göreviyse: hangi dosyalar etkilenecek kısaca planla.",
-    ],
-  },
-  {
-    pass: 2,
-    title: "Eksik & Mantık Kontrolü",
-    lens: "gap_logic",
-    execution: "read",
-    tasks: [
-      "İlgili dosyaları Read/Grep ile oku — eksikleri gerçek koda göre bul.",
-      "Mantık hatalarını, çelişkileri düzelt — gerekirse Write/StrReplace ile uygula.",
-      "Kullanıcı isteğine sadık mı kontrol et.",
-    ],
-  },
-  {
-    pass: 3,
-    title: "Doğrulama & Final",
-    lens: "verify_final",
-    execution: "verify",
-    tasks: [
-      "Pass 2'deki düzeltmeleri Shell ile test/build et — kırık bırakma.",
-      "Eksik kod varsa Write/StrReplace ile tamamla, sonra tekrar doğrula.",
-      "Final cevap + değişen dosya listesi + test/build özeti.",
-    ],
-  },
-];
+function localizeSkeleton(
+  mode: ThinkingMode,
+  skeleton: PassSkeleton[],
+  locale: Locale,
+): PassFocus[] {
+  return skeleton.map((s) => {
+    const text = getPassText(locale, mode, s.pass);
+    return { ...s, title: text.title, tasks: text.tasks };
+  });
+}
 
-const MEDIUM_PASSES: PassFocus[] = [
-  {
-    pass: 1,
-    title: "İlk Taslak",
-    lens: "draft",
-    execution: "none",
-    tasks: [
-      "İlk cevabı ve temel planı ver.",
-      "Kod göreviyse etkilenecek dosyaları listele.",
-    ],
-  },
-  {
-    pass: 2,
-    title: "Eksik Analizi",
-    lens: "gap_analysis",
-    execution: "read",
-    tasks: [
-      "Read/Grep ile codebase'i tara — kullanıcı tam ne istiyor anla.",
-      "Atlanan adım, dosya, bağımlılık var mı bul.",
-    ],
-  },
-  {
-    pass: 3,
-    title: "Kod / Mantık Review",
-    lens: "code_logic_review",
-    execution: "read",
-    tasks: [
-      "Read/Grep ile gerçek kodu oku — bug, güvenlik, edge case, performans.",
-      "Kod yoksa mantık review: argüman zinciri, çıkarımlar.",
-      "Review sonucunu cevaba yansıt (meta değil, düzeltme).",
-    ],
-  },
-  {
-    pass: 4,
-    title: "Uygulama",
-    lens: "implement",
-    execution: "write",
-    tasks: [
-      "Write/StrReplace/Delete ile değişiklikleri uygula.",
-      "Yeni dosya oluştur, mevcut dosyayı düzenle veya sil — gerektiği gibi.",
-      "Mock/placeholder yasak. Sessiz self-review yap, sonucu koda yansıt.",
-    ],
-  },
-  {
-    pass: 5,
-    title: "Doğrulama & Final",
-    lens: "verify_final",
-    execution: "verify",
-    tasks: [
-      "Shell ile test/build çalıştır — kırık bırakma.",
-      "Risk, varsayım, bilinmeyenleri belirt.",
-      "Final cevap: net özet + değişen/oluşan dosya listesi.",
-    ],
-  },
-];
-
-const MORE_PASSES: PassFocus[] = [
-  ...MEDIUM_PASSES.slice(0, 4),
-  {
-    pass: 5,
-    title: "Karşı Argüman",
-    lens: "counter_argument",
-    execution: "read",
-    tasks: [
-      "Steel-man karşı argüman kur.",
-      "Read ile mevcut implementasyonu karşı argümanla test et.",
-      "Gerekirse Write ile düzelt.",
-    ],
-  },
-  {
-    pass: 6,
-    title: "Yapı & Etkiler",
-    lens: "structure_ripple",
-    execution: "write",
-    tasks: [
-      "Yapıyı optimize et — dosya organizasyonu, okunabilirlik.",
-      "İkinci derece etkileri hesapla, gerekirse kodu güncelle.",
-      "Edge case'leri koda yansıt.",
-    ],
-  },
-  {
-    pass: 7,
-    title: "Doğrulama & Final Sentez",
-    lens: "verify_final",
-    execution: "verify",
-    tasks: [
-      "Test/build çalıştır.",
-      "Tüm pass'lerin en iyi halini birleştir.",
-      "Final cevap + dosya değişiklik özeti.",
-    ],
-  },
-];
-
-const MAX_PASSES: PassFocus[] = [
-  {
-    pass: 1,
-    title: "İlk Taslak",
-    lens: "draft",
-    execution: "none",
-    tasks: ["İlk cevap, dosya planı."],
-  },
-  {
-    pass: 2,
-    title: "Eksik Analizi",
-    lens: "gap_analysis",
-    execution: "read",
-    tasks: ["Read/Grep ile codebase keşfi.", "Atlanan konuları bul."],
-  },
-  {
-    pass: 3,
-    title: "İlk Prensipler",
-    lens: "first_principles",
-    execution: "read",
-    tasks: ["Varsayımları sök.", "Read ile mevcut mimariyi doğrula."],
-  },
-  {
-    pass: 4,
-    title: "Kod / Mantık Review",
-    lens: "code_logic_review",
-    execution: "read",
-    tasks: ["Read/Grep ile kod review.", "Bug, güvenlik, edge case."],
-  },
-  {
-    pass: 5,
-    title: "Derin Kod Review",
-    lens: "deep_code_review",
-    execution: "read",
-    tasks: [
-      "Satır satır Read ile incele.",
-      "SSRF, auth, input validation, race condition.",
-    ],
-  },
-  {
-    pass: 6,
-    title: "Uygulama",
-    lens: "implement",
-    execution: "write",
-    tasks: [
-      "Write/StrReplace/Delete ile tüm değişiklikleri uygula.",
-      "İç muhakeme sessiz — şeytanın avukatı, sonucu koda yansıt.",
-    ],
-  },
-  {
-    pass: 7,
-    title: "Karşı Argüman & Alternatifler",
-    lens: "counter_argument",
-    execution: "write",
-    tasks: [
-      "Alternatif implementasyonları değerlendir.",
-      "Gerekirse kodu güncelle.",
-    ],
-  },
-  {
-    pass: 8,
-    title: "Uzman Paneli",
-    lens: "expert_panel",
-    execution: "read",
-    tasks: [
-      "Mühendis/güvenlik/ürün perspektifi — Read ile kodu tekrar oku.",
-      "Eksikleri Write ile kapat.",
-    ],
-  },
-  {
-    pass: 9,
-    title: "Yapı & Uygulanabilirlik",
-    lens: "structure_actionable",
-    execution: "write",
-    tasks: [
-      "Dosya yapısını optimize et.",
-      "Somut, uygulanabilir final kod hali.",
-    ],
-  },
-  {
-    pass: 10,
-    title: "Doğrulama & Final",
-    lens: "verify_final",
-    execution: "verify",
-    tasks: [
-      "Test, build, lint çalıştır.",
-      "Risk/bilinmeyen haritası.",
-      "Final cevap + tüm dosya değişiklikleri özeti.",
-    ],
-  },
-];
-
-const PASS_PLANS: Record<ThinkingMode, PassFocus[]> = {
-  easy_thinking: EASY_PASSES,
-  medium_thinking: MEDIUM_PASSES,
-  more_thinking: MORE_PASSES,
-  max_thinking: MAX_PASSES,
-};
-
-export function getPassPlan(mode: ThinkingMode, taskKind: TaskKind = "code"): PassFocus[] {
+export function getPassPlan(
+  mode: ThinkingMode,
+  taskKind: TaskKind = "code",
+  locale: Locale = "tr",
+): PassFocus[] {
   if (taskKind === "creative") {
     return getCreativePassPlan(mode);
   }
-  return PASS_PLANS[mode];
+  return localizeSkeleton(mode, PASS_SKELETONS[mode], locale);
 }
 
 export function getPassFocus(
   mode: ThinkingMode,
   passNumber: number,
   taskKind: TaskKind = "code",
+  locale: Locale = "tr",
 ): PassFocus | null {
-  const plan = getPassPlan(mode, taskKind);
+  const plan = getPassPlan(mode, taskKind, locale);
   return plan.find((p) => p.pass === passNumber) ?? null;
 }
 
-export function getExecutionHint(kind: ExecutionKind): string {
-  return EXECUTION_HINTS[kind];
-}
-
-export function formatPassRoadmap(mode: ThinkingMode, taskKind: TaskKind = "code"): string {
-  const plan = getPassPlan(mode, taskKind);
+export function formatPassRoadmap(
+  mode: ThinkingMode,
+  taskKind: TaskKind = "code",
+  locale: Locale = "tr",
+): string {
+  const plan = getPassPlan(mode, taskKind, locale);
   return plan
     .map((p) => {
       const exec =
@@ -291,19 +112,3 @@ export function formatPassRoadmap(mode: ThinkingMode, taskKind: TaskKind = "code
     })
     .join("\n");
 }
-
-export const EXECUTION_LAYER_RULE = [
-  "**Execution katmanı (kesin):**",
-  "- MCP dosya okumaz/yazmaz — agent workspace araçlarını kullanır.",
-  "- Read pass → Read/Grep/SemanticSearch",
-  "- Write pass → Write/StrReplace/Delete",
-  "- Verify pass → Shell (test/build)",
-  "- İç review sessiz kalır; kullanıcıya sadece sonuç ve dosya özeti gider.",
-].join("\n");
-
-export const ANTI_STAGNATION_RULE = [
-  "**Anti-stagnation (kesin):**",
-  "- Önceki pass ile aynı cevabı kopyala-yapıştır YASAK.",
-  "- Bu pass'in odağına göre EN AZ 1 somut iyileştirme zorunlu.",
-  "- Write pass'te gerçek dosya değişikliği yoksa pass başarısız sayılır.",
-].join("\n");

@@ -207,6 +207,8 @@ describe("thinking prompts", () => {
     assert.match(d, /Execution layer \(mandatory\)/);
     assert.match(d, /OUTPUT RULE \(mandatory\)/);
     assert.match(d, /Judgment \(adaptive\)/);
+    assert.match(d, /First Draft/);
+    assert.match(d, /Scan codebase with Read\/Grep/);
   });
 
   test("de refinement uses German next-step copy", () => {
@@ -257,6 +259,16 @@ describe("pass focus per mode", () => {
     assert.match(roadmap, /✏️ write/);
     assert.match(roadmap, /✓ verify/);
     assert.match(roadmap, /Pass 10/);
+  });
+
+  test("de medium pass 3 uses German code review title", () => {
+    const f = getPassFocus("medium_thinking", 3, "code", "de");
+    assert.ok(f);
+    assert.match(f.title, /Code-.*Review|Logik/i);
+    const s = createSession("warum schlägt dieser test fehl", "medium_thinking", "de");
+    const d = buildStartDirective(s);
+    assert.match(d, /Erster Entwurf/);
+    assert.match(d, /Codebase mit Read\/Grep scannen/);
   });
 
   test("start directive shows execution layer rule", () => {

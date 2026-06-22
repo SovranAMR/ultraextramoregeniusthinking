@@ -141,7 +141,7 @@ export function handleThinkNext(sessionId: string, answer: string) {
   }
 
   const nextPassNumber = session.currentRound + 1;
-  const focus = getPassFocus(session.mode, nextPassNumber, session.taskKind);
+  const focus = getPassFocus(session.mode, nextPassNumber, session.taskKind, session.language);
   const execution = focus?.execution ?? "none";
 
   const validation = validatePassAnswer(answer, nextPassNumber, execution);
