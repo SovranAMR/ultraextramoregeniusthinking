@@ -322,6 +322,33 @@ describe("task kind & answer guard", () => {
     assert.doesNotMatch(d, /Uygulama/i);
   });
 
+  test("detects analysis task from EN architectural decision phrasing", () => {
+    assert.equal(
+      detectTaskKind("analyze the architectural decision for event sourcing vs CRUD"),
+      "analysis",
+    );
+    assert.equal(
+      detectTaskKind("should we choose CQRS or traditional layering for this domain"),
+      "analysis",
+    );
+    assert.equal(
+      detectTaskKind("weigh the advantages and disadvantages of blue-green deployment"),
+      "analysis",
+    );
+  });
+
+  test("EN analysis session uses read-heavy roadmap", () => {
+    const s = createSession(
+      "think in medium mode: pros and cons of monolith vs microservices",
+      "medium_thinking",
+      "en",
+    );
+    assert.equal(s.taskKind, "analysis");
+    const d = buildStartDirective(s);
+    assert.match(d, /analysis/i);
+    assert.doesNotMatch(d, /Implement/i);
+  });
+
   test("rejects meta log think_next answer", () => {
     const v = validatePassAnswer("Plan: dosyayı okuyacağım, eksikleri bulacağım.", 4, "read");
     assert.equal(v.isMeta, true);

@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-06-22T08:56:00.353Z",
-  "runCount": 25,
+  "lastRun": "2026-06-22T09:02:00.000Z",
+  "runCount": 26,
   "roadmapPhase": "polish",
   "roadmapDone": { "basiret": true, "i18n": true, "product": true, "polish": false },
   "fazAProgress": {
@@ -26,18 +26,17 @@
   },
   "fazDProgress": {
     "d1_analysis_pass_plan": true,
-    "d2_analysis_detect_triggers": false,
+    "d2_analysis_detect_triggers": true,
     "d3_polish_done": false
   },
-  "lastFocus": "D1: analysis read/verify pass planı",
+  "lastFocus": "D2: analysis EN tetikleyicileri genişletme",
   "lastFiles": [
     "src/thinking/task-kind.ts",
-    "src/thinking/locale/analysis-plans.ts",
-    "src/thinking/pass-focus.ts"
+    "test/thinking-smoke.mjs"
   ],
   "testsPass": true,
   "escalate": false,
   "guardPhaseComplete": true,
   "productScope": "code-first",
-  "nextRisk": "D2: analysis EN tetikleyicileri genişletme"
+  "nextRisk": "D3: polish fazı kapanışı"
 }

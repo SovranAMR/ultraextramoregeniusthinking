@@ -13,7 +13,7 @@ const CODE_RE =
   /\b(kod|refactor|bug|fix|api|typescript|javascript|python|fonksiyon|class|migrate|implement|dosya oluştur|yaz ve düzelt)\b/i;
 
 const ANALYSIS_RE =
-  /\b(analiz|artı eksileri|karşılaştır|değerlendir|mimari karar|trade-?off|pros and cons|compare|evaluate|why should|hangisi daha|tercih etmeli)\b/i;
+  /\b(analiz|analysis|analyze|analyse|artı eksileri|advantages and disadvantages|strengths and weaknesses|karşılaştır|compare|değerlendir|evaluate|assess|mimari karar|architectural decision|trade-?offs?|pros and cons|why should|which is better|should we choose|hangisi daha|tercih etmeli|weigh (?:the )?options|cost-?benefit|impact analysis|versus|\bvs\.?\b)\b/i;
 
 /** Görsel görevde yanlışlıkla code planına düşüren zayıf sinyaller (dosya oluştur, implement vb.) */
 const STRONG_CODE_RE =
